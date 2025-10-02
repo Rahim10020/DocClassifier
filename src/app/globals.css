@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --primary: #6366f1;
+    --primary-gradient: #8b5cf6;
+    --secondary: #1e293b;
+    --muted: #475569;
+    --accent: #818cf8;
+    --destructive: #ef4444;
+    --border: #334155;
+    --input: #1e293b;
+    --ring: #6366f1;
+}
+
+[data-mode="dark"] {
+    color-scheme: dark;
+}
+
+body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Geist', 'Inter', sans-serif;
+}
+
+.glass {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-card {
+    background-color: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
