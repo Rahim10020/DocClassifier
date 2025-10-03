@@ -14,7 +14,7 @@ interface DetailsPageProps {
 export default async function DetailsPage({ params }: DetailsPageProps) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-        return <div>Unauthorized</div>;
+        return <div>Non autorisé</div>;
     }
 
     const classification = await getClassificationById(params.classificationId);

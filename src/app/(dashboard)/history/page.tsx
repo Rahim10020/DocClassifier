@@ -23,7 +23,7 @@ import { FileText, Calendar, CheckCircle, Files } from 'lucide-react';
 export default async function HistoryPage({ searchParams }: { searchParams: { page?: string; status?: string; search?: string } }) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-        return <div>Unauthorized</div>;
+        return <div>Non autorisé</div>;
     }
 
     const page = parseInt(searchParams.page || '1', 10);
@@ -127,6 +127,6 @@ async function fetchClassifications(userId: string, filters: { page: number; sta
         return await res.json();
     } catch (error) {
         console.error('Error fetching classifications:', error);
-        throw new Error('Unable to load classifications. Please try again later.');
+        throw new Error('Impossible de charger les classifications. Veuillez réessayer plus tard.');
     }
 }
