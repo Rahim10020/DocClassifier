@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
@@ -16,7 +16,6 @@ export default function LoginForm() {
         resolver: zodResolver(loginSchema),
     });
     const [loading, setLoading] = useState(false);
-    const { toast } = useToast();
 
     const onSubmit = async (data: LoginFormData) => {
         setLoading(true);
@@ -29,7 +28,7 @@ export default function LoginForm() {
         setLoading(false);
 
         if (result?.error) {
-            toast({ title: 'Error', description: result.error, variant: 'destructive' });
+            toast.error(result.error);
         } else {
             window.location.href = '/dashboard';
         }

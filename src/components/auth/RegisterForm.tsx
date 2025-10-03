@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
 export default function RegisterForm() {
@@ -15,7 +15,6 @@ export default function RegisterForm() {
         resolver: zodResolver(registerSchema),
     });
     const [loading, setLoading] = useState(false);
-    const { toast } = useToast();
 
     const onSubmit = async (data: RegisterFormData) => {
         setLoading(true);
@@ -29,9 +28,9 @@ export default function RegisterForm() {
 
         if (!response.ok) {
             const error = await response.json();
-            toast({ title: 'Error', description: error.error, variant: 'destructive' });
+            toast.error(error.error);
         } else {
-            toast({ title: 'Success', description: 'Account created! Please sign in.' });
+            toast.success('Account created! Please sign in.');
             window.location.href = '/login';
         }
     };
