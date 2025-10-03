@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/authOptions';
 import prisma from '@/lib/db/prisma';
+import { ClassificationStatus } from '@/types/classification';
 
 export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = req.url;
+    const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = 10;
     const status = searchParams.get('status');
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     const where = {
         userId: session.user.id,
-        ...(status && status !== 'all' ? { status } : {}),
+        ...(status && status !== 'all' ? { status: status as ClassificationStatus } : {}),
         ...(search ? { name: { contains: search } } : {}), // Adjust for file names if needed
     };
 
