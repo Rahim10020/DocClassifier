@@ -2,7 +2,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Upload, FolderArchive } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils/cn';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db/prisma';
 import { ClassificationWithDocuments } from '@/types/classification';

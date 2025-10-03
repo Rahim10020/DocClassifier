@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import RegisterForm from '@/components/auth/RegisterForm';
 import Link from 'next/link';
-import { cn } from '@/lib/utils/cn';
 
 export const metadata: Metadata = {
     title: 'Register - DocClassifier',
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background-dark to-background-secondary animate-fade-in">
+        <div className="min-h-screen flex items-center justify-center">
             <div className="glass-card p-8 rounded-lg shadow-pronounced max-w-md w-full space-y-8">
                 <div className="text-center">
                     <img src="/images/logo.svg" alt="DocClassifier" className="mx-auto h-12 w-auto" />
