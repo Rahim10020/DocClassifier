@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import { useHistory } from './useHistory';
 import type { Classification } from '@/types/classification';
 import type { CategoryNode } from '@/types/category';
 
@@ -11,15 +10,15 @@ interface UseClassificationProps {
 
 export function useClassification({ initialClassification, initialStructure }: UseClassificationProps) {
     const { toast } = useToast();
-    const { current: structure, push, undo, redo, canUndo, canRedo } = useHistory<CategoryNode[]>({ initialState: initialStructure });
+    const [structure, setStructure] = useState<CategoryNode[]>(initialStructure);
     const [classification, setClassification] = useState(initialClassification);
     const [isDirty, setIsDirty] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
     const updateStructure = useCallback((newStructure: CategoryNode[]) => {
-        push(newStructure);
+        setStructure(newStructure);
         setIsDirty(true);
-    }, [push]);
+    }, []);
 
     const renameCategory = (id: string, newName: string) => {
         // Implement recursive rename in tree
@@ -195,9 +194,5 @@ export function useClassification({ initialClassification, initialStructure }: U
         moveDocument,
         save,
         validate,
-        undo,
-        redo,
-        canUndo,
-        canRedo,
     };
 }

@@ -1,7 +1,6 @@
 import {
     LayoutDashboard,
     Upload,
-    History,
     Settings,
     FileText,
     FolderOpen,
@@ -28,12 +27,6 @@ export const mainNavItems = [
         href: '/upload',
         icon: Upload,
         description: 'Upload new documents for classification',
-    },
-    {
-        title: 'History',
-        href: '/history',
-        icon: History,
-        description: 'View and manage your classification history',
     },
     {
         title: 'Review',
@@ -91,7 +84,6 @@ export const userMenuItems = [
 export const breadcrumbLabels: Record<string, string> = {
     '/dashboard': 'Dashboard',
     '/upload': 'Upload Documents',
-    '/history': 'Classification History',
     '/profile': 'Profile Settings',
     '/settings': 'Settings',
     '/help': 'Help & Support',
@@ -132,13 +124,6 @@ export const quickActions = [
         color: 'primary' as const,
     },
     {
-        title: 'View History',
-        href: '/history',
-        icon: History,
-        description: 'Browse past classifications',
-        color: 'secondary' as const,
-    },
-    {
         title: 'Review Pending',
         href: '/review',
         icon: FileText,
@@ -173,7 +158,6 @@ export const navGroups = {
 export const routePermissions: Record<string, string[]> = {
     '/dashboard': ['user', 'admin'],
     '/upload': ['user', 'admin'],
-    '/history': ['user', 'admin'],
     '/review': ['user', 'admin'],
     '/profile': ['user', 'admin'],
     '/admin': ['admin'],

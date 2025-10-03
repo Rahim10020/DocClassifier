@@ -11,7 +11,6 @@ export async function middleware(request: NextRequest) {
         '/dashboard',
         '/upload',
         '/review',
-        '/history',
         '/profile',
     ];
 

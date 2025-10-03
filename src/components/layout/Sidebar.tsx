@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 const navItems = [
     { name: 'Tableau de bord', href: '/dashboard', icon: Home },
     { name: 'Télécharger', href: '/upload', icon: Upload },
-    { name: 'Historique', href: '/history', icon: FolderArchive },
     { name: 'Profil', href: '/profile', icon: User },
 ];
 

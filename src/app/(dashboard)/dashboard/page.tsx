@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Upload, FolderArchive, TrendingUp, Files, HardDrive } from 'lucide-react';
+import { FileText, Upload, TrendingUp, Files, HardDrive } from 'lucide-react';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db/prisma';
@@ -64,21 +64,15 @@ export default async function DashboardPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                        { 
-                            label: 'Télécharger Documents', 
-                            href: '/upload', 
+                        {
+                            label: 'Télécharger Documents',
+                            href: '/upload',
                             icon: Upload,
                             description: 'Téléchargez et classez vos documents'
                         },
-                        { 
-                            label: 'Historique', 
-                            href: '/history', 
-                            icon: FolderArchive,
-                            description: 'Consultez vos classifications précédentes'
-                        },
-                        { 
-                            label: 'Réviser Classifications', 
-                            href: '/review', 
+                        {
+                            label: 'Réviser Classifications',
+                            href: '/review',
                             icon: FileText,
                             description: 'Examinez et validez vos classifications'
                         },
@@ -108,9 +102,9 @@ export default async function DashboardPage() {
                     <p className="text-muted-foreground">Vos dernières activités de classification</p>
                 </div>
                 {recentClassifications.length === 0 ? (
-                    <EmptyState 
-                        title="Aucune Classification Récente" 
-                        description="Commencez par télécharger quelques documents pour voir vos classifications ici !" 
+                    <EmptyState
+                        title="Aucune Classification Récente"
+                        description="Commencez par télécharger quelques documents pour voir vos classifications ici !"
                     />
                 ) : (
                     <div className="space-y-4">
@@ -128,8 +122,8 @@ export default async function DashboardPage() {
                                             </p>
                                         </div>
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/history/${classification.id}`}>
-                                                Voir Détails
+                                            <Link href={`/review/${classification.id}`}>
+                                                Réviser
                                             </Link>
                                         </Button>
                                     </div>

@@ -96,14 +96,6 @@ export function WelcomeBanner({
                             <Upload className="w-4 h-4 mr-2" />
                             Upload Documents
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => handleQuickAction('view-history')}
-                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                        >
-                            <FileText className="w-4 h-4 mr-2" />
-                            View History
-                        </Button>
                     </div>
                 </div>
 
