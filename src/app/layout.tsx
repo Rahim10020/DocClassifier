@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { SessionProvider } from 'next-auth/react';
-import { Toaster } from '@/components/ui/use-toast';
+import { Providers } from './providers.tsx';
 import './globals.css';
 import { cn } from '@/lib/utils/cn';
 
@@ -25,10 +24,9 @@ export default function RootLayout({
                     inter.variable
                 )}
             >
-                <SessionProvider>
+                <Providers>
                     {children}
-                    <Toaster />
-                </SessionProvider>
+                </Providers>
             </body>
         </html>
     );

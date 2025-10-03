@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getToken } from 'next-auth/jwt';
 import { authOptions } from '@/lib/auth/auth.config';
 
 export async function middleware(request: NextRequest) {
-    const session = await getServerSession(authOptions);
+    // Use getToken for better edge runtime compatibility in NextAuth v4
+    const token = await getToken({ req: request, secret: authOptions.secret });
 
     const protectedPaths = [
         '/dashboard',
@@ -18,7 +19,7 @@ export async function middleware(request: NextRequest) {
         request.nextUrl.pathname.startsWith(path)
     );
 
-    if (isProtected && !session?.user) {
+    if (isProtected && !token) {
         const url = request.nextUrl.clone();
         url.pathname = '/login';
         url.searchParams.set('callbackUrl', request.nextUrl.pathname);
