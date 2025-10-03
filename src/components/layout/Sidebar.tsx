@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Upload, FolderArchive, User } from 'lucide-react';
+import { Home, Upload, FolderArchive, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Upload', href: '/upload', icon: Upload },
-    { name: 'History', href: '/history', icon: FolderArchive },
-    { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Tableau de bord', href: '/dashboard', icon: Home },
+    { name: 'Télécharger', href: '/upload', icon: Upload },
+    { name: 'Historique', href: '/history', icon: FolderArchive },
+    { name: 'Profil', href: '/profile', icon: User },
 ];
 
 export default function Sidebar() {
@@ -20,52 +21,68 @@ export default function Sidebar() {
     return (
         <aside
             className={cn(
-                'glass-card h-screen sticky top-0 p-4 transition-all duration-300',
+                'glass-card h-screen sticky top-0 p-4 transition-all duration-300 border-r border-border/40',
                 isCollapsed ? 'w-16' : 'w-64'
             )}
         >
-            <div className="flex items-center mb-8">
-                <img
-                    src="/images/logo.svg"
-                    alt="DocClassifier"
-                    className={cn('h-8', isCollapsed && 'hidden')}
-                />
-                <button
+            {/* Logo et bouton de collapse */}
+            <div className="flex items-center justify-between mb-8">
+                <div className={cn('flex items-center space-x-2', isCollapsed && 'hidden')}>
+                    <img
+                        src="/images/logo.svg"
+                        alt="DocClassifier"
+                        className="h-8 w-8"
+                    />
+                    <span className="font-bold text-lg">DocClassifier</span>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="ml-auto p-2 hover:bg-background-secondary rounded"
+                    className="p-2 hover:bg-background/50 rounded-lg"
                 >
-                    <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d={isCollapsed ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12'}
-                        />
-                    </svg>
-                </button>
+                    {isCollapsed ? (
+                        <ChevronRight className="h-4 w-4" />
+                    ) : (
+                        <ChevronLeft className="h-4 w-4" />
+                    )}
+                </Button>
             </div>
+
+            {/* Navigation */}
             <nav className="space-y-2">
                 {navItems.map((item) => (
                     <Link
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            'flex items-center p-2 rounded-lg transition-colors',
+                            'flex items-center p-3 rounded-lg transition-all duration-200 group',
                             pathname === item.href
-                                ? 'bg-gradient-to-r from-primary to-primary-gradient text-white'
-                                : 'hover:bg-background-secondary text-muted-foreground'
+                                ? 'bg-gradient-to-r from-primary to-primary-gradient text-white shadow-lg'
+                                : 'hover:bg-background/50 text-muted-foreground hover:text-foreground'
                         )}
                     >
-                        <item.icon className="h-5 w-5 mr-3" />
-                        {!isCollapsed && <span>{item.name}</span>}
+                        <item.icon className={cn('h-5 w-5 flex-shrink-0', !isCollapsed && 'mr-3')} />
+                        {!isCollapsed && (
+                            <span className="font-medium">{item.name}</span>
+                        )}
+                        {isCollapsed && (
+                            <div className="absolute left-full ml-2 px-2 py-1 bg-background border rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                <span className="text-sm font-medium">{item.name}</span>
+                            </div>
+                        )}
                     </Link>
                 ))}
             </nav>
+
+            {/* Informations supplémentaires */}
+            {!isCollapsed && (
+                <div className="mt-8 p-4 bg-background/30 rounded-lg border border-border/40">
+                    <p className="text-xs text-muted-foreground text-center">
+                        Version 1.0.0
+                    </p>
+                </div>
+            )}
         </aside>
     );
 }

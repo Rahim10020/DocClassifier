@@ -8,11 +8,15 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     await requireAuth();
 
     return (
-        <div className="min-h-screen flex bg-gradient-to-br from-background-dark to-background-secondary">
+        <div className="min-h-screen flex bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             <Sidebar />
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-1 p-6 overflow-auto">{children}</main>
+                <main className="flex-1 overflow-auto">
+                    <div className="container mx-auto px-6 py-8 max-w-7xl">
+                        {children}
+                    </div>
+                </main>
             </div>
         </div>
     );
