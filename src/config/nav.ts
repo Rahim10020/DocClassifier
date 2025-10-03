@@ -14,66 +14,37 @@ import {
  * Navigation configuration for the application
  */
 
-// Main navigation items for the sidebar
+// Main navigation items - simplified for SaaS interface
 export const mainNavItems = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutDashboard,
-        description: 'Overview of your classifications and recent activity',
-    },
-    {
-        title: 'Upload',
+        title: 'Télécharger',
         href: '/upload',
         icon: Upload,
-        description: 'Upload new documents for classification',
+        description: 'Télécharger et classifier vos documents',
     },
     {
-        title: 'Review',
-        href: '/review',
-        icon: FileText,
-        description: 'Review and validate classification results',
-    },
-] as const;
-
-// Secondary navigation items (bottom of sidebar)
-export const secondaryNavItems = [
-    {
-        title: 'Profile',
+        title: 'Profil',
         href: '/profile',
         icon: Settings,
-        description: 'Manage your account settings',
-    },
-    {
-        title: 'Help & Support',
-        href: '/help',
-        icon: HelpCircle,
-        description: 'Get help and contact support',
+        description: 'Gérer vos paramètres de compte',
     },
 ] as const;
 
-// User menu items (dropdown in header)
+// Secondary navigation items - simplified
+export const secondaryNavItems = [] as const;
+
+// User menu items (dropdown in header) - simplified
 export const userMenuItems = [
     {
-        title: 'Profile',
+        title: 'Profil',
         href: '/profile',
         icon: Settings,
-    },
-    {
-        title: 'Settings',
-        href: '/settings',
-        icon: Settings,
-    },
-    {
-        title: 'Help',
-        href: '/help',
-        icon: HelpCircle,
     },
     {
         separator: true,
     },
     {
-        title: 'Sign Out',
+        title: 'Déconnexion',
         href: '/logout',
         icon: LogOut,
         variant: 'destructive' as const,
@@ -164,10 +135,10 @@ export const routePermissions: Record<string, string[]> = {
     '/settings': ['admin'],
 } as const;
 
-// Default redirect paths based on user role
+// Default redirect paths based on user role - redirect to upload for SaaS interface
 export const defaultRedirects: Record<string, string> = {
-    user: '/dashboard',
-    admin: '/dashboard',
+    user: '/upload',
+    admin: '/upload',
     guest: '/login',
 } as const;
 

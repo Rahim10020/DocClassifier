@@ -1,138 +1,106 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Upload, TrendingUp, Files, HardDrive } from 'lucide-react';
+import { Upload, FileText, ArrowRight, CheckCircle, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth/session';
-import prisma from '@/lib/db/prisma';
-import { ClassificationWithDocuments } from '@/types/classification';
-import EmptyState from '@/components/common/EmptyState';
-import StatsCard from '@/components/dashboard/StatsCard';
-import { QuickActions } from '@/components/dashboard/QuickActions';
 
-export default async function DashboardPage() {
+export default async function HomePage() {
     const user = await getCurrentUser();
     if (!user) return null;
 
-    const recentClassifications = await prisma.classification.findMany({
-        where: { userId: user.id },
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: { documents: true },
-    }) as ClassificationWithDocuments[];
-
-    const totalClassifications = await prisma.classification.count({ where: { userId: user.id } });
-    const totalDocuments = await prisma.documentMetadata.count({ where: { classification: { userId: user.id } } });
-
     return (
-        <div className="space-y-8">
-            {/* En-tête de bienvenue */}
-            <div className="text-center space-y-2">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary-gradient bg-clip-text text-transparent">
-                    Bonjour, {user.name || user.email} 👋
+        <div className="space-y-12">
+            {/* Hero Section */}
+            <div className="text-center space-y-6 py-12">
+                <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
+                    <Zap className="h-4 w-4" />
+                    <span>Classification automatique de documents</span>
+                </div>
+
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary-gradient bg-clip-text text-transparent leading-tight">
+                    Téléchargez vos documents<br />
+                    <span className="text-foreground">et laissez-nous faire le reste</span>
                 </h1>
-                <p className="text-muted-foreground text-lg">
-                    Gérez vos documents et classifications avec facilité
+
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    Notre système d'intelligence artificielle classe automatiquement vos documents
+                    avec une précision exceptionnelle. Simple, rapide et efficace.
                 </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                    <Button asChild size="lg" className="text-lg px-8 py-6">
+                        <Link href="/upload">
+                            <Upload className="mr-2 h-5 w-5" />
+                            Commencer maintenant
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
+                    </Button>
+
+                    <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+                        <Link href="/profile">
+                            <FileText className="mr-2 h-5 w-5" />
+                            Voir mon profil
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
-            {/* Statistiques */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatsCard
-                    title="Classifications Totales"
-                    value={totalClassifications}
-                    icon={TrendingUp}
-                    trend={12}
-                />
-                <StatsCard
-                    title="Documents Traités"
-                    value={totalDocuments}
-                    icon={Files}
-                    trend={8}
-                />
-                <StatsCard
-                    title="Espace Utilisé"
-                    value="0 MB"
-                    icon={HardDrive}
-                />
-            </section>
+            {/* Features Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8">
+                <Card className="text-center p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <CardContent className="space-y-4">
+                        <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Upload className="h-8 w-8 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-semibold">Téléchargement Simple</h3>
+                        <p className="text-muted-foreground">
+                            Glissez-déposez vos fichiers ou cliquez pour sélectionner.
+                            Support de tous les formats populaires.
+                        </p>
+                    </CardContent>
+                </Card>
 
-            {/* Actions rapides */}
-            <section className="space-y-6">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Quick Actions</h2>
-                    <p className="text-muted-foreground">Quickly access the main features</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                        {
-                            label: 'Télécharger Documents',
-                            href: '/upload',
-                            icon: Upload,
-                            description: 'Téléchargez et classez vos documents'
-                        },
-                        {
-                            label: 'Réviser Classifications',
-                            href: '/review',
-                            icon: FileText,
-                            description: 'Examinez et validez vos classifications'
-                        },
-                    ].map((action) => (
-                        <Card key={action.href} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                            <CardHeader className="text-center pb-4">
-                                <div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                                    <action.icon className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle className="text-lg">{action.label}</CardTitle>
-                                <p className="text-sm text-muted-foreground">{action.description}</p>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                                <Button asChild className="w-full" variant="outline">
-                                    <Link href={action.href}>Commencer</Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </section>
+                <Card className="text-center p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <CardContent className="space-y-4">
+                        <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                            <CheckCircle className="h-8 w-8 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-semibold">Classification Automatique</h3>
+                        <p className="text-muted-foreground">
+                            Notre IA analyse et classe vos documents avec précision.
+                            Pas besoin d'intervention manuelle.
+                        </p>
+                    </CardContent>
+                </Card>
 
-            {/* Classifications récentes */}
-            <section className="space-y-6">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Classifications Récentes</h2>
-                    <p className="text-muted-foreground">Vos dernières activités de classification</p>
-                </div>
-                {recentClassifications.length === 0 ? (
-                    <EmptyState
-                        title="Aucune Classification Récente"
-                        description="Commencez par télécharger quelques documents pour voir vos classifications ici !"
-                    />
-                ) : (
-                    <div className="space-y-4">
-                        {recentClassifications.map((classification) => (
-                            <Card key={classification.id} className="hover:shadow-md transition-shadow">
-                                <CardContent className="p-6">
-                                    <div className="flex justify-between items-center">
-                                        <div className="space-y-1">
-                                            <h3 className="text-lg font-semibold">
-                                                Classification #{classification.id.slice(0, 8)}
-                                            </h3>
-                                            <p className="text-muted-foreground">
-                                                {classification.totalDocuments} documents • Créé le{' '}
-                                                {new Date(classification.createdAt).toLocaleDateString('fr-FR')}
-                                            </p>
-                                        </div>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/review/${classification.id}`}>
-                                                Réviser
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </section>
+                <Card className="text-center p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <CardContent className="space-y-4">
+                        <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                            <FileText className="h-8 w-8 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-semibold">Résultats Instantanés</h3>
+                        <p className="text-muted-foreground">
+                            Recevez vos classifications en quelques secondes.
+                            Téléchargez vos résultats organisés.
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center py-12 bg-gradient-to-r from-primary/5 to-primary-gradient/5 rounded-2xl border border-primary/10">
+                <h2 className="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
+                <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
+                    Rejoignez des milliers d'utilisateurs qui font confiance à notre plateforme
+                    pour la classification automatique de leurs documents.
+                </p>
+                <Button asChild size="lg" className="text-lg px-12 py-6">
+                    <Link href="/upload">
+                        <Upload className="mr-2 h-5 w-5" />
+                        Télécharger mes documents
+                    </Link>
+                </Button>
+            </div>
         </div>
     );
 }

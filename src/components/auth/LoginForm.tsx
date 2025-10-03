@@ -31,7 +31,7 @@ export default function LoginForm() {
         if (result?.error) {
             toast.error(result.error);
         } else {
-            window.location.href = '/dashboard';
+            window.location.href = '/upload';
         }
     };
 

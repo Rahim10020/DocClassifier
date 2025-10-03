@@ -13,7 +13,16 @@ import { z } from 'zod';
 type FormData = z.infer<typeof updateProfileSchema>;
 
 interface ProfileFormProps {
-    user: User;
+    user: {
+        image: string | null | undefined;
+        id: string;
+        email: string;
+        name: string | null | undefined;
+        password: string;
+        createdAt: Date;
+        emailVerified: Date | null;
+        updatedAt: Date;
+    };
 }
 
 export default function ProfileForm({ user }: ProfileFormProps) {
