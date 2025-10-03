@@ -1,13 +1,12 @@
 import type { Config } from 'tailwindcss';
-import animate from 'tailwindcss-animate';
 
 const config: Config = {
-    darkMode: ['class', '[data-mode="dark"]'],
     content: [
         './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
         './src/components/**/*.{js,ts,jsx,tsx,mdx}',
         './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     ],
+    darkMode: ['class', '[data-mode="dark"]'],
     theme: {
         extend: {
             colors: {
@@ -19,13 +18,17 @@ const config: Config = {
                     dark: '#0f172a',
                     secondary: '#1e293b',
                 },
-            },
-            typography: {
-                DEFAULT: {
-                    css: {
-                        fontFamily: 'Geist, Inter, sans-serif',
-                    },
+                muted: {
+                    foreground: '#475569',
                 },
+                accent: '#818cf8',
+                destructive: '#ef4444',
+                border: '#334155',
+                input: '#1e293b',
+                ring: '#6366f1',
+            },
+            fontFamily: {
+                sans: ['Geist', 'Inter', 'sans-serif'],
             },
             spacing: {
                 'generous': '2rem',
@@ -53,22 +56,7 @@ const config: Config = {
         },
     },
     plugins: [
-        animate,
-        function ({ addUtilities }) {
-            addUtilities({
-                '.glass': {
-                    'background-color': 'rgba(255, 255, 255, 0.1)',
-                    'backdrop-filter': 'blur(10px)',
-                    'border': '1px solid rgba(255, 255, 255, 0.18)',
-                },
-                '.glass-card': {
-                    'background-color': 'rgba(30, 41, 59, 0.8)', // slate-800 with opacity
-                    'backdrop-filter': 'blur(12px)',
-                    'border': '1px solid rgba(255, 255, 255, 0.1)',
-                    'box-shadow': '0 4px 30px rgba(0, 0, 0, 0.1)',
-                },
-            });
-        },
+        require('tailwindcss-animate'),
     ],
 };
 
