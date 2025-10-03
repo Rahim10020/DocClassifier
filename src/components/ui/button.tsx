@@ -50,7 +50,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 className={buttonClasses}
                 ref={ref}
                 {...props}
-            />
+            >
+                {children}
+            </button>
         );
     }
 );

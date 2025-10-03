@@ -9,13 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import toast from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginForm() {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
     });
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const onSubmit = async (data: LoginFormData) => {
         setLoading(true);
@@ -43,7 +44,25 @@ export default function LoginForm() {
             </div>
             <div>
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" {...register('password')} className="mt-1" />
+                <div className="relative mt-1">
+                    <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        {...register('password')}
+                        className="pr-10"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                        {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        ) : (
+                            <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        )}
+                    </button>
+                </div>
                 {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password.message}</p>}
             </div>
             <Button type="submit" disabled={loading} className="w-full">
