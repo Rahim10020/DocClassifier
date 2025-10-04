@@ -22,7 +22,7 @@ export default function SimpleHeader() {
 
     return (
         <header className="sticky top-0 z-50 glass-card border-b border-border/40 backdrop-blur-xl">
-            <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+            <div className="flex items-center justify-between px-6 py-2 max-w-6xl mx-auto">
                 {/* Logo */}
                 <img
                     src="/images/docClassifier.png"

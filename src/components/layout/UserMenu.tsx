@@ -15,7 +15,7 @@ export default function UserMenu() {
 
     return (
         <div className="glass-card p-1 rounded-full">
-            <div className="h-8 w-8 flex items-center justify-center bg-primary text-white rounded-full">
+            <div className="h-9 w-9 flex items-center justify-center bg-primary text-white rounded-full">
                 {user?.image ? (
                     <img src={user.image} alt="Avatar" className="h-full w-full rounded-full" />
                 ) : (
