@@ -2,13 +2,11 @@ import ProfileForm from '@/components/profile/ProfileForm';
 import PasswordForm from '@/components/profile/PasswordForm';
 import DeleteAccount from '@/components/profile/DeleteAccount';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Lock, Trash2 } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth.config';
 import { getUserById } from '@/lib/db/queries/users';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 
 export default async function ProfilePage() {
     const session = await getServerSession(authOptions);
