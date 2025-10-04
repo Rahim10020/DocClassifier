@@ -1,5 +1,4 @@
 import {
-    LayoutDashboard,
     Upload,
     Settings,
     FileText,
@@ -53,7 +52,6 @@ export const userMenuItems = [
 
 // Breadcrumb configuration
 export const breadcrumbLabels: Record<string, string> = {
-    '/dashboard': 'Dashboard',
     '/upload': 'Upload Documents',
     '/profile': 'Profile Settings',
     '/settings': 'Settings',
@@ -85,7 +83,7 @@ export const footerLinks = [
     },
 ] as const;
 
-// Quick action items for dashboard
+// Quick action items for upload page
 export const quickActions = [
     {
         title: 'Upload Documents',
@@ -127,7 +125,6 @@ export const navGroups = {
 
 // Route access permissions (for role-based access control)
 export const routePermissions: Record<string, string[]> = {
-    '/dashboard': ['user', 'admin'],
     '/upload': ['user', 'admin'],
     '/review': ['user', 'admin'],
     '/profile': ['user', 'admin'],

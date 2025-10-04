@@ -49,7 +49,7 @@ export default async function ProfilePage() {
                 <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                         <Lock className="h-5 w-5" />
-                        <span>Sécurité</span>
+                        <span>Security</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">

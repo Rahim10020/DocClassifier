@@ -8,7 +8,6 @@ export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request, secret: authOptions.secret });
 
     const protectedPaths = [
-        '/dashboard',
         '/upload',
         '/review',
         '/profile',

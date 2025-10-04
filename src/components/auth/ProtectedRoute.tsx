@@ -196,7 +196,7 @@ interface GuestRouteProps {
 
 export function GuestRoute({
     children,
-    redirectTo = '/dashboard',
+    redirectTo = '/upload',
 }: GuestRouteProps) {
     const { data: session, status } = useSession();
     const router = useRouter();

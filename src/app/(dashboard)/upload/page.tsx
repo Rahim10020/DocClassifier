@@ -30,10 +30,10 @@ export default function UploadPage() {
                     <h1 className="text-3xl font-bold animate-fade-in">Upload Documents</h1>
                     <p className="text-muted-foreground mt-2">Drag and drop your files or click to select</p>
                 </div>
-                <Link href="/dashboard">
+                <Link href="/profile">
                     <Button variant="outline">
                         <FolderOpen className="mr-2 h-4 w-4" />
-                        Back to Dashboard
+                        Back to Profile
                     </Button>
                 </Link>
             </div>

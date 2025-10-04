@@ -16,7 +16,7 @@ export default function Home() {
                         saving you time and effort.
                     </p>
                     <Button asChild size="lg" className="animate-slide-in">
-                        <Link href="/dashboard">Get Started</Link>
+                        <Link href="/upload">Get Started</Link>
                     </Button>
                 </div>
             </section>

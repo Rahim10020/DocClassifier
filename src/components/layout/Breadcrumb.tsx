@@ -11,7 +11,7 @@ export default function Breadcrumb() {
 
     return (
         <nav className="flex items-center space-x-2 text-sm">
-            <Link href="/dashboard" className="flex items-center hover:text-primary">
+            <Link href="/upload" className="flex items-center hover:text-primary">
                 <Home className="h-4 w-4 mr-1" />
                 <span className="hidden md:inline">Home</span>
             </Link>
