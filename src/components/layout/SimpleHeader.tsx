@@ -25,9 +25,9 @@ export default function SimpleHeader() {
             <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
                 {/* Logo */}
                 <img
-                    src="/images/docclassifier.png"
+                    src="/images/docClassifier.png"
                     alt="DocClassifier"
-                    className="h-8 w-32"
+                    className="h-9 w-42"
                 />
                 <div className="flex items-center space-x-4">
                     {/* Navigation desktop */}
