@@ -25,15 +25,9 @@ export default async function ProfilePage() {
         <div className="max-w-4xl mx-auto space-y-8">
             {/* En-tête */}
             <div className="flex items-center space-x-4">
-                <Link href="/upload">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Retour au téléchargement
-                    </Button>
-                </Link>
                 <div>
-                    <h1 className="text-3xl font-bold">Paramètres du profil</h1>
-                    <p className="text-muted-foreground">Gérez vos informations personnelles</p>
+                    <h1 className="text-3xl font-bold">Settings</h1>
+                    <p className="text-muted-foreground">Manage your personal information</p>
                 </div>
             </div>
 
@@ -42,7 +36,7 @@ export default async function ProfilePage() {
                 <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                         <User className="h-5 w-5" />
-                        <span>Informations personnelles</span>
+                        <span>Personal information</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
