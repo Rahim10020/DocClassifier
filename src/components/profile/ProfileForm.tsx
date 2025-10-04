@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import type { User } from '@/types/user';
 import { z } from 'zod';
 
 type FormData = z.infer<typeof updateProfileSchema>;

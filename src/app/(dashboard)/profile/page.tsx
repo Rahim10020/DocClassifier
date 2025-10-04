@@ -32,8 +32,7 @@ export default async function ProfilePage() {
             {/* Informations du profil */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <User className="h-5 w-5" />
+                    <CardTitle>
                         <span>Personal information</span>
                     </CardTitle>
                 </CardHeader>
