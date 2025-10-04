@@ -29,50 +29,52 @@ export default function SimpleHeader() {
                     alt="DocClassifier"
                     className="h-8 w-32"
                 />
+                <div className="flex items-center space-x-4">
+                    {/* Navigation desktop */}
+                    <nav className="hidden md:flex items-center space-x-4">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href;
+                            const isSignOut = item.action === 'signout';
+                            
+                            if (isSignOut) {
+                                return (
+                                    <button
+                                        key={item.name}
+                                        onClick={handleSignOut}
+                                        className={cn(
+                                            "flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors hover:text-primary",
+                                            "relative group"
+                                        )}
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        <span>{item.name}</span>
+                                    </button>
+                                );
+                            }
 
-                {/* Navigation desktop */}
-                <nav className="hidden md:flex items-center space-x-6">
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        const isSignOut = item.action === 'signout';
-                        
-                        if (isSignOut) {
                             return (
-                                <button
-                                    key={item.name}
-                                    onClick={handleSignOut}
-                                    className={cn(
+                                <Link key={item.href} href={item.href}>
+                                    <div className={cn(
                                         "flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors hover:text-primary",
                                         "relative group"
-                                    )}
-                                >
-                                    <item.icon className="h-4 w-4" />
-                                    <span>{item.name}</span>
-                                </button>
+                                    )}>
+                                        <item.icon className="h-4 w-4" />
+                                        <span>{item.name}</span>
+                                        {isActive && (
+                                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                                        )}
+                                    </div>
+                                </Link>
                             );
-                        }
+                        })}
+                    </nav>
 
-                        return (
-                            <Link key={item.href} href={item.href}>
-                                <div className={cn(
-                                    "flex items-center space-x-2 px-3 py-2 text-sm font-medium transition-colors hover:text-primary",
-                                    "relative group"
-                                )}>
-                                    <item.icon className="h-4 w-4" />
-                                    <span>{item.name}</span>
-                                    {isActive && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-                                    )}
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                {/* Menu utilisateur */}
-                <div className="flex items-center space-x-4">
-                    <UserMenu />
+                    {/* Menu utilisateur */}
+                    <div className="flex items-center space-x-4">
+                        <UserMenu />
+                    </div>
                 </div>
+                
             </div>
 
             {/* Navigation mobile */}
