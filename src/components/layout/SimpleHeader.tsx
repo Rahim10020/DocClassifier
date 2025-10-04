@@ -17,7 +17,7 @@ export default function SimpleHeader() {
     const pathname = usePathname();
 
     const handleSignOut = () => {
-        signOut({ callbackUrl: '/login' });
+        signOut({ callbackUrl: '/' });
     };
 
     return (
