@@ -2,14 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Upload, User, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 import UserMenu from '@/components/layout/UserMenu';
 import { signOut } from 'next-auth/react';
 
 const navItems = [
-    { name: 'Télécharger', href: '/upload', icon: Upload },
     { name: 'Profil', href: '/profile', icon: User },
     { name: 'Déconnexion', href: '#', icon: LogOut, action: 'signout' },
 ];
