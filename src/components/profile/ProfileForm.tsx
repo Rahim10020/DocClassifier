@@ -14,13 +14,13 @@ type FormData = z.infer<typeof updateProfileSchema>;
 
 interface ProfileFormProps {
     user: {
-        image: string | null | undefined;
+        image?: string | null;
         id: string;
         email: string;
-        name: string | null | undefined;
+        name?: string | null;
         password: string;
         createdAt: Date;
-        emailVerified: Date | null;
+        emailVerified?: Date | null;
         updatedAt: Date;
     };
 }
