@@ -22,26 +22,8 @@ export default function SimpleHeader() {
                 <img
                     src="/images/docclassifier.png"
                     alt="DocClassifier"
-                    className="h-8 w-64"
+                    className="h-8 w-32"
                 />
-
-                {/* Navigation principale */}
-                <nav className="hidden md:flex items-center space-x-1">
-                    {navItems.map((item) => (
-                        <Link key={item.href} href={item.href}>
-                            <Button
-                                variant={pathname === item.href ? "default" : "ghost"}
-                                className={cn(
-                                    "flex items-center space-x-2 px-4 py-2",
-                                    pathname === item.href && "bg-primary text-white"
-                                )}
-                            >
-                                <item.icon className="h-4 w-4" />
-                                <span>{item.name}</span>
-                            </Button>
-                        </Link>
-                    ))}
-                </nav>
 
                 {/* Menu utilisateur */}
                 <div className="flex items-center space-x-4">
