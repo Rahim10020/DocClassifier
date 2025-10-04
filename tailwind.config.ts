@@ -28,7 +28,7 @@ const config: Config = {
                 ring: '#6366f1',
             },
             fontFamily: {
-                sans: ['Geist', 'Inter', 'sans-serif'],
+                sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
             },
             spacing: {
                 'generous': '2rem',
