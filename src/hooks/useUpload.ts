@@ -41,7 +41,7 @@ export function useUpload() {
         setProgress(0);
     }, []);
 
-    const uploadFiles = useCallback(async (): Promise<ApiResponse<{ classificationId: string; sessionId: string }>> => {
+    const uploadFiles = useCallback(async (): Promise<ApiResponse<{ classificationId: string; sessionId: string; totalFiles: number }>> => {
         if (files.length === 0 || uploading) return { success: false, error: 'No files to upload' };
 
         setUploading(true);
@@ -49,8 +49,10 @@ export function useUpload() {
 
         const formData = new FormData();
         files.forEach((fileInfo, index) => {
-            const file = new File([], fileInfo.filename); // Placeholder, actual files need to be stored
-            // Note: In real impl, store actual File objects in state
+            // Note: This is a placeholder implementation
+            // In a real implementation, you would need to store the actual File objects
+            // and retrieve them here to create the FormData properly
+            const file = new File([], fileInfo.filename);
             formData.append('files', file, fileInfo.originalName);
         });
 
@@ -60,7 +62,7 @@ export function useUpload() {
                 body: formData,
             });
 
-            const data = await response.json() as ApiResponse<{ classificationId: string; sessionId: string }>;
+            const data = await response.json() as ApiResponse<{ classificationId: string; sessionId: string; totalFiles: number }>;
 
             if (data.success) {
                 setProgress(100);

@@ -35,7 +35,7 @@ export default function SimpleHeader() {
                         {navItems.map((item) => {
                             const isActive = pathname === item.href;
                             const isSignOut = item.action === 'signout';
-                            
+
                             if (isSignOut) {
                                 return (
                                     <button
@@ -74,7 +74,7 @@ export default function SimpleHeader() {
                         <UserMenu />
                     </div>
                 </div>
-                
+
             </div>
 
             {/* Navigation mobile */}

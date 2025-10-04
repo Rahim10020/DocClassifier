@@ -8,8 +8,6 @@ import UploadSummary from '@/components/upload/UploadSummary';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { File, FolderOpen } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
@@ -18,8 +16,8 @@ export default function UploadPage() {
 
     const handleStartClassification = async () => {
         const result = await uploadFiles();
-        if (result?.classificationId) {
-            router.push(`/review/${result.classificationId}`);
+        if (result?.data?.classificationId) {
+            router.push(`/review/${result.data.classificationId}`);
         }
     };
 
@@ -30,12 +28,6 @@ export default function UploadPage() {
                     <h1 className="text-3xl font-bold animate-fade-in">Upload Documents</h1>
                     <p className="text-muted-foreground mt-2">Drag and drop your files or click to select</p>
                 </div>
-                <Link href="/profile">
-                    <Button variant="outline">
-                        <FolderOpen className="mr-2 h-4 w-4" />
-                        Back to Profile
-                    </Button>
-                </Link>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -49,7 +41,7 @@ export default function UploadPage() {
                     {files.length > 0 && !uploading && (
                         <UploadSummary
                             fileCount={files.length}
-                            totalSize={files.reduce((sum, file) => sum + file.size, 0)}
+                            totalSize={files.reduce((sum, file) => sum + file.fileSize, 0)}
                             onClear={clearFiles}
                         />
                     )}
