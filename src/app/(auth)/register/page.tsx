@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="glass-card p-8 rounded-lg shadow-pronounced max-w-md w-full space-y-8">
+        <div className="flex items-center justify-center">
+            <div className="p-5 rounded-lg shadow-pronounced max-w-md w-full space-y-8">
                 <div className="text-center">
                     <h2 className="mt-6 text-3xl font-bold text-primary">Create a new account</h2>
                 </div>
@@ -17,7 +17,7 @@ export default function RegisterPage() {
                 <p className="text-center text-sm text-muted-foreground">
                     Already have an account?{' '}
                     <Link href="/login" className="text-primary hover:underline">
-                        Sign in
+                        Log in
                     </Link>
                 </p>
             </div>
