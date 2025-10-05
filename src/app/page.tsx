@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, FolderTree, Download, Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Footer } from '@/components/layout/Footer';
 
 export default function Home() {
     const { isAuthenticated, loading } = useAuth();
@@ -96,6 +97,9 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* Footer */}
+            <Footer />
         </div>
     );
 }
