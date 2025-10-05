@@ -1,8 +1,34 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, FolderTree, Download, Zap } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Home() {
+    const { isAuthenticated, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && isAuthenticated) {
+            router.push('/upload');
+        }
+    }, [isAuthenticated, loading, router]);
+
+    // Show loading or redirect if authenticated
+    if (loading || isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-background-dark to-background-secondary flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-background-dark to-background-secondary">
             {/* Fixed Header */}
@@ -16,9 +42,11 @@ export default function Home() {
                     />
                     {/* Action Buttons */}
                     <div className="flex items-center space-x-3">
-                        <Button asChild variant="outline" size="sm" className="rounded-full">
-                            <Link href="/login">Log in</Link>
-                        </Button>
+                        {!isAuthenticated && (
+                            <Button asChild variant="outline" size="sm" className="rounded-full">
+                                <Link href="/login">Log in</Link>
+                            </Button>
+                        )}
                         <Button asChild size="sm" className="rounded-full">
                             <Link href="/upload">Get Started</Link>
                         </Button>

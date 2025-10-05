@@ -1,0 +1,1 @@
+- verifier le temps de chargement pour voir si on peut l'ameliorer.
