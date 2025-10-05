@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FileText, FolderTree, Download, Zap } from 'lucide-react';
-import UserMenu from '@/components/layout/UserMenu';
 
 export default function Home() {
     return (
@@ -15,9 +14,14 @@ export default function Home() {
                         alt="DocClassifier"
                         className="h-9 w-42"
                     />
-                    {/* User Menu */}
-                    <div className="flex items-center">
-                        <UserMenu />
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-3">
+                        <Button asChild variant="outline" size="sm" className="rounded-full">
+                            <Link href="/login">Log in</Link>
+                        </Button>
+                        <Button asChild size="sm" className="rounded-full">
+                            <Link href="/upload">Get Started</Link>
+                        </Button>
                     </div>
                 </div>
             </header>
@@ -31,9 +35,6 @@ export default function Home() {
                         DocClassifier uses intelligent algorithms to automatically categorize your documents,
                         saving you time and effort.
                     </p>
-                    <Button asChild size="lg" className="animate-slide-in">
-                        <Link href="/upload">Get Started</Link>
-                    </Button>
                 </div>
             </section>
 
