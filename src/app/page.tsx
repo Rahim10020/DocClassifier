@@ -1,12 +1,28 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FileText, FolderTree, Download, Zap } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import UserMenu from '@/components/layout/UserMenu';
 
 export default function Home() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-background-dark to-background-secondary">
-            <section className="py-20 text-center animate-fade-in">
+            {/* Fixed Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/40 backdrop-blur-xl">
+                <div className="flex items-center justify-between px-6 py-2 max-w-6xl mx-auto">
+                    {/* Logo */}
+                    <img
+                        src="/images/docClassifier.png"
+                        alt="DocClassifier"
+                        className="h-9 w-42"
+                    />
+                    {/* User Menu */}
+                    <div className="flex items-center">
+                        <UserMenu />
+                    </div>
+                </div>
+            </header>
+
+            <section className="py-20 text-center animate-fade-in pt-24">
                 <div className="container mx-auto px-4">
                     <h1 className="text-5xl font-bold text-primary mb-6">
                         Organize Your Documents with Ease
