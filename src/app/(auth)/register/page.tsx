@@ -11,7 +11,6 @@ export default function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center">
             <div className="glass-card p-8 rounded-lg shadow-pronounced max-w-md w-full space-y-8">
                 <div className="text-center">
-                    <img src="/images/logo.svg" alt="DocClassifier" className="mx-auto h-12 w-auto" />
                     <h2 className="mt-6 text-3xl font-bold text-primary">Create a new account</h2>
                 </div>
                 <RegisterForm />
