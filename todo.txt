@@ -1,1 +1,4 @@
 - verifier le temps de chargement pour voir si on peut l'ameliorer.
+- voir si un message de d'information s'affiche apres la creation de compte. si c'est pas le cas, faire en sorte que 
+    ca s'affiche.
+- coder ma page d'accueil comme celle de logogenie.
