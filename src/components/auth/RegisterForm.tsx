@@ -40,11 +40,6 @@ export default function RegisterForm() {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-                <Label htmlFor="name">Name (optional)</Label>
-                <Input id="name" type="text" {...register('name')} className="mt-1" />
-                {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>}
-            </div>
-            <div>
                 <Label htmlFor="email">Email address</Label>
                 <Input id="email" type="email" {...register('email')} className="mt-1" />
                 {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>}
