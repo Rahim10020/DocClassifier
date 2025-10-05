@@ -24,11 +24,13 @@ export default function SimpleHeader() {
         <header className="sticky top-0 z-50 glass-card border-b border-border/40 backdrop-blur-xl">
             <div className="flex items-center justify-between px-6 py-2 max-w-6xl mx-auto">
                 {/* Logo */}
-                <img
-                    src="/images/docClassifier.png"
-                    alt="DocClassifier"
-                    className="h-9 w-42"
-                />
+                <Link href="/">
+                    <img
+                        src="/images/docClassifier.png"
+                        alt="DocClassifier"
+                        className="h-9 w-42 cursor-pointer"
+                    />
+                </Link>
                 <div className="flex items-center space-x-4">
                     {/* Navigation desktop */}
                     <nav className="hidden md:flex items-center space-x-4">
