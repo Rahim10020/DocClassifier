@@ -4,15 +4,17 @@ import { authOptions } from '@/lib/auth/authOptions';
 import prisma from '@/lib/db/prisma';
 import { TempStorage } from '@/lib/storage/tempStorage'; // Assume
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
+
     try {
         const classification = await prisma.classification.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: { documents: true },
         });
         if (!classification || classification.userId !== session.user.id) {
@@ -24,22 +26,24 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
+
     try {
-        const classification = await prisma.classification.findUnique({ where: { id: params.id } });
+        const classification = await prisma.classification.findUnique({ where: { id } });
         if (!classification || classification.userId !== session.user.id) {
             return NextResponse.json({ error: 'Not found' }, { status: 404 });
         }
 
-        await prisma.classification.delete({ where: { id: params.id } });
+        await prisma.classification.delete({ where: { id } });
         // Cleanup temp
-        const tempStorage = new TempStorage(session.id);
-        tempStorage.cleanupClassification(params.id); // Assume method
+        const tempStorage = new TempStorage(session.user.id);
+        await tempStorage.cleanup(id);
 
         return NextResponse.json({ success: true });
     } catch (error) {

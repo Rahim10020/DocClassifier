@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import CategoryTree from '@/components/review/CategoryTree';
 import DocumentPreview from '@/components/review/DocumentPreview';
 import ClassificationStats from '@/components/review/ClassificationStats';
@@ -14,23 +14,7 @@ import DownloadButton from '@/components/common/DownloadButton';
 import { CategoryNode } from '@/types/category';
 import { TreeNode } from '@/types/tree';
 import { DocumentMetadata } from '@/types/document';
-
-// Import the Classification type from the queries file
-interface Classification {
-    id: string;
-    userId: string;
-    sessionId: string;
-    status: 'PROCESSING' | 'READY' | 'VALIDATED' | 'DOWNLOADED' | 'EXPIRED';
-    proposedStructure: any;
-    finalStructure?: any;
-    totalDocuments: number;
-    totalSize: bigint;
-    createdAt: Date;
-    processedAt?: Date;
-    validatedAt?: Date;
-    downloadedAt?: Date;
-    expiresAt?: Date;
-}
+import { Classification } from '@/types/classification';
 
 interface ReviewPageClientProps {
     classification: Classification;
@@ -72,13 +56,71 @@ export default function ReviewPageClient({
     };
 
     const [isValidated, setIsValidated] = useState(classification.status === 'VALIDATED');
+    const [isProcessing, setIsProcessing] = useState(classification.status === 'PROCESSING');
+    const [processingProgress, setProcessingProgress] = useState(0);
+
+    // Poll for classification status updates when processing
+    useEffect(() => {
+        if (!isProcessing) return;
+
+        const pollStatus = async () => {
+            try {
+                const response = await fetch(`/api/classification/${classificationId}`);
+                if (response.ok) {
+                    const updatedClassification = await response.json();
+                    if (updatedClassification.status !== 'PROCESSING') {
+                        setIsProcessing(false);
+                        setProcessingProgress(100);
+                        // Reload the page to get updated data
+                        window.location.reload();
+                    } else {
+                        // Estimate progress based on time elapsed
+                        const elapsed = Date.now() - new Date(classification.createdAt).getTime();
+                        const estimatedProgress = Math.min((elapsed / 30000) * 100, 90); // Max 30 seconds, 90% progress
+                        setProcessingProgress(estimatedProgress);
+                    }
+                }
+            } catch (error) {
+                console.error('Error polling classification status:', error);
+            }
+        };
+
+        const interval = setInterval(pollStatus, 2000); // Poll every 2 seconds
+        return () => clearInterval(interval);
+    }, [isProcessing, classificationId, classification.createdAt]);
 
     const { DndContextProvider } = useDragDrop({ onMoveDocument: () => { } });
     const {
         structure,
         isDirty,
         isSaving,
-    } = useClassification({ initialClassification: classification, initialStructure: categoryNodes });
+    } = useClassification({ initialClassification: classification as any, initialStructure: categoryNodes });
+
+    // Show processing state if classification is still processing
+    if (isProcessing) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen space-y-6">
+                <LoadingSpinner />
+                <div className="text-center space-y-2">
+                    <h2 className="text-2xl font-semibold">Classification en cours...</h2>
+                    <p className="text-muted-foreground">
+                        Analyse et traitement de vos documents ({Math.round(processingProgress)}%)
+                    </p>
+                </div>
+                <div className="w-64">
+                    <div className="bg-gray-200 rounded-full h-3">
+                        <div
+                            className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                            style={{ width: `${processingProgress}%` }}
+                        ></div>
+                    </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                    Cette opération peut prendre quelques minutes selon le nombre de fichiers.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <Suspense fallback={<LoadingSpinner />}>

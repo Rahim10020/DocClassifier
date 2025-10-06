@@ -19,15 +19,28 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     // Parse proposedStructure with proper fallback structure
     let proposedStructure;
     try {
-        proposedStructure = JSON.parse(classification.proposedStructure || '{"categories": []}');
+        const structureToParse = classification.proposedStructure && String(classification.proposedStructure).trim() !== ''
+            ? classification.proposedStructure
+            : '{"categories": []}';
+        proposedStructure = JSON.parse(structureToParse);
     } catch (error) {
         console.warn('Failed to parse proposedStructure:', error);
         proposedStructure = { categories: [] };
     }
 
+    // Ensure all optional fields are properly typed for the client component
+    const clientClassification = {
+        ...classification,
+        finalStructure: classification.finalStructure ?? null,
+        processedAt: classification.processedAt ?? null,
+        validatedAt: classification.validatedAt ?? null,
+        downloadedAt: classification.downloadedAt ?? null,
+        expiresAt: classification.expiresAt ?? null,
+    };
+
     return (
         <ReviewPageClient
-            classification={classification}
+            classification={clientClassification}
             documents={documents}
             proposedStructure={proposedStructure}
             classificationId={classificationId}

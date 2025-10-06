@@ -47,11 +47,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Create classification
-        const classificationData: ClassificationCreateInput = {
+        const classificationData = {
             userId: user.id,
             sessionId,
-            status: 'PROCESSING',
-            proposedStructure: JSON.stringify([]), // Empty initial
+            status: 'PROCESSING' as const,
+            proposedStructure: [] as any, // Empty initial structure
             totalDocuments: validFiles.length,
             totalSize: BigInt(totalSize),
         };
@@ -59,6 +59,37 @@ export async function POST(request: NextRequest) {
         const classification = await prisma.classification.create({
             data: classificationData,
         });
+
+        // Trigger classification processing asynchronously
+        try {
+            // Create document records first
+            const documentPromises = validFiles.map(async (file) => {
+                const filename = `${Date.now()}-${file.name}`;
+                return prisma.documentMetadata.create({
+                    data: {
+                        classificationId: classification.id,
+                        filename,
+                        originalName: file.name,
+                        mimeType: file.type,
+                        fileSize: file.size,
+                    },
+                });
+            });
+
+            await Promise.all(documentPromises);
+
+            // Trigger classification processing in background
+            const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+            fetch(`${baseUrl}/api/classification/${classification.id}/process`, {
+                method: 'POST',
+            }).catch(error => {
+                console.error('Background classification processing failed:', error);
+            });
+
+        } catch (error) {
+            console.error('Error setting up classification processing:', error);
+            // Don't fail the upload if processing setup fails
+        }
 
         return NextResponse.json({
             success: true,

@@ -5,7 +5,8 @@ import prisma from '@/lib/db/prisma';
 import { extractText } from '@/lib/classifier/textExtractor';
 import { classifyDocuments } from '@/lib/classifier/categorizer';
 import { getClassificationById, updateClassification } from '@/lib/db/queries/classifications';
-import { bulkCreateDocuments } from '@/lib/db/queries/documents';
+import { TempStorage } from '@/lib/storage/tempStorage';
+import path from 'path';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     try {
@@ -20,13 +21,21 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             return NextResponse.json({ error: 'Classification not found or unauthorized' }, { status: 404 });
         }
 
-        // Assume documents are already uploaded and have filepaths and mimeTypes in DB or temp storage
-        // For simplicity, fetch documents from DB or temp; here pseudo-code
-        const documents = await prisma.document.findMany({ where: { classificationId } }); // Adjust model
+        // Fetch documents from database
+        const documents = await prisma.documentMetadata.findMany({ where: { classificationId } });
+
+        // Create temp storage instance to access files
+        const classificationData = await getClassificationById(classificationId);
+        if (!classificationData?.sessionId) {
+            throw new Error('Session ID not found for classification');
+        }
+
+        const storage = new TempStorage(classificationData.sessionId);
 
         for (const doc of documents) {
-            const text = await extractText(doc.filepath, doc.mimeType);
-            await prisma.document.update({
+            const filePath = path.join(storage.getBasePath(), doc.filename);
+            const text = await extractText(filePath, doc.mimeType);
+            await prisma.documentMetadata.update({
                 where: { id: doc.id },
                 data: { extractedText: text },
             });
@@ -35,21 +44,25 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         const docTexts = documents.map((doc) => ({ id: doc.id, text: doc.extractedText || '' }));
         const result = classifyDocuments(docTexts);
 
-        const proposedStructure = JSON.stringify(result); // Or structured format
+        const proposedStructure = result; // Keep as structured object
 
         await updateClassification(classificationId, {
             status: 'READY',
             proposedStructure,
         });
 
-        // Create metadata; assume bulkCreateDocuments handles it
-        await bulkCreateDocuments(result.documents.map((doc) => ({
-            // Map to DB schema
-            classificationId,
-            documentId: doc.id,
-            confidence: doc.confidence,
-            // etc.
-        })));
+        // Update documents with classification results
+        for (const category of result.categories) {
+            for (const doc of category.documents) {
+                await prisma.documentMetadata.update({
+                    where: { id: doc.id },
+                    data: {
+                        categoryName: category.name,
+                        confidence: (doc as any).confidence,
+                    },
+                });
+            }
+        }
 
         return NextResponse.json({ classification: { ...classification, proposedStructure } });
     } catch (error) {
