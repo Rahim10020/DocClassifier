@@ -1,12 +1,26 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { siteConfig } from '@/config/site';
 import { fileSchema } from '@/lib/validators/uploadSchemas';
 import { UploadedFile } from '@/types/document';
 import { ApiResponse } from '@/types/api';
 
-export function useUpload() {
+type UploadContextValue = {
+    files: UploadedFile[];
+    uploading: boolean;
+    progress: number;
+    addFiles: (files: File[]) => void;
+    removeFile: (index: number) => void;
+    clearFiles: () => void;
+    uploadFiles: () => Promise<ApiResponse<{ classificationId: string; sessionId: string; totalFiles: number }>>;
+    validateFile: (file: File) => boolean;
+    isValid: boolean;
+};
+
+const UploadContext = createContext<UploadContextValue | null>(null);
+
+export function UploadProvider({ children }: { children: React.ReactNode }) {
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -22,18 +36,23 @@ export function useUpload() {
 
     const addFiles = useCallback((newFiles: File[]) => {
         const validNewFiles = newFiles.filter(validateFile);
-        setFiles((prev) => [...prev, ...validNewFiles.map((f) => ({
-            originalName: f.name,
-            filename: `${Date.now()}-${f.name}`,
-            fileSize: f.size,
-            mimeType: f.type,
-            status: 'pending' as const,
-            progress: 0,
-        }))]);
+        if (validNewFiles.length === 0) return;
+        setFiles((previousFiles) => [
+            ...previousFiles,
+            ...validNewFiles.map((file) => ({
+                file,
+                originalName: file.name,
+                filename: `${Date.now()}-${file.name}`,
+                fileSize: file.size,
+                mimeType: file.type,
+                status: 'pending' as const,
+                progress: 0,
+            })),
+        ]);
     }, [validateFile]);
 
     const removeFile = useCallback((index: number) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
+        setFiles((previousFiles) => previousFiles.filter((_, i) => i !== index));
     }, []);
 
     const clearFiles = useCallback(() => {
@@ -48,12 +67,8 @@ export function useUpload() {
         setProgress(0);
 
         const formData = new FormData();
-        files.forEach((fileInfo, index) => {
-            // Note: This is a placeholder implementation
-            // In a real implementation, you would need to store the actual File objects
-            // and retrieve them here to create the FormData properly
-            const file = new File([], fileInfo.filename);
-            formData.append('files', file, fileInfo.originalName);
+        files.forEach((fileInfo) => {
+            formData.append('files', fileInfo.file, fileInfo.originalName);
         });
 
         try {
@@ -81,7 +96,7 @@ export function useUpload() {
     const isValid = files.length > 0 && files.length <= siteConfig.maxFiles &&
         files.reduce((sum, f) => sum + f.fileSize, 0) <= siteConfig.maxFileSize * siteConfig.maxFiles;
 
-    return {
+    const value = useMemo<UploadContextValue>(() => ({
         files,
         uploading,
         progress,
@@ -91,5 +106,19 @@ export function useUpload() {
         uploadFiles,
         validateFile,
         isValid,
-    };
+    }), [files, uploading, progress, addFiles, removeFile, clearFiles, uploadFiles, validateFile, isValid]);
+
+    return (
+        <UploadContext.Provider value={value}>{children}</UploadContext.Provider>
+    );
 }
+
+export function useUpload(): UploadContextValue {
+    const ctx = useContext(UploadContext);
+    if (!ctx) {
+        throw new Error('useUpload must be used within an UploadProvider');
+    }
+    return ctx;
+}
+
+

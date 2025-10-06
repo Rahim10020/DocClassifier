@@ -1,6 +1,6 @@
 'use client';
 
-import { useUpload } from '@/hooks/useUpload';
+import { useUpload, UploadProvider } from '@/hooks/useUpload';
 import DropZone from '@/components/upload/DropZone';
 import FileList from '@/components/upload/FileList';
 import UploadProgress from '@/components/upload/UploadProgress';
@@ -10,7 +10,7 @@ import { Card } from '@/components/ui/card';
 import { File, FolderOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function UploadPage() {
+function UploadPageInner() {
     const { files, uploading, progress, uploadFiles, clearFiles, isValid } = useUpload();
     const router = useRouter();
 
@@ -54,5 +54,13 @@ export default function UploadPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function UploadPage() {
+    return (
+        <UploadProvider>
+            <UploadPageInner />
+        </UploadProvider>
     );
 }

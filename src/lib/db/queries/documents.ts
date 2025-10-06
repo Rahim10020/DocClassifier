@@ -1,4 +1,4 @@
-import prisma from '../prisma';
+import prisma from '@/lib/db/prisma';
 
 // Define the Document type based on Prisma schema
 type Document = {
@@ -23,7 +23,7 @@ type Document = {
  */
 export async function createDocumentMetadata(data: Omit<Document, 'id'>): Promise<Document> {
     try {
-        return await prisma.document.create({ data });
+        return await prisma.documentMetadata.create({ data });
     } catch (error) {
         console.error('Error creating document metadata:', error);
         throw new Error('Database creation failed.');
@@ -39,7 +39,7 @@ export async function createDocumentMetadata(data: Omit<Document, 'id'>): Promis
 export async function bulkCreateDocuments(data: Omit<Document, 'id'>[]): Promise<Document[]> {
     try {
         return await prisma.$transaction(
-            data.map((item) => prisma.document.create({ data: item }))
+            data.map((item) => prisma.documentMetadata.create({ data: item }))
         );
     } catch (error) {
         console.error('Error bulk creating documents:', error);
@@ -55,7 +55,7 @@ export async function bulkCreateDocuments(data: Omit<Document, 'id'>[]): Promise
  */
 export async function getDocumentsByClassificationId(classificationId: string): Promise<Document[]> {
     try {
-        return await prisma.document.findMany({ where: { classificationId } });
+        return await prisma.documentMetadata.findMany({ where: { classificationId } });
     } catch (error) {
         console.error('Error fetching documents:', error);
         throw new Error('Database query failed.');

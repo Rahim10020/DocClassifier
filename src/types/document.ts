@@ -17,6 +17,7 @@ export type DocumentMetadata = {
 
 // Interface for uploaded file (pre-processing)
 export interface UploadedFile {
+    file: File;
     originalName: string;
     filename: string; // Temp filename in /tmp
     fileSize: number;

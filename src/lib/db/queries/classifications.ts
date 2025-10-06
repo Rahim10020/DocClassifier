@@ -1,4 +1,4 @@
-import prisma from '../prisma';
+import prisma from '@/lib/db/prisma';
 
 // Define the Classification type based on Prisma schema
 type Classification = {

@@ -2,11 +2,24 @@ import { TreeNode } from '@/types/tree';
 
 // Assume proposedStructure is { categories: [{id, name, parentId?, documents: []}] }
 export function buildTree(proposedStructure: any): TreeNode[] {
-    const nodes: TreeNode[] = proposedStructure.categories.map((cat: any) => ({
-        id: cat.id,
-        name: cat.name,
-        children: [],
-    }));
+    // Validate input
+    if (!proposedStructure) {
+        console.warn('buildTree: proposedStructure is undefined or null');
+        return [];
+    }
+    
+    if (!proposedStructure.categories || !Array.isArray(proposedStructure.categories)) {
+        console.warn('buildTree: proposedStructure.categories is not an array');
+        return [];
+    }
+    
+    const nodes: TreeNode[] = proposedStructure.categories
+        .filter((cat: any) => cat && cat.id && cat.name) // Filter out invalid categories
+        .map((cat: any) => ({
+            id: cat.id,
+            name: cat.name,
+            children: [],
+        }));
 
     const tree: TreeNode[] = [];
     const map: { [key: string]: TreeNode } = {};

@@ -10,7 +10,7 @@ import path from 'path';
 
 export async function POST(request: NextRequest) {
     try {
-        await requireAuth();
+        const user = await requireAuth();
 
         const formData = await request.formData();
         const files = formData.getAll('files') as File[];
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
         // Create classification
         const classificationData: ClassificationCreateInput = {
-            userId: (await requireAuth()).id,
+            userId: user.id,
             sessionId,
             status: 'PROCESSING',
             proposedStructure: JSON.stringify([]), // Empty initial

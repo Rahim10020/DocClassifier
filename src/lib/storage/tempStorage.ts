@@ -4,17 +4,40 @@ import { logger } from '@/lib/utils/logger';
 
 export class TempStorage {
     private sessionId: string;
+    private basePath: string;
 
     constructor(sessionId?: string) {
         this.sessionId = sessionId || this.generateSessionId();
+        this.basePath = path.join('/tmp', this.sessionId);
     }
 
     private generateSessionId(): string {
         return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
+    /**
+     * Initialize the temporary storage directory
+     */
+    async init(): Promise<void> {
+        try {
+            await fs.mkdir(this.basePath, { recursive: true });
+            logger('info', 'Temp storage initialized', { sessionId: this.sessionId, basePath: this.basePath });
+        } catch (err) {
+            const errorMsg = (err as Error).message;
+            logger('error', 'Failed to initialize temp storage', { error: errorMsg, basePath: this.basePath });
+            throw new Error(`Failed to initialize temp storage: ${errorMsg}`);
+        }
+    }
+
+    /**
+     * Get the base path for this storage session
+     */
+    getBasePath(): string {
+        return this.basePath;
+    }
+
     getFilePath(documentId: string): string {
-        return path.join('/tmp', this.sessionId, 'documents', documentId);
+        return path.join(this.basePath, 'documents', documentId);
     }
 
     async saveFile(documentId: string, content: Buffer | string): Promise<void> {
@@ -41,8 +64,7 @@ export class TempStorage {
 
     async cleanup(classificationId?: string) {
         try {
-            const basePath = path.join('/tmp', this.sessionId); // Assume sessionId
-            const targetPath = classificationId ? path.join(basePath, classificationId) : basePath;
+            const targetPath = classificationId ? path.join(this.basePath, classificationId) : this.basePath;
 
             if (await this.pathExists(targetPath)) {
                 await fs.rm(targetPath, { recursive: true, force: true });
