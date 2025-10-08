@@ -10,15 +10,27 @@ import path from 'path';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const jobSecretHeader = req.headers.get('x-job-secret');
+        const expectedSecret = process.env.JOB_SECRET;
+        const isJobRequest = Boolean(expectedSecret && jobSecretHeader && jobSecretHeader === expectedSecret);
+
+        // Allow either a background job with secret or an authenticated user
+        let userId: string | null = null;
+        if (!isJobRequest) {
+            const session = await getServerSession(authOptions);
+            if (!session?.user?.id) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+            userId = session.user.id;
         }
 
         const classificationId = params.id;
         const classification = await getClassificationById(classificationId);
-        if (!classification || classification.userId !== session.user.id) {
-            return NextResponse.json({ error: 'Classification not found or unauthorized' }, { status: 404 });
+        if (!classification) {
+            return NextResponse.json({ error: 'Classification not found' }, { status: 404 });
+        }
+        if (!isJobRequest && userId && classification.userId !== userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
         // Fetch documents from database
@@ -49,6 +61,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         await updateClassification(classificationId, {
             status: 'READY',
             proposedStructure,
+            processedAt: new Date() as any,
         });
 
         // Update documents with classification results

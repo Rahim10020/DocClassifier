@@ -39,11 +39,13 @@ export async function POST(request: NextRequest) {
 
         const totalSize = validFiles.reduce((sum, f) => sum + f.size, 0);
 
-        // Save files
+        // Save files and keep the same generated filename for DB
+        const savedFiles: Array<{ filename: string; file: File }> = [];
         for (const file of validFiles) {
             const filename = `${Date.now()}-${file.name}`;
             const buffer = Buffer.from(await file.arrayBuffer());
             await fs.writeFile(path.join(storage.getBasePath(), filename), buffer);
+            savedFiles.push({ filename, file });
         }
 
         // Create classification
@@ -63,8 +65,7 @@ export async function POST(request: NextRequest) {
         // Trigger classification processing asynchronously
         try {
             // Create document records first
-            const documentPromises = validFiles.map(async (file) => {
-                const filename = `${Date.now()}-${file.name}`;
+            const documentPromises = savedFiles.map(async ({ filename, file }) => {
                 return prisma.documentMetadata.create({
                     data: {
                         classificationId: classification.id,
@@ -82,6 +83,9 @@ export async function POST(request: NextRequest) {
             const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
             fetch(`${baseUrl}/api/classification/${classification.id}/process`, {
                 method: 'POST',
+                headers: {
+                    'x-job-secret': process.env.JOB_SECRET || '',
+                },
             }).catch(error => {
                 console.error('Background classification processing failed:', error);
             });
