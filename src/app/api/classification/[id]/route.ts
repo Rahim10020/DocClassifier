@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/authOptions';
 import prisma from '@/lib/db/prisma';
 import { TempStorage } from '@/lib/storage/tempStorage'; // Assume
+import { serializeBigInt } from '@/lib/utils/formatters';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         if (!classification || classification.userId !== session.user.id) {
             return NextResponse.json({ error: 'Not found' }, { status: 404 });
         }
-        return NextResponse.json(classification);
+        return NextResponse.json(serializeBigInt(classification));
     } catch (error) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }

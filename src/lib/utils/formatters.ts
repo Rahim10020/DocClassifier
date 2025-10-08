@@ -30,3 +30,22 @@ export function getFileIcon(mimeType: string): React.ComponentType<{ className?:
     if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || mimeType === 'text/csv') return FileSpreadsheet;
     return File;
 }
+
+// Converts BigInt fields to strings recursively for JSON safety
+export function serializeBigInt<T>(value: T): T {
+    if (value === null || value === undefined) return value;
+    if (typeof value === 'bigint') {
+        return (value.toString() as unknown) as T;
+    }
+    if (Array.isArray(value)) {
+        return (value.map(serializeBigInt) as unknown) as T;
+    }
+    if (typeof value === 'object') {
+        const result: Record<string, unknown> = {};
+        for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+            result[key] = serializeBigInt(val as never);
+        }
+        return (result as unknown) as T;
+    }
+    return value;
+}
