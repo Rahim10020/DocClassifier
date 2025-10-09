@@ -63,7 +63,24 @@ export default function ReviewPageClient({
     useEffect(() => {
         if (!isProcessing) return;
 
+        let pollCount = 0;
+        const maxPolls = 300; // Maximum 300 polls = 10 minutes at 2-second intervals
+        const maxProcessingTime = 10 * 60 * 1000; // 10 minutes max processing time
+
         const pollStatus = async () => {
+            pollCount++;
+
+            // Stop polling if we've exceeded maximum polls or time
+            const elapsed = Date.now() - new Date(classification.createdAt).getTime();
+            if (pollCount >= maxPolls || elapsed >= maxProcessingTime) {
+                console.warn('Classification polling stopped due to timeout');
+                setIsProcessing(false);
+                setProcessingProgress(100);
+                // Show error message to user
+                alert('Classification is taking longer than expected. Please refresh the page and try again.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/api/classification/${classificationId}`);
                 if (response.ok) {
@@ -74,14 +91,28 @@ export default function ReviewPageClient({
                         // Reload the page to get updated data
                         window.location.reload();
                     } else {
-                        // Estimate progress based on time elapsed
-                        const elapsed = Date.now() - new Date(classification.createdAt).getTime();
-                        const estimatedProgress = Math.min((elapsed / 30000) * 100, 90); // Max 30 seconds, 90% progress
+                        // Estimate progress based on time elapsed and poll count
+                        // Allow progress to go up to 95% instead of 90%
+                        const timeProgress = Math.min((elapsed / maxProcessingTime) * 100, 95);
+                        const pollProgress = Math.min((pollCount / maxPolls) * 100, 95);
+                        const estimatedProgress = Math.max(timeProgress, pollProgress);
                         setProcessingProgress(estimatedProgress);
                     }
+                } else if (response.status === 408) {
+                    // Timeout error from server
+                    console.error('Classification processing timeout');
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+                    alert('Classification processing timed out. Please try again.');
                 }
             } catch (error) {
                 console.error('Error polling classification status:', error);
+                // Continue polling on network errors, but stop after max attempts
+                if (pollCount >= maxPolls) {
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+                    alert('Network error during classification. Please refresh the page.');
+                }
             }
         };
 
@@ -95,6 +126,30 @@ export default function ReviewPageClient({
         isDirty,
         isSaving,
     } = useClassification({ initialClassification: classification as any, initialStructure: categoryNodes });
+
+    // Function to manually stop processing
+    const stopProcessing = async () => {
+        if (confirm('Êtes-vous sûr de vouloir arrêter le processus de classification ? Vous pourrez le relancer plus tard.')) {
+            try {
+                const response = await fetch(`/api/classification/${classificationId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'READY' })
+                });
+
+                if (response.ok) {
+                    setIsProcessing(false);
+                    setProcessingProgress(100);
+                    window.location.reload();
+                } else {
+                    alert('Erreur lors de l\'arrêt du processus');
+                }
+            } catch (error) {
+                console.error('Error stopping classification:', error);
+                alert('Erreur lors de l\'arrêt du processus');
+            }
+        }
+    };
 
     // Show processing state if classification is still processing
     if (isProcessing) {
@@ -115,9 +170,17 @@ export default function ReviewPageClient({
                         ></div>
                     </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                    Cette opération peut prendre quelques minutes selon le nombre de fichiers.
-                </p>
+                <div className="text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                        Cette opération peut prendre quelques minutes selon le nombre de fichiers.
+                    </p>
+                    <button
+                        onClick={stopProcessing}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                    >
+                        Arrêter le processus
+                    </button>
+                </div>
             </div>
         );
     }

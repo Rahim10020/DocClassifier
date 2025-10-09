@@ -14,11 +14,18 @@ export async function extractTextFromPDF(filepath: string): Promise<string> {
 
         // If the text length is very small relative to the number of pages, it might be a scanned PDF (image-based)
         if (data.text.length < 100 && data.numpages > 0) {
-            console.warn(`PDF at ${filepath} appears to be image-based; returning empty text.`);
+            console.warn(`PDF at ${filepath} appears to be image-based or has minimal text content (${data.text.length} chars, ${data.numpages} pages); returning empty text.`);
             return '';
         }
 
-        return data.text.trim();
+        const trimmedText = data.text.trim();
+        if (trimmedText.length === 0) {
+            console.warn(`PDF at ${filepath} has no extractable text content.`);
+            return '';
+        }
+
+        console.log(`Successfully extracted ${trimmedText.length} characters from PDF: ${filepath}`);
+        return trimmedText;
     } catch (error) {
         console.error(`Error parsing PDF at ${filepath}:`, error);
         throw new Error('Failed to parse PDF file.');
