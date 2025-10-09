@@ -48,24 +48,49 @@ export function classifyDocuments(documents: Document[]): ClassificationResult {
             };
         }
 
+        // Build TF-IDF and align vectors across a unified vocabulary
         const texts = validDocuments.map((doc) => doc.text);
         const tfidfMatrix = calculateTFIDF(texts);
-        const vectors = tfidfMatrix.map((docTfidf) => docTfidf.map((item) => item.tfidf)); // Simplified vector (assumes same terms order; in practice, align terms)
+        if (!Array.isArray(tfidfMatrix) || tfidfMatrix.length !== validDocuments.length) {
+            throw new Error(`TF-IDF matrix invalid: expected ${validDocuments.length} rows, got ${Array.isArray(tfidfMatrix) ? tfidfMatrix.length : 'non-array'}`);
+        }
 
-        // Align vectors to same dimension
+        // Collect unique terms preserving insertion order
         const allTerms = new Set<string>();
-        tfidfMatrix.forEach((doc) => doc.forEach((item) => allTerms.add(item.term)));
+        tfidfMatrix.forEach((docItems) => {
+            docItems.forEach((item) => {
+                if (item && typeof item.term === 'string') allTerms.add(item.term);
+            });
+        });
         const termArray = Array.from(allTerms);
-        const alignedVectors = tfidfMatrix.map((doc) => {
+
+        // Map term -> index for O(1) placement
+        const termIndex = new Map<string, number>();
+        termArray.forEach((t, i) => termIndex.set(t, i));
+
+        const alignedVectors = tfidfMatrix.map((docItems, docIdx) => {
             const vec = new Array(termArray.length).fill(0);
-            doc.forEach((item) => {
-                const idx = termArray.indexOf(item.term);
-                vec[idx] = item.tfidf;
+            docItems.forEach((item) => {
+                if (!item) return;
+                const idx = termIndex.get(item.term);
+                if (idx !== undefined) vec[idx] = item.tfidf ?? 0;
             });
             return vec;
         });
 
-        console.log(`Running k-means clustering with ${alignedVectors.length} vectors and k=${alignedVectors.length < 3 ? Math.min(2, alignedVectors.length) : 3} to ${Math.min(10, alignedVectors.length)}`);
+        console.log('[categorizer] TF-IDF alignment', {
+            documents: validDocuments.length,
+            vocabularySize: termArray.length,
+            vectorLength: alignedVectors[0]?.length || 0,
+        });
+
+        console.log(`[categorizer] Running k-means candidate search`, {
+            vectors: alignedVectors.length,
+            kRange: {
+                min: alignedVectors.length < 3 ? Math.min(2, alignedVectors.length) : 3,
+                max: Math.min(10, alignedVectors.length)
+            }
+        });
 
         const optimalK = determineOptimalK(alignedVectors);
 
@@ -82,7 +107,7 @@ export function classifyDocuments(documents: Document[]): ClassificationResult {
             };
         }
 
-        console.log(`Using optimal K: ${optimalK}`);
+        console.log(`[categorizer] Using optimal K: ${optimalK}`);
         const { centroids, clusters } = kmeans(alignedVectors, optimalK, {
             maxIterations: 100,
             tolerance: 1e-6
@@ -92,11 +117,19 @@ export function classifyDocuments(documents: Document[]): ClassificationResult {
             throw new Error('K-means clustering failed to return valid results');
         }
 
-        console.log(`K-means completed: ${centroids.length} centroids, ${new Set(clusters).size} clusters`);
+        console.log('[categorizer] K-means completed', {
+            centroids: centroids.length,
+            clustersCount: new Set(clusters).size,
+            assignments: clusters.length
+        });
 
         const categories: Category[] = [];
         for (let i = 0; i < optimalK; i++) {
-            const clusterIndices = validDocuments.map((_, idx) => ({ doc: _, idx })).filter(({ idx: docIdx }) => clusters[docIdx] === i);
+            // Build mapping from cluster assignment to original validDocuments index
+            const clusterIndices = clusters
+                .map((clusterId, idx) => ({ clusterId, idx }))
+                .filter(({ clusterId }) => clusterId === i)
+                .map(({ idx }) => ({ doc: validDocuments[idx], idx }));
             const clusterDocs = clusterIndices.map(({ doc }) => doc);
 
             if (clusterDocs.length === 0) {
@@ -107,7 +140,7 @@ export function classifyDocuments(documents: Document[]): ClassificationResult {
             const clusterText = clusterDocs.map((doc) => doc.text).join(' ');
             const categoryName = generateCategoryName(clusterText);
 
-            console.log(`Creating category "${categoryName}" with ${clusterDocs.length} documents`);
+            console.log('[categorizer] Creating category', { name: categoryName, size: clusterDocs.length, clusterIndex: i });
 
             categories.push({
                 id: `cat-${i}`,
@@ -133,7 +166,7 @@ export function classifyDocuments(documents: Document[]): ClassificationResult {
 
         return { categories, documents };
     } catch (error) {
-        console.error('Error in document classification:', error);
+        console.error('[categorizer] Error in document classification', { error });
         throw new Error('Classification process failed.');
     }
 }

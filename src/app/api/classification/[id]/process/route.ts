@@ -9,9 +9,9 @@ import { TempStorage } from '@/lib/storage/tempStorage';
 import path from 'path';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-    // Add timeout to prevent infinite processing (5 minutes)
+    // Timeout global porté à 15 minutes
     const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Processing timeout after 5 minutes')), 5 * 60 * 1000);
+        setTimeout(() => reject(new Error('Processing timeout after 15 minutes')), 15 * 60 * 1000);
     });
 
     try {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        // Race between processing and timeout
+        // Course entre traitement et timeout
         await Promise.race([
             performClassificationProcess(classificationId),
             timeoutPromise
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     } catch (error) {
         console.error('Error processing classification:', error);
 
-        // Update classification status to READY if processing fails (mark as ready so polling stops)
+        // Mise à jour du statut si échec pour arrêter le polling
         try {
             const classificationId = params.id;
             await updateClassification(classificationId, {
@@ -60,12 +60,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
         if (error instanceof Error && error.message.includes('timeout')) {
             return NextResponse.json({
-                error: 'Processing timeout - classification took too long to complete',
+                error: 'Délai dépassé: le traitement de classification a été trop long',
                 code: 'TIMEOUT'
             }, { status: 408 });
         }
 
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Erreur interne lors du traitement de la classification' }, { status: 500 });
     }
 }
 
@@ -86,10 +86,11 @@ async function performClassificationProcess(classificationId: string) {
 
     const storage = new TempStorage(classificationData.sessionId);
 
-    // Process documents with parallel text extraction for better performance
+    // Extraction de texte en parallèle avec batchs, logs détaillés
     const totalDocuments = documents.length;
     const BATCH_SIZE = 5; // Process 5 documents in parallel
     let processedDocuments = 0;
+    const typeCounters = new Map<string, number>();
 
     // Process documents in batches for better performance
     for (let i = 0; i < documents.length; i += BATCH_SIZE) {
@@ -105,9 +106,14 @@ async function performClassificationProcess(classificationId: string) {
                     where: { id: doc.id },
                     data: { extractedText: text },
                 });
+                // Compter types
+                typeCounters.set(doc.mimeType, (typeCounters.get(doc.mimeType) || 0) + 1);
+                // Log échantillon 100 chars
+                const sample = (text || '').slice(0, 100).replace(/\s+/g, ' ');
+                console.log('[process] Extraction OK', { id: doc.id, name: doc.originalName, type: doc.mimeType, sample });
                 return { success: true, id: doc.id };
             } catch (error) {
-                console.error(`Error processing document ${doc.filename}:`, error);
+                console.error('[process] Extraction KO', { id: doc.id, name: doc.originalName, type: doc.mimeType, error });
                 return { success: false, id: doc.id, error: error instanceof Error ? error.message : 'Unknown error' };
             }
         });
@@ -115,9 +121,9 @@ async function performClassificationProcess(classificationId: string) {
         const batchResults = await Promise.allSettled(batchPromises);
         processedDocuments += batchResults.length;
 
-        // Update progress for this batch
+        // Progression
         if (processedDocuments % 5 === 0 || processedDocuments === totalDocuments) {
-            console.log(`Processed ${processedDocuments}/${totalDocuments} documents for classification ${classificationId}`);
+            console.log('[process] Progress', { processed: processedDocuments, total: totalDocuments, classificationId });
         }
 
         // Add small delay between batches to prevent overwhelming the system
@@ -129,15 +135,17 @@ async function performClassificationProcess(classificationId: string) {
     // Filter out documents that failed text extraction
     const validDocuments = documents.filter(doc => doc.extractedText && doc.extractedText.trim().length > 0);
 
-    console.log(`Text extraction results for classification ${classificationId}:`);
-    console.log(`- Total documents: ${documents.length}`);
-    console.log(`- Documents with text: ${validDocuments.length}`);
-    console.log(`- Documents without text: ${documents.length - validDocuments.length}`);
+    console.log('[process] Extraction summary', {
+        total: documents.length,
+        withText: validDocuments.length,
+        withoutText: documents.length - validDocuments.length,
+        byType: Object.fromEntries(typeCounters)
+    });
 
-    // Log details of documents without text
+    // Détails des documents sans texte
     const docsWithoutText = documents.filter(doc => !doc.extractedText || doc.extractedText.trim().length === 0);
     docsWithoutText.forEach(doc => {
-        console.log(`Document without text: ${doc.originalName} (${doc.mimeType})`);
+        console.log('[process] No text extracted', { id: doc.id, name: doc.originalName, type: doc.mimeType });
     });
 
     if (validDocuments.length === 0) {
@@ -145,37 +153,34 @@ async function performClassificationProcess(classificationId: string) {
         throw new Error('No documents could be processed - text extraction failed for all files');
     }
 
-    // Log sample text content for debugging
+    // Échantillons de texte (100 premiers caractères) pour debug
     validDocuments.slice(0, 3).forEach((doc, idx) => {
-        console.log(`Sample text from document ${doc.originalName}: "${doc.extractedText?.substring(0, 200)}..."`);
+        const sample = (doc.extractedText || '').slice(0, 100).replace(/\s+/g, ' ');
+        console.log('[process] Text sample', { name: doc.originalName, sample });
     });
 
     console.log(`Starting classification for ${validDocuments.length} documents in classification ${classificationId}`);
 
     const docTexts = validDocuments.map((doc) => ({ id: doc.id, text: doc.extractedText || '' }));
 
-    // Add timeout to classification algorithm itself (increased to 4 minutes)
+    // Timeout de l’algorithme de classification (4 minutes)
     const classificationPromise = classifyDocuments(docTexts);
     const classificationTimeout = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Classification algorithm timeout after 4 minutes')), 4 * 60 * 1000); // 4 minutes
     });
 
     const algorithmStartTime = Date.now();
-    console.log(`Starting classification algorithm with ${docTexts.length} documents...`);
+    console.log('[process] Classification start', { n: docTexts.length });
     const result = await Promise.race([classificationPromise, classificationTimeout]) as any;
-    console.log(`Classification algorithm completed in ${Date.now() - algorithmStartTime}ms`);
+    console.log('[process] Classification done', { durationMs: Date.now() - algorithmStartTime });
 
     if (!result || !result.categories) {
         throw new Error('Classification failed to produce results');
     }
 
-    console.log(`Classification completed successfully:`);
-    console.log(`- Categories created: ${result.categories.length}`);
+    console.log('[process] Classification summary', { categories: result.categories.length });
     result.categories.forEach((cat: any, idx: number) => {
-        console.log(`  Category ${idx + 1}: "${cat.name}" with ${cat.documents.length} documents`);
-        cat.documents.forEach((doc: any) => {
-            console.log(`    - ${doc.originalName}: ${(doc as any).confidence?.toFixed(2) || '0.00'} confidence`);
-        });
+        console.log('[process] Category', { index: idx + 1, name: cat.name, size: cat.documents.length });
     });
 
     const proposedStructure = result;
@@ -199,5 +204,5 @@ async function performClassificationProcess(classificationId: string) {
         }
     }
 
-    console.log(`Classification ${classificationId} fully completed and saved to database`);
+    console.log('[process] Completed and saved', { classificationId });
 }

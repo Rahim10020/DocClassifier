@@ -7,42 +7,44 @@ import { kmeans } from 'ml-kmeans';
  * @returns Clustering result with centroids and assignments.
  */
 export function kMeansClustering(vectors: number[][], k: number): { centroids: number[][]; clusters: number[] } {
-    try {
-        // Add timeout and validation
-        if (vectors.length === 0) {
-            throw new Error('No vectors provided for clustering');
-        }
-
-        if (k <= 0 || k > vectors.length) {
-            throw new Error(`Invalid k value: ${k}. Must be between 1 and ${vectors.length}`);
-        }
-
-        // Validate vectors
-        for (let i = 0; i < vectors.length; i++) {
-            if (!vectors[i] || vectors[i].length === 0) {
-                throw new Error(`Invalid vector at index ${i}`);
-            }
-        }
-
-        const result = kmeans(vectors, k, {
-            maxIterations: 100, // Prevent infinite loops
-            tolerance: 1e-6
-        });
-
-        // Validate results
-        if (!result.centroids || !result.clusters) {
-            throw new Error('K-means returned invalid results');
-        }
-
-        return result;
-    } catch (error) {
-        console.error('K-means clustering failed:', error);
-        // Return a fallback clustering result
-        return {
-            centroids: vectors.slice(0, k).map(v => [...v]),
-            clusters: vectors.map((_, i) => i % k)
-        };
+    // Validation stricte sans fallback silencieux
+    if (!Array.isArray(vectors) || vectors.length === 0) {
+        throw new Error('No vectors provided for clustering');
     }
+    if (!Number.isFinite(k) || k <= 0 || k > vectors.length) {
+        throw new Error(`Invalid k value: ${k}. Must be between 1 and ${vectors.length}`);
+    }
+    for (let i = 0; i < vectors.length; i++) {
+        const v = vectors[i];
+        if (!Array.isArray(v) || v.length === 0) {
+            throw new Error(`Invalid vector at index ${i}`);
+        }
+        if (v.some((x) => !Number.isFinite(x))) {
+            throw new Error(`Non-finite value in vector at index ${i}`);
+        }
+    }
+
+    console.log('[clustering] kMeansClustering start', { n: vectors.length, dim: vectors[0]?.length || 0, k });
+    const result = kmeans(vectors, k, {
+        maxIterations: 100,
+        tolerance: 1e-6
+    });
+
+    if (!result || !result.centroids || !result.clusters) {
+        throw new Error('K-means returned invalid results');
+    }
+    if (result.clusters.length !== vectors.length) {
+        throw new Error(`K-means assignments length mismatch: ${result.clusters.length} != ${vectors.length}`);
+    }
+    if (result.centroids.length !== k) {
+        throw new Error(`K-means centroid count mismatch: ${result.centroids.length} != ${k}`);
+    }
+
+    console.log('[clustering] kMeansClustering done', {
+        centroids: result.centroids.length,
+        clustersCount: new Set(result.clusters).size
+    });
+    return result;
 }
 
 /**
@@ -55,15 +57,14 @@ export function determineOptimalK(vectors: number[][]): number {
     const minK = Math.min(3, Math.floor(vectors.length / 2)); // Ensure we don't try more clusters than documents/2
     const wcss: number[] = []; // Within-cluster sum of squares
 
-    console.log(`Determining optimal K for ${vectors.length} documents (minK: ${minK}, maxK: ${maxK})`);
+    console.log('[clustering] determineOptimalK', { n: vectors.length, minK, maxK });
 
     for (let k = minK; k <= maxK; k++) {
         try {
             const { centroids, clusters } = kMeansClustering(vectors, k);
 
-            // Validate results
             if (!centroids || centroids.length !== k || !clusters || clusters.length !== vectors.length) {
-                console.warn(`Invalid clustering results for k=${k}, using fallback`);
+                console.warn(`[clustering] Invalid results for k=${k}`);
                 wcss.push(Infinity);
                 continue;
             }
@@ -77,9 +78,9 @@ export function determineOptimalK(vectors: number[][]): number {
             }
             wcss.push(sum);
 
-            console.log(`k=${k}: WCSS=${sum.toFixed(2)}, clusters: ${new Set(clusters).size}`);
+            console.log('[clustering] elbow step', { k, wcss: Number.isFinite(sum) ? Number(sum.toFixed(2)) : 'inf', clusters: new Set(clusters).size });
         } catch (error) {
-            console.error(`Error in k-means for k=${k}:`, error);
+            console.error(`[clustering] Error in k-means for k=${k}`, { error });
             wcss.push(Infinity);
         }
     }
@@ -102,7 +103,7 @@ export function determineOptimalK(vectors: number[][]): number {
         }
     }
 
-    console.log(`Selected optimal K: ${optimalK} (maxDiff: ${maxDiff.toFixed(2)})`);
+    console.log('[clustering] optimalK selected', { optimalK, maxDiff: Number(maxDiff.toFixed(2)) });
     return Math.max(minK, optimalK);
 }
 
