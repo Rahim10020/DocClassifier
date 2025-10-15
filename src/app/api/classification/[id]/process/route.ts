@@ -55,7 +55,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 status: 'READY' // Mark as ready so polling stops, even though processing failed
             });
         } catch (updateError) {
-            console.error('Error updating classification status:', updateError);
+            console.error('Error updating classification status:', updateError instanceof Error ? updateError.message : String(updateError));
         }
 
         if (error instanceof Error && error.message.includes('timeout')) {
@@ -113,7 +113,7 @@ async function performClassificationProcess(classificationId: string) {
                 console.log('[process] Extraction OK', { id: doc.id, name: doc.originalName, type: doc.mimeType, sample });
                 return { success: true, id: doc.id };
             } catch (error) {
-                console.error('[process] Extraction KO', { id: doc.id, name: doc.originalName, type: doc.mimeType, error });
+                console.error('[process] Extraction KO', { id: doc.id, name: doc.originalName, type: doc.mimeType, error: error instanceof Error ? error.message : String(error) });
                 return { success: false, id: doc.id, error: error instanceof Error ? error.message : 'Unknown error' };
             }
         });
@@ -133,7 +133,37 @@ async function performClassificationProcess(classificationId: string) {
     }
 
     // Filter out documents that failed text extraction
-    const validDocuments = documents.filter(doc => doc.extractedText && doc.extractedText.trim().length > 0);
+    // Also check if we need to extract text first (in case of re-processing)
+    let documentsWithText = documents.filter(doc => doc.extractedText && doc.extractedText.trim().length > 0);
+
+    // If no documents have extracted text, it means extraction failed or never happened
+    if (documentsWithText.length === 0) {
+        console.log('[process] No documents have extracted text, this might indicate extraction failed');
+        // For now, let's try to re-extract text for all documents
+        console.log('[process] Attempting to re-extract text for all documents...');
+
+        for (const doc of documents) {
+            try {
+                const filePath = path.join(storage.getBasePath(), doc.filename);
+                const text = await extractText(filePath, doc.mimeType);
+                if (text && text.trim().length > 0) {
+                    await prisma.documentMetadata.update({
+                        where: { id: doc.id },
+                        data: { extractedText: text },
+                    });
+                    console.log('[process] Re-extracted text for', doc.originalName, 'length:', text.length);
+                }
+            } catch (error) {
+                console.error('[process] Failed to re-extract text for', doc.originalName, ':', error instanceof Error ? error.message : String(error));
+            }
+        }
+
+        // Re-fetch documents after text extraction
+        const updatedDocuments = await prisma.documentMetadata.findMany({ where: { classificationId } });
+        documentsWithText = updatedDocuments.filter(doc => doc.extractedText && doc.extractedText.trim().length > 0);
+    }
+
+    const validDocuments = documentsWithText;
 
     console.log('[process] Extraction summary', {
         total: documents.length,
@@ -149,7 +179,13 @@ async function performClassificationProcess(classificationId: string) {
     });
 
     if (validDocuments.length === 0) {
-        console.error('No documents have extractable text content');
+        console.error('No documents have extractable text content after re-extraction attempt');
+        console.error('Document details:', documents.map(d => ({
+            id: d.id,
+            filename: d.filename,
+            mimeType: d.mimeType,
+            hasExtractedText: !!(d.extractedText && d.extractedText.trim().length > 0)
+        })));
         throw new Error('No documents could be processed - text extraction failed for all files');
     }
 
@@ -171,11 +207,31 @@ async function performClassificationProcess(classificationId: string) {
 
     const algorithmStartTime = Date.now();
     console.log('[process] Classification start', { n: docTexts.length });
-    const result = await Promise.race([classificationPromise, classificationTimeout]) as any;
+
+    let result;
+    try {
+        result = await Promise.race([classificationPromise, classificationTimeout]) as any;
+    } catch (classificationError) {
+        console.error('[process] Classification algorithm error:', classificationError);
+        const errorMessage = classificationError instanceof Error ? classificationError.message : String(classificationError);
+        throw new Error(`Classification algorithm failed: ${errorMessage}`);
+    }
+
     console.log('[process] Classification done', { durationMs: Date.now() - algorithmStartTime });
 
-    if (!result || !result.categories) {
-        throw new Error('Classification failed to produce results');
+    if (!result) {
+        console.error('[process] Classification returned null/undefined result');
+        throw new Error('Classification failed to produce results - returned null');
+    }
+
+    if (!result.categories || !Array.isArray(result.categories)) {
+        console.error('[process] Classification result missing categories:', result);
+        throw new Error('Classification failed to produce valid categories');
+    }
+
+    if (result.categories.length === 0) {
+        console.error('[process] Classification produced empty categories');
+        throw new Error('Classification produced no categories');
     }
 
     console.log('[process] Classification summary', { categories: result.categories.length });
@@ -192,15 +248,22 @@ async function performClassificationProcess(classificationId: string) {
     });
 
     // Update documents with classification results
+    console.log('[process] Updating documents with classification results...');
     for (const category of result.categories) {
         for (const doc of category.documents) {
-            await prisma.documentMetadata.update({
-                where: { id: doc.id },
-                data: {
-                    categoryName: category.name,
-                    confidence: (doc as any).confidence,
-                },
-            });
+            try {
+                await prisma.documentMetadata.update({
+                    where: { id: doc.id },
+                    data: {
+                        categoryName: category.name,
+                        confidence: (doc as any).confidence,
+                    },
+                });
+                console.log('[process] Updated document', doc.id, 'with category', category.name);
+            } catch (updateError) {
+                console.error('[process] Failed to update document', doc.id, ':', updateError instanceof Error ? updateError.message : String(updateError));
+                // Continue with other documents even if one fails
+            }
         }
     }
 
