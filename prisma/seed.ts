@@ -19,7 +19,6 @@ async function main() {
         update: {},
         create: {
             email: adminEmail,
-            name: 'System Administrator',
             password: adminPassword,
         },
     });
@@ -35,7 +34,6 @@ async function main() {
         update: {},
         create: {
             email: demoEmail,
-            name: 'Demo User',
             password: demoPassword,
         },
     });
