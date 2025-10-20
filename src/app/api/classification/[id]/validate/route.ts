@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/authOptions';
+import { authOptions } from '@/lib/auth/auth.config';
 import prisma from '@/lib/db/prisma';
 import { getClassificationById } from '@/lib/db/queries/classifications';
 
