@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { File, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { formatBytes } from '@/lib/utils/formatters';
+import { formatBytes } from '@/lib/utils/helpers';
 
 interface UploadSummaryProps {
     fileCount: number;

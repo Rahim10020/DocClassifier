@@ -1,7 +1,7 @@
 import { FileIcon } from 'lucide-react';
 import ConfidenceIndicator from './ConfidenceIndicator';
 import { DocumentMetadata } from '@/types/document';
-import { formatBytes } from '@/lib/utils/formatters';
+import { formatBytes } from '@/lib/utils/helpers';
 import DraggableDocument from '@/components/dnd/DraggableDocument';
 
 interface DocumentItemProps {

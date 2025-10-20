@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { getUserStats } from '@/lib/db/queries/users';
-import { formatDate } from '@/lib/utils/formatters';
+import { formatDate } from '@/lib/utils/helpers';
 // Import Recharts if needed
 // import { BarChart } from 'recharts';
 

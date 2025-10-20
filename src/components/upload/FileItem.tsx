@@ -4,8 +4,8 @@ import { FileText, FileSpreadsheet, File, Loader2, XCircle, X } from 'lucide-rea
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
-import { formatBytes } from '@/lib/utils/formatters';
-import { getFileIcon } from '@/lib/utils/formatters';
+import { formatBytes } from '@/lib/utils/helpers';
+import { getFileIcon } from '@/lib/utils/helpers';
 import { UploadedFile } from '@/types/document';
 
 interface FileItemProps {
