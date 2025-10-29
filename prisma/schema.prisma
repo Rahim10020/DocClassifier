@@ -1,6 +1,5 @@
-
 datasource db {
-  provider = "sqlite" // ou "postgresql" en prod
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -9,65 +8,67 @@ generator client {
 }
 
 model Session {
-  id            String    @id @default(cuid())
-  createdAt     DateTime  @default(now())
-  expiresAt     DateTime  // Expire après 2 heures
-  profile       String?   // "student", "professional", "researcher", "personal"
-  language      String    @default("fr")
-  totalFiles    Int       @default(0)
-  processedFiles Int      @default(0)
-  status        String    @default("uploading") // uploading, processing, ready, expired
+  id             String    @id @default(cuid())
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime
+  profile        String?
+  language       String    @default("fr")
+  totalFiles     Int       @default(0)
+  processedFiles Int       @default(0)
+  status         String    @default("uploading")
   
-  documents     Document[]
+  documents      Document[]
   
   @@index([expiresAt])
+  @@index([status])
 }
 
 model Document {
-  id            String    @id @default(cuid())
-  sessionId     String
-  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  sessionId      String
+  session        Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   
-  // Métadonnées fichier
-  originalName  String
-  fileName      String    // Nom stocké
-  fileType      String    // pdf, docx, txt, etc.
-  fileSize      Int
-  filePath      String    // Chemin temporaire
+  originalName   String
+  fileName       String
+  fileType       String
+  fileSize       Int
+  filePath       String
   
-  // Contenu extrait
-  extractedText String?   @db.Text
-  language      String?
+  extractedText  String?   @db.Text
+  language       String?
   
-  // Classification
-  mainCategory    String?
-  subCategory     String?
-  confidence      Float?    // Score de confiance (0-1)
-  keywords        String[]  // Mots-clés extraits
+  mainCategory   String?
+  subCategory    String?
+  confidence     Float?
+  keywords       String[]
   
-  // Métadonnées supplémentaires
-  pageCount     Int?
-  wordCount     Int?
+  pageCount      Int?
+  wordCount      Int?
   
-  createdAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
   
   @@index([sessionId])
+  @@index([mainCategory])
 }
 
 model Category {
-  id            String    @id @default(cuid())
-  name          String    @unique
-  nameEn        String?
-  parentId      String?
-  parent        Category? @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children      Category[] @relation("CategoryToCategory")
+  id             String     @id @default(cuid())
+  name           String     @unique
+  nameEn         String?
+  parentId       String?
+  parent         Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  children       Category[] @relation("CategoryToCategory")
   
-  profile       String[]  // ["student", "professional", "researcher", "personal"]
-  keywords      String[]  // Mots-clés associés
-  priority      Int       @default(0)
+  profiles       String[]
+  keywords       String[]
+  priority       Int        @default(0)
   
-  icon          String?
-  color         String?
+  icon           String?
+  color          String?
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
   
   @@index([parentId])
+  @@index([priority])
 }
