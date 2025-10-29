@@ -1,10 +1,19 @@
 
+datasource db {
+  provider = "sqlite" // ou "postgresql" en prod
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
 model Session {
   id            String    @id @default(cuid())
   createdAt     DateTime  @default(now())
   expiresAt     DateTime  // Expire après 2 heures
   profile       String?   // "student", "professional", "researcher", "personal"
-  language      String    @default("fr") // Langue détectée
+  language      String    @default("fr")
   totalFiles    Int       @default(0)
   processedFiles Int      @default(0)
   status        String    @default("uploading") // uploading, processing, ready, expired
@@ -48,17 +57,17 @@ model Document {
 model Category {
   id            String    @id @default(cuid())
   name          String    @unique
-  nameEn        String?   // Traduction anglaise
-  parentId      String?   // Pour sous-catégories
+  nameEn        String?
+  parentId      String?
   parent        Category? @relation("CategoryToCategory", fields: [parentId], references: [id])
   children      Category[] @relation("CategoryToCategory")
   
   profile       String[]  // ["student", "professional", "researcher", "personal"]
   keywords      String[]  // Mots-clés associés
-  priority      Int       @default(0) // Pour le scoring
+  priority      Int       @default(0)
   
-  icon          String?   // Icône associée
-  color         String?   // Couleur pour l'UI
+  icon          String?
+  color         String?
   
   @@index([parentId])
 }
