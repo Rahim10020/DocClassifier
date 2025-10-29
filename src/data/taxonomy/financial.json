@@ -1,0 +1,140 @@
+{
+    "id": "financial",
+    "name": "Financier",
+    "nameEn": "Financial",
+    "icon": "wallet",
+    "color": "#10b981",
+    "profiles": [
+        "professional",
+        "personal"
+    ],
+    "priority": 85,
+    "keywords": [
+        "facture",
+        "invoice",
+        "paiement",
+        "payment",
+        "montant",
+        "amount",
+        "total",
+        "prix",
+        "price",
+        "€",
+        "$",
+        "tva",
+        "vat",
+        "tax",
+        "devis",
+        "quote",
+        "remboursement",
+        "refund",
+        "crédit",
+        "credit",
+        "débit",
+        "debit",
+        "solde",
+        "balance",
+        "compte",
+        "account",
+        "banque",
+        "bank",
+        "transaction",
+        "virement",
+        "transfer"
+    ],
+    "subcategories": [
+        {
+            "id": "invoices",
+            "name": "Factures",
+            "nameEn": "Invoices",
+            "keywords": [
+                "facture",
+                "invoice",
+                "n°",
+                "no.",
+                "numéro de facture",
+                "date d'émission",
+                "issue date",
+                "à payer",
+                "due date",
+                "échéance",
+                "montant dû",
+                "amount due",
+                "fournisseur",
+                "supplier"
+            ]
+        },
+        {
+            "id": "quotes",
+            "name": "Devis",
+            "nameEn": "Quotes",
+            "keywords": [
+                "devis",
+                "quote",
+                "estimation",
+                "estimate",
+                "proposition",
+                "proposal",
+                "valable jusqu'au",
+                "valid until",
+                "offre",
+                "offer"
+            ]
+        },
+        {
+            "id": "bank_statements",
+            "name": "Relevés bancaires",
+            "nameEn": "Bank Statements",
+            "keywords": [
+                "relevé",
+                "statement",
+                "compte bancaire",
+                "bank account",
+                "solde",
+                "balance",
+                "opérations",
+                "transactions",
+                "date de valeur",
+                "value date",
+                "crédit",
+                "débit"
+            ]
+        },
+        {
+            "id": "receipts",
+            "name": "Reçus",
+            "nameEn": "Receipts",
+            "keywords": [
+                "reçu",
+                "receipt",
+                "ticket de caisse",
+                "cash register",
+                "payé",
+                "paid",
+                "espèces",
+                "cash",
+                "carte bancaire",
+                "credit card"
+            ]
+        },
+        {
+            "id": "tax_documents",
+            "name": "Documents fiscaux",
+            "nameEn": "Tax Documents",
+            "keywords": [
+                "impôt",
+                "tax",
+                "déclaration",
+                "declaration",
+                "fisc",
+                "fiscal",
+                "tva",
+                "vat",
+                "avis d'imposition",
+                "tax notice",
+                "taxe",
+                "duty"
+            ]
+        }
+    ]
+}
