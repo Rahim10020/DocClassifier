@@ -1,0 +1,123 @@
+{
+    "id": "health",
+    "name": "Santé",
+    "nameEn": "Health",
+    "icon": "heart-pulse",
+    "color": "#ec4899",
+    "profiles": [
+        "personal"
+    ],
+    "priority": 70,
+    "keywords": [
+        "médical",
+        "medical",
+        "santé",
+        "health",
+        "médecin",
+        "doctor",
+        "hôpital",
+        "hospital",
+        "clinique",
+        "clinic",
+        "patient",
+        "diagnostic",
+        "diagnosis",
+        "traitement",
+        "treatment",
+        "médicament",
+        "medication",
+        "ordonnance",
+        "prescription",
+        "analyse",
+        "test",
+        "résultat",
+        "result"
+    ],
+    "subcategories": [
+        {
+            "id": "medical_reports",
+            "name": "Rapports médicaux",
+            "nameEn": "Medical Reports",
+            "keywords": [
+                "rapport médical",
+                "medical report",
+                "compte-rendu",
+                "summary",
+                "diagnostic",
+                "diagnosis",
+                "examen",
+                "examination",
+                "consultation"
+            ]
+        },
+        {
+            "id": "prescriptions",
+            "name": "Ordonnances",
+            "nameEn": "Prescriptions",
+            "keywords": [
+                "ordonnance",
+                "prescription",
+                "médicament",
+                "medication",
+                "drug",
+                "posologie",
+                "dosage",
+                "traitement",
+                "treatment",
+                "pharmacie",
+                "pharmacy"
+            ]
+        },
+        {
+            "id": "test_results",
+            "name": "Résultats d'analyses",
+            "nameEn": "Test Results",
+            "keywords": [
+                "analyse",
+                "test",
+                "résultat",
+                "result",
+                "laboratoire",
+                "laboratory",
+                "prise de sang",
+                "blood test",
+                "radiologie",
+                "radiology",
+                "imagerie",
+                "imaging"
+            ]
+        },
+        {
+            "id": "insurance_health",
+            "name": "Assurance santé",
+            "nameEn": "Health Insurance",
+            "keywords": [
+                "assurance",
+                "insurance",
+                "mutuelle",
+                "remboursement",
+                "reimbursement",
+                "couverture",
+                "coverage",
+                "sécurité sociale",
+                "social security"
+            ]
+        },
+        {
+            "id": "vaccination",
+            "name": "Vaccination",
+            "nameEn": "Vaccination",
+            "keywords": [
+                "vaccin",
+                "vaccine",
+                "vaccination",
+                "immunisation",
+                "immunization",
+                "carnet de santé",
+                "health record",
+                "rappel",
+                "booster"
+            ]
+        }
+    ]
+}
