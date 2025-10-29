@@ -1,0 +1,135 @@
+{
+    "id": "professional",
+    "name": "Professionnel",
+    "nameEn": "Professional",
+    "icon": "briefcase",
+    "color": "#f59e0b",
+    "profiles": [
+        "professional"
+    ],
+    "priority": 80,
+    "keywords": [
+        "contrat",
+        "contract",
+        "entreprise",
+        "company",
+        "emploi",
+        "employment",
+        "travail",
+        "work",
+        "projet",
+        "project",
+        "client",
+        "customer",
+        "réunion",
+        "meeting",
+        "rapport",
+        "report",
+        "présentation",
+        "presentation",
+        "compte-rendu",
+        "minutes",
+        "ordre du jour",
+        "agenda"
+    ],
+    "subcategories": [
+        {
+            "id": "contracts",
+            "name": "Contrats",
+            "nameEn": "Contracts",
+            "keywords": [
+                "contrat",
+                "contract",
+                "accord",
+                "agreement",
+                "clause",
+                "signature",
+                "partie",
+                "party",
+                "engagement",
+                "commitment"
+            ]
+        },
+        {
+            "id": "reports",
+            "name": "Rapports",
+            "nameEn": "Reports",
+            "keywords": [
+                "rapport",
+                "report",
+                "analyse",
+                "analysis",
+                "résultats",
+                "results",
+                "conclusions",
+                "recommendations",
+                "synthèse",
+                "summary"
+            ]
+        },
+        {
+            "id": "presentations",
+            "name": "Présentations",
+            "nameEn": "Presentations",
+            "keywords": [
+                "présentation",
+                "presentation",
+                "slides",
+                "diapo",
+                "pitch",
+                "powerpoint",
+                "keynote",
+                "support visuel",
+                "visual aid"
+            ]
+        },
+        {
+            "id": "meeting_minutes",
+            "name": "Comptes-rendus",
+            "nameEn": "Meeting Minutes",
+            "keywords": [
+                "compte-rendu",
+                "minutes",
+                "réunion",
+                "meeting",
+                "ordre du jour",
+                "agenda",
+                "participants",
+                "décisions",
+                "decisions",
+                "actions"
+            ]
+        },
+        {
+            "id": "proposals",
+            "name": "Propositions commerciales",
+            "nameEn": "Business Proposals",
+            "keywords": [
+                "proposition",
+                "proposal",
+                "offre commerciale",
+                "business offer",
+                "soumission",
+                "bid",
+                "appel d'offres",
+                "tender"
+            ]
+        },
+        {
+            "id": "hr_documents",
+            "name": "Documents RH",
+            "nameEn": "HR Documents",
+            "keywords": [
+                "ressources humaines",
+                "human resources",
+                "paie",
+                "payroll",
+                "congé",
+                "leave",
+                "absence",
+                "fiche de poste",
+                "job description"
+            ]
+        }
+    ]
+}

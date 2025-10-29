@@ -1,0 +1,126 @@
+{
+    "id": "legal",
+    "name": "Juridique",
+    "nameEn": "Legal",
+    "icon": "scale",
+    "color": "#8b5cf6",
+    "profiles": [
+        "professional",
+        "personal"
+    ],
+    "priority": 75,
+    "keywords": [
+        "juridique",
+        "legal",
+        "droit",
+        "law",
+        "contrat",
+        "contract",
+        "tribunal",
+        "court",
+        "avocat",
+        "lawyer",
+        "juge",
+        "judge",
+        "procédure",
+        "procedure",
+        "jugement",
+        "judgment",
+        "loi",
+        "act",
+        "réglementation",
+        "regulation",
+        "conformité",
+        "compliance"
+    ],
+    "subcategories": [
+        {
+            "id": "contracts_legal",
+            "name": "Contrats légaux",
+            "nameEn": "Legal Contracts",
+            "keywords": [
+                "contrat",
+                "contract",
+                "bail",
+                "lease",
+                "location",
+                "rental",
+                "accord",
+                "agreement",
+                "clause",
+                "terme",
+                "term"
+            ]
+        },
+        {
+            "id": "court_documents",
+            "name": "Documents judiciaires",
+            "nameEn": "Court Documents",
+            "keywords": [
+                "tribunal",
+                "court",
+                "jugement",
+                "judgment",
+                "ordonnance",
+                "order",
+                "assignation",
+                "summons",
+                "plainte",
+                "complaint",
+                "procès",
+                "lawsuit"
+            ]
+        },
+        {
+            "id": "certificates",
+            "name": "Certificats",
+            "nameEn": "Certificates",
+            "keywords": [
+                "certificat",
+                "certificate",
+                "attestation",
+                "acte",
+                "deed",
+                "naissance",
+                "birth",
+                "mariage",
+                "marriage",
+                "décès",
+                "death"
+            ]
+        },
+        {
+            "id": "permits",
+            "name": "Autorisations et permis",
+            "nameEn": "Permits & Licenses",
+            "keywords": [
+                "permis",
+                "permit",
+                "autorisation",
+                "authorization",
+                "licence",
+                "license",
+                "agrément",
+                "approval",
+                "habilitation",
+                "accreditation"
+            ]
+        },
+        {
+            "id": "legal_correspondence",
+            "name": "Correspondance juridique",
+            "nameEn": "Legal Correspondence",
+            "keywords": [
+                "courrier juridique",
+                "legal letter",
+                "mise en demeure",
+                "notice",
+                "notification",
+                "avocat",
+                "lawyer",
+                "cabinet juridique",
+                "law firm"
+            ]
+        }
+    ]
+}
