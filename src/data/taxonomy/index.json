@@ -1,0 +1,82 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2025-10-29",
+    "categories": [
+        "academic",
+        "financial",
+        "professional",
+        "legal",
+        "health",
+        "personal"
+    ],
+    "profiles": [
+        {
+            "id": "student",
+            "name": "Étudiant",
+            "nameEn": "Student",
+            "icon": "graduation-cap",
+            "description": "Pour organiser vos documents académiques",
+            "descriptionEn": "To organize your academic documents",
+            "defaultCategories": [
+                "academic",
+                "financial",
+                "personal"
+            ]
+        },
+        {
+            "id": "professional",
+            "name": "Professionnel",
+            "nameEn": "Professional",
+            "icon": "briefcase",
+            "description": "Pour vos documents professionnels et d'entreprise",
+            "descriptionEn": "For your professional and business documents",
+            "defaultCategories": [
+                "professional",
+                "financial",
+                "legal"
+            ]
+        },
+        {
+            "id": "researcher",
+            "name": "Chercheur",
+            "nameEn": "Researcher",
+            "icon": "microscope",
+            "description": "Pour la recherche scientifique et académique",
+            "descriptionEn": "For scientific and academic research",
+            "defaultCategories": [
+                "academic",
+                "professional"
+            ]
+        },
+        {
+            "id": "personal",
+            "name": "Personnel",
+            "nameEn": "Personal",
+            "icon": "user",
+            "description": "Pour vos documents personnels et familiaux",
+            "descriptionEn": "For your personal and family documents",
+            "defaultCategories": [
+                "personal",
+                "financial",
+                "health",
+                "legal"
+            ]
+        },
+        {
+            "id": "auto",
+            "name": "Auto",
+            "nameEn": "Auto",
+            "icon": "zap",
+            "description": "Laissez le système décider automatiquement",
+            "descriptionEn": "Let the system decide automatically",
+            "defaultCategories": [
+                "academic",
+                "financial",
+                "professional",
+                "legal",
+                "health",
+                "personal"
+            ]
+        }
+    ]
+}

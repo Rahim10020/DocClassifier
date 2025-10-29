@@ -1,0 +1,138 @@
+{
+    "id": "personal",
+    "name": "Personnel",
+    "nameEn": "Personal",
+    "icon": "user",
+    "color": "#06b6d4",
+    "profiles": [
+        "personal"
+    ],
+    "priority": 65,
+    "keywords": [
+        "personnel",
+        "personal",
+        "privé",
+        "private",
+        "famille",
+        "family",
+        "maison",
+        "home",
+        "voyage",
+        "travel",
+        "loisir",
+        "leisure",
+        "photo",
+        "picture",
+        "lettre",
+        "letter",
+        "note",
+        "memo"
+    ],
+    "subcategories": [
+        {
+            "id": "identity",
+            "name": "Documents d'identité",
+            "nameEn": "Identity Documents",
+            "keywords": [
+                "carte d'identité",
+                "id card",
+                "passeport",
+                "passport",
+                "permis de conduire",
+                "driver's license",
+                "visa",
+                "identité",
+                "identity"
+            ]
+        },
+        {
+            "id": "correspondence",
+            "name": "Correspondance",
+            "nameEn": "Correspondence",
+            "keywords": [
+                "lettre",
+                "letter",
+                "courrier",
+                "mail",
+                "email",
+                "message",
+                "correspondance",
+                "carte postale",
+                "postcard"
+            ]
+        },
+        {
+            "id": "travel",
+            "name": "Voyage",
+            "nameEn": "Travel",
+            "keywords": [
+                "voyage",
+                "travel",
+                "billet",
+                "ticket",
+                "réservation",
+                "reservation",
+                "hôtel",
+                "hotel",
+                "vol",
+                "flight",
+                "train",
+                "itinéraire",
+                "itinerary"
+            ]
+        },
+        {
+            "id": "utilities",
+            "name": "Factures services",
+            "nameEn": "Utility Bills",
+            "keywords": [
+                "électricité",
+                "electricity",
+                "eau",
+                "water",
+                "gaz",
+                "gas",
+                "internet",
+                "téléphone",
+                "phone",
+                "abonnement",
+                "subscription"
+            ]
+        },
+        {
+            "id": "insurance_personal",
+            "name": "Assurances personnelles",
+            "nameEn": "Personal Insurance",
+            "keywords": [
+                "assurance",
+                "insurance",
+                "habitation",
+                "home",
+                "auto",
+                "car",
+                "vie",
+                "life",
+                "police",
+                "policy",
+                "sinistre",
+                "claim"
+            ]
+        },
+        {
+            "id": "hobbies",
+            "name": "Loisirs",
+            "nameEn": "Hobbies",
+            "keywords": [
+                "loisir",
+                "hobby",
+                "sport",
+                "club",
+                "association",
+                "adhésion",
+                "membership",
+                "activité",
+                "activity"
+            ]
+        }
+    ]
+}
