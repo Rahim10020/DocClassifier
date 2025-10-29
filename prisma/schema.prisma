@@ -1,0 +1,64 @@
+
+model Session {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime  // Expire après 2 heures
+  profile       String?   // "student", "professional", "researcher", "personal"
+  language      String    @default("fr") // Langue détectée
+  totalFiles    Int       @default(0)
+  processedFiles Int      @default(0)
+  status        String    @default("uploading") // uploading, processing, ready, expired
+  
+  documents     Document[]
+  
+  @@index([expiresAt])
+}
+
+model Document {
+  id            String    @id @default(cuid())
+  sessionId     String
+  session       Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Métadonnées fichier
+  originalName  String
+  fileName      String    // Nom stocké
+  fileType      String    // pdf, docx, txt, etc.
+  fileSize      Int
+  filePath      String    // Chemin temporaire
+  
+  // Contenu extrait
+  extractedText String?   @db.Text
+  language      String?
+  
+  // Classification
+  mainCategory    String?
+  subCategory     String?
+  confidence      Float?    // Score de confiance (0-1)
+  keywords        String[]  // Mots-clés extraits
+  
+  // Métadonnées supplémentaires
+  pageCount     Int?
+  wordCount     Int?
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([sessionId])
+}
+
+model Category {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  nameEn        String?   // Traduction anglaise
+  parentId      String?   // Pour sous-catégories
+  parent        Category? @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children      Category[] @relation("CategoryToCategory")
+  
+  profile       String[]  // ["student", "professional", "researcher", "personal"]
+  keywords      String[]  // Mots-clés associés
+  priority      Int       @default(0) // Pour le scoring
+  
+  icon          String?   // Icône associée
+  color         String?   // Couleur pour l'UI
+  
+  @@index([parentId])
+}
