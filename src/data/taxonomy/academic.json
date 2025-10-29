@@ -1,0 +1,141 @@
+{
+    "id": "academic",
+    "name": "Académique",
+    "nameEn": "Academic",
+    "icon": "graduation-cap",
+    "color": "#3b82f6",
+    "profiles": [
+        "student",
+        "researcher"
+    ],
+    "priority": 90,
+    "keywords": [
+        "cours",
+        "course",
+        "lecture",
+        "université",
+        "university",
+        "étudiant",
+        "student",
+        "professeur",
+        "professor",
+        "examen",
+        "exam",
+        "note",
+        "grade",
+        "devoir",
+        "assignment",
+        "projet",
+        "project",
+        "thèse",
+        "thesis",
+        "mémoire",
+        "dissertation",
+        "recherche",
+        "research",
+        "bibliographie",
+        "bibliography",
+        "citation",
+        "reference"
+    ],
+    "subcategories": [
+        {
+            "id": "lecture_notes",
+            "name": "Notes de cours",
+            "nameEn": "Lecture Notes",
+            "keywords": [
+                "notes",
+                "cours",
+                "lecture",
+                "chapitre",
+                "chapter",
+                "résumé",
+                "summary",
+                "polycopié",
+                "handout",
+                "slides"
+            ]
+        },
+        {
+            "id": "assignments",
+            "name": "Devoirs",
+            "nameEn": "Assignments",
+            "keywords": [
+                "devoir",
+                "assignment",
+                "exercice",
+                "exercise",
+                "travail",
+                "homework",
+                "à rendre",
+                "due",
+                "consigne",
+                "instructions"
+            ]
+        },
+        {
+            "id": "exams",
+            "name": "Examens",
+            "nameEn": "Exams",
+            "keywords": [
+                "examen",
+                "exam",
+                "test",
+                "évaluation",
+                "assessment",
+                "contrôle",
+                "quiz",
+                "partiel",
+                "midterm",
+                "final"
+            ]
+        },
+        {
+            "id": "research_papers",
+            "name": "Articles de recherche",
+            "nameEn": "Research Papers",
+            "keywords": [
+                "article",
+                "paper",
+                "recherche",
+                "research",
+                "étude",
+                "study",
+                "publication",
+                "journal",
+                "revue",
+                "peer-reviewed"
+            ]
+        },
+        {
+            "id": "thesis",
+            "name": "Thèses et mémoires",
+            "nameEn": "Thesis & Dissertations",
+            "keywords": [
+                "thèse",
+                "thesis",
+                "mémoire",
+                "dissertation",
+                "doctorat",
+                "phd",
+                "master",
+                "soutenance",
+                "defense"
+            ]
+        },
+        {
+            "id": "syllabi",
+            "name": "Programmes de cours",
+            "nameEn": "Syllabi",
+            "keywords": [
+                "syllabus",
+                "programme",
+                "curriculum",
+                "plan de cours",
+                "course outline",
+                "objectifs",
+                "objectives"
+            ]
+        }
+    ]
+}
