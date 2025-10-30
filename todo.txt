@@ -2,3 +2,5 @@
 - voir si un message d'information s'affiche apres la creation de compte. si c'est pas le cas, faire en sorte que 
     ca s'affiche.
 - coder ma page d'accueil comme celle de logogenie.
+
+-download route
