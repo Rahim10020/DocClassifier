@@ -1,29 +1,99 @@
+import { extractKeywords } from './keyword-extractor';
+import { scoreAgainstTaxonomy, findBestMatch } from './scorer';
+import { getTaxonomyByProfile } from './taxonomy';
+import { DocumentClassification, AlternativeCategory } from '@/types/document';
+import { Profile } from '@/types/category';
 
-async function classifyDocument(
-    document: Document,
-    taxonomy: Category[],
-    profile?: string
-): Promise<Classification> {
-    // 1. Extraction mots-clés
-    const keywords = extractKeywords(
-        document.extractedText,
-        document.language
-    );
+export interface ClassificationInput {
+    documentId: string;
+    text: string;
+    language: string;
+    profile?: Profile;
+}
 
-    // 2. Scoring
-    const scores = scoreAgainstTaxonomy(keywords, taxonomy, profile);
+export async function classifyDocument(
+    input: ClassificationInput
+): Promise<DocumentClassification> {
+    const { documentId, text, language, profile } = input;
 
-    // 3. Sélection meilleure catégorie
-    const best = scores[0];
+    // 1. Extraction des mots-clés
+    const keywords = extractKeywords(text, {
+        language: language as 'fr' | 'en',
+        maxKeywords: 30,
+    });
 
-    // 4. Calcul confiance
-    const confidence = best.score > 0.7 ? best.score : 0.5;
+    if (keywords.length === 0) {
+        return {
+            documentId,
+            mainCategory: 'Uncategorized',
+            confidence: 0,
+            keywords: [],
+            alternativeCategories: [],
+        };
+    }
+
+    // 2. Charger la taxonomie appropriée
+    const taxonomy = getTaxonomyByProfile(profile);
+
+    // 3. Scoring contre la taxonomie
+    const scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language);
+
+    // 4. Sélection de la meilleure catégorie
+    const bestMatch = findBestMatch(scores);
+
+    // 5. Construire le résultat
+    const alternativeCategories: AlternativeCategory[] = bestMatch.alternatives.map(alt => ({
+        categoryId: alt.categoryId,
+        categoryName: alt.categoryName,
+        subCategory: alt.subCategory,
+        score: alt.score,
+        matchedKeywords: alt.matchedKeywords,
+    }));
 
     return {
-        mainCategory: best.categoryName,
-        subCategory: best.subCategory,
-        confidence,
-        keywords: keywords.slice(0, 10), // Top 10
-        alternativeCategories: scores.slice(1, 4) // Top 3 alternatives
+        documentId,
+        mainCategory: bestMatch.mainCategory,
+        subCategory: bestMatch.subCategory,
+        confidence: bestMatch.confidence,
+        keywords: keywords.slice(0, 10), // Top 10 keywords
+        alternativeCategories,
     };
+}
+
+export async function classifyDocuments(
+    inputs: ClassificationInput[]
+): Promise<DocumentClassification[]> {
+    const results: DocumentClassification[] = [];
+
+    for (const input of inputs) {
+        try {
+            const classification = await classifyDocument(input);
+            results.push(classification);
+        } catch (error) {
+            console.error(`Error classifying document ${input.documentId}:`, error);
+            results.push({
+                documentId: input.documentId,
+                mainCategory: 'Error',
+                confidence: 0,
+                keywords: [],
+                alternativeCategories: [],
+            });
+        }
+    }
+
+    return results;
+}
+
+export function reclassifyDocument(
+    documentId: string,
+    text: string,
+    language: string,
+    newProfile?: Profile
+): Promise<DocumentClassification> {
+    return classifyDocument({
+        documentId,
+        text,
+        language,
+        profile: newProfile,
+    });
 }
