@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { classifyDocument } from '@/lib/classification/classifier';
 import { updateSessionStatus } from '@/lib/session';
 import { Profile } from '@/types/category';
+import { Document } from '@/types/document';
 
 export async function POST(request: NextRequest) {
     try {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const documents = session.documents.filter(doc => doc.extractedText);
+        const documents = session.documents.filter((doc: Document) => doc.extractedText);
 
         if (documents.length === 0) {
             return NextResponse.json(
