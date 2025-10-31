@@ -1,0 +1,84 @@
+{
+    "id": "creative",
+    "name": "Créatif",
+    "nameEn": "Creative",
+    "icon": "palette",
+    "color": "#ec4899",
+    "profiles": [
+        "personal",
+        "professional"
+    ],
+    "priority": 68,
+    "keywords": [
+        "design",
+        "graphique",
+        "graphic",
+        "logo",
+        "brand",
+        "illustration",
+        "photographie",
+        "photography",
+        "vidéo",
+        "video",
+        "audio",
+        "musique",
+        "music",
+        "art",
+        "créatif",
+        "creative",
+        "portfolio"
+    ],
+    "subcategories": [
+        {
+            "id": "graphic_design",
+            "name": "Design graphique",
+            "nameEn": "Graphic Design",
+            "keywords": [
+                "logo",
+                "brand",
+                "identity",
+                "visual",
+                "mockup",
+                "prototype"
+            ]
+        },
+        {
+            "id": "photography",
+            "name": "Photographie",
+            "nameEn": "Photography",
+            "keywords": [
+                "photo",
+                "image",
+                "shooting",
+                "portfolio",
+                "gallery"
+            ]
+        },
+        {
+            "id": "video_audio",
+            "name": "Vidéo & Audio",
+            "nameEn": "Video & Audio",
+            "keywords": [
+                "video",
+                "montage",
+                "editing",
+                "sound",
+                "podcast",
+                "music"
+            ]
+        },
+        {
+            "id": "writing",
+            "name": "Écriture créative",
+            "nameEn": "Creative Writing",
+            "keywords": [
+                "roman",
+                "novel",
+                "poésie",
+                "poetry",
+                "script",
+                "scénario"
+            ]
+        }
+    ]
+}

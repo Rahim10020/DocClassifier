@@ -1,0 +1,68 @@
+{
+    "id": "education",
+    "name": "Éducation",
+    "nameEn": "Education",
+    "icon": "book-open",
+    "color": "#a855f7",
+    "profiles": [
+        "student",
+        "personal"
+    ],
+    "priority": 73,
+    "keywords": [
+        "éducation",
+        "education",
+        "formation",
+        "training",
+        "cours en ligne",
+        "online course",
+        "certificat",
+        "certificate",
+        "diplôme",
+        "degree",
+        "apprentissage",
+        "learning",
+        "tutoriel",
+        "tutorial",
+        "leçon",
+        "lesson"
+    ],
+    "subcategories": [
+        {
+            "id": "certifications",
+            "name": "Certifications",
+            "nameEn": "Certifications",
+            "keywords": [
+                "certificat",
+                "certification",
+                "badge",
+                "credential",
+                "diploma"
+            ]
+        },
+        {
+            "id": "online_courses",
+            "name": "Cours en ligne",
+            "nameEn": "Online Courses",
+            "keywords": [
+                "mooc",
+                "e-learning",
+                "coursera",
+                "udemy",
+                "webinar"
+            ]
+        },
+        {
+            "id": "training_materials",
+            "name": "Matériel de formation",
+            "nameEn": "Training Materials",
+            "keywords": [
+                "manuel",
+                "handbook",
+                "guide",
+                "ressources",
+                "resources"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,69 @@
+{
+    "id": "environmental",
+    "name": "Environnement",
+    "nameEn": "Environmental",
+    "icon": "leaf",
+    "color": "#22c55e",
+    "profiles": [
+        "researcher",
+        "professional"
+    ],
+    "priority": 69,
+    "keywords": [
+        "environnement",
+        "environment",
+        "écologie",
+        "ecology",
+        "durable",
+        "sustainable",
+        "climat",
+        "climate",
+        "énergie",
+        "energy",
+        "recyclage",
+        "recycling",
+        "pollution",
+        "carbon",
+        "carbone",
+        "vert",
+        "green"
+    ],
+    "subcategories": [
+        {
+            "id": "environmental_reports",
+            "name": "Rapports environnementaux",
+            "nameEn": "Environmental Reports",
+            "keywords": [
+                "étude impact",
+                "impact study",
+                "audit",
+                "évaluation"
+            ]
+        },
+        {
+            "id": "sustainability",
+            "name": "Développement durable",
+            "nameEn": "Sustainability",
+            "keywords": [
+                "durable",
+                "sustainable",
+                "rse",
+                "csr",
+                "green",
+                "vert"
+            ]
+        },
+        {
+            "id": "energy",
+            "name": "Énergie",
+            "nameEn": "Energy",
+            "keywords": [
+                "énergie",
+                "energy",
+                "renouvelable",
+                "renewable",
+                "solaire"
+            ]
+        }
+    ]
+}

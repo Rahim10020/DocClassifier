@@ -1,0 +1,64 @@
+{
+    "id": "government",
+    "name": "Administration",
+    "nameEn": "Government",
+    "icon": "landmark",
+    "color": "#64748b",
+    "profiles": [
+        "personal"
+    ],
+    "priority": 74,
+    "keywords": [
+        "administration",
+        "gouvernement",
+        "government",
+        "mairie",
+        "city hall",
+        "préfecture",
+        "prefecture",
+        "état civil",
+        "civil status",
+        "passeport",
+        "passport",
+        "visa",
+        "nationalité",
+        "nationality",
+        "démarche administrative"
+    ],
+    "subcategories": [
+        {
+            "id": "civil_status",
+            "name": "État civil",
+            "nameEn": "Civil Status",
+            "keywords": [
+                "état civil",
+                "civil status",
+                "acte naissance",
+                "birth certificate"
+            ]
+        },
+        {
+            "id": "administrative_procedures",
+            "name": "Démarches administratives",
+            "nameEn": "Administrative Procedures",
+            "keywords": [
+                "démarche",
+                "procedure",
+                "formulaire",
+                "form",
+                "demande"
+            ]
+        },
+        {
+            "id": "citizenship",
+            "name": "Citoyenneté",
+            "nameEn": "Citizenship",
+            "keywords": [
+                "nationalité",
+                "nationality",
+                "naturalisation",
+                "citizenship"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,86 @@
+{
+    "id": "real_estate",
+    "name": "Immobilier",
+    "nameEn": "Real Estate",
+    "icon": "home",
+    "color": "#0ea5e9",
+    "profiles": [
+        "personal",
+        "professional"
+    ],
+    "priority": 71,
+    "keywords": [
+        "immobilier",
+        "real estate",
+        "propriété",
+        "property",
+        "location",
+        "rental",
+        "achat",
+        "purchase",
+        "vente",
+        "sale",
+        "maison",
+        "house",
+        "appartement",
+        "apartment",
+        "terrain",
+        "land",
+        "hypothèque",
+        "mortgage",
+        "loyer",
+        "rent"
+    ],
+    "subcategories": [
+        {
+            "id": "purchase_sale",
+            "name": "Achat/Vente",
+            "nameEn": "Purchase/Sale",
+            "keywords": [
+                "acte de vente",
+                "deed",
+                "notaire",
+                "notary",
+                "compromis"
+            ]
+        },
+        {
+            "id": "rental",
+            "name": "Location",
+            "nameEn": "Rental",
+            "keywords": [
+                "bail",
+                "lease",
+                "loyer",
+                "rent",
+                "locataire",
+                "tenant"
+            ]
+        },
+        {
+            "id": "property_management",
+            "name": "Gestion immobilière",
+            "nameEn": "Property Management",
+            "keywords": [
+                "copropriété",
+                "charges",
+                "syndic",
+                "maintenance",
+                "travaux"
+            ]
+        },
+        {
+            "id": "mortgage",
+            "name": "Prêts immobiliers",
+            "nameEn": "Mortgages",
+            "keywords": [
+                "hypothèque",
+                "mortgage",
+                "prêt",
+                "loan",
+                "banque",
+                "taux"
+            ]
+        }
+    ]
+}

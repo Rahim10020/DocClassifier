@@ -1,0 +1,68 @@
+{
+    "id": "science",
+    "name": "Sciences",
+    "nameEn": "Science",
+    "icon": "atom",
+    "color": "#8b5cf6",
+    "profiles": [
+        "researcher",
+        "student"
+    ],
+    "priority": 82,
+    "keywords": [
+        "science",
+        "scientifique",
+        "scientific",
+        "expérience",
+        "experiment",
+        "laboratoire",
+        "laboratory",
+        "données",
+        "data",
+        "analyse",
+        "analysis",
+        "hypothèse",
+        "hypothesis",
+        "méthode",
+        "method",
+        "résultats",
+        "results"
+    ],
+    "subcategories": [
+        {
+            "id": "lab_reports",
+            "name": "Rapports de laboratoire",
+            "nameEn": "Lab Reports",
+            "keywords": [
+                "laboratoire",
+                "lab",
+                "expérience",
+                "experiment",
+                "protocole"
+            ]
+        },
+        {
+            "id": "data_analysis",
+            "name": "Analyse de données",
+            "nameEn": "Data Analysis",
+            "keywords": [
+                "données",
+                "data",
+                "statistiques",
+                "statistics",
+                "analyse"
+            ]
+        },
+        {
+            "id": "scientific_publications",
+            "name": "Publications scientifiques",
+            "nameEn": "Scientific Publications",
+            "keywords": [
+                "publication",
+                "journal",
+                "peer review",
+                "article scientifique"
+            ]
+        }
+    ]
+}

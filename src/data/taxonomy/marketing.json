@@ -1,0 +1,81 @@
+{
+    "id": "marketing",
+    "name": "Marketing",
+    "nameEn": "Marketing",
+    "icon": "megaphone",
+    "color": "#f97316",
+    "profiles": [
+        "professional"
+    ],
+    "priority": 72,
+    "keywords": [
+        "marketing",
+        "campagne",
+        "campaign",
+        "publicité",
+        "advertising",
+        "brand",
+        "marque",
+        "stratégie",
+        "strategy",
+        "social media",
+        "réseaux sociaux",
+        "analytics",
+        "roi",
+        "conversion",
+        "lead",
+        "prospect",
+        "client"
+    ],
+    "subcategories": [
+        {
+            "id": "campaigns",
+            "name": "Campagnes",
+            "nameEn": "Campaigns",
+            "keywords": [
+                "campagne",
+                "campaign",
+                "lancement",
+                "launch",
+                "promotion"
+            ]
+        },
+        {
+            "id": "content_marketing",
+            "name": "Content Marketing",
+            "nameEn": "Content Marketing",
+            "keywords": [
+                "blog",
+                "article",
+                "content",
+                "seo",
+                "copywriting"
+            ]
+        },
+        {
+            "id": "analytics_marketing",
+            "name": "Analytics",
+            "nameEn": "Analytics",
+            "keywords": [
+                "analytics",
+                "metrics",
+                "kpi",
+                "roi",
+                "performance",
+                "dashboard"
+            ]
+        },
+        {
+            "id": "social_media",
+            "name": "Réseaux sociaux",
+            "nameEn": "Social Media",
+            "keywords": [
+                "facebook",
+                "twitter",
+                "linkedin",
+                "instagram",
+                "social media"
+            ]
+        }
+    ]
+}

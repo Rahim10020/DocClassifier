@@ -1,0 +1,68 @@
+{
+    "id": "events",
+    "name": "Événements",
+    "nameEn": "Events",
+    "icon": "calendar-days",
+    "color": "#f59e0b",
+    "profiles": [
+        "personal",
+        "professional"
+    ],
+    "priority": 67,
+    "keywords": [
+        "événement",
+        "event",
+        "conférence",
+        "conference",
+        "séminaire",
+        "seminar",
+        "mariage",
+        "wedding",
+        "anniversaire",
+        "birthday",
+        "invitation",
+        "réservation",
+        "booking",
+        "billet",
+        "ticket",
+        "festival"
+    ],
+    "subcategories": [
+        {
+            "id": "conferences",
+            "name": "Conférences",
+            "nameEn": "Conferences",
+            "keywords": [
+                "conférence",
+                "conference",
+                "séminaire",
+                "workshop",
+                "summit"
+            ]
+        },
+        {
+            "id": "personal_events",
+            "name": "Événements personnels",
+            "nameEn": "Personal Events",
+            "keywords": [
+                "mariage",
+                "wedding",
+                "anniversaire",
+                "birthday",
+                "fête"
+            ]
+        },
+        {
+            "id": "tickets_bookings",
+            "name": "Billets & Réservations",
+            "nameEn": "Tickets & Bookings",
+            "keywords": [
+                "billet",
+                "ticket",
+                "réservation",
+                "booking",
+                "confirmation"
+            ]
+        }
+    ]
+}

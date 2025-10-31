@@ -1,0 +1,84 @@
+{
+    "id": "technical",
+    "name": "Technique",
+    "nameEn": "Technical",
+    "icon": "code",
+    "color": "#14b8a6",
+    "profiles": [
+        "professional",
+        "researcher"
+    ],
+    "priority": 78,
+    "keywords": [
+        "code",
+        "programming",
+        "développement",
+        "development",
+        "api",
+        "documentation",
+        "architecture",
+        "système",
+        "system",
+        "serveur",
+        "server",
+        "base de données",
+        "database",
+        "réseau",
+        "network",
+        "sécurité",
+        "security",
+        "bug",
+        "debug"
+    ],
+    "subcategories": [
+        {
+            "id": "documentation",
+            "name": "Documentation technique",
+            "nameEn": "Technical Documentation",
+            "keywords": [
+                "manuel",
+                "guide",
+                "readme",
+                "api doc",
+                "specification",
+                "specs"
+            ]
+        },
+        {
+            "id": "code_reviews",
+            "name": "Revues de code",
+            "nameEn": "Code Reviews",
+            "keywords": [
+                "pull request",
+                "pr",
+                "review",
+                "merge",
+                "commit",
+                "feedback"
+            ]
+        },
+        {
+            "id": "architecture",
+            "name": "Architecture système",
+            "nameEn": "System Architecture",
+            "keywords": [
+                "architecture",
+                "design",
+                "schema",
+                "diagram",
+                "infrastructure"
+            ]
+        },
+        {
+            "id": "security",
+            "name": "Sécurité",
+            "nameEn": "Security",
+            "keywords": [
+                "vulnerability",
+                "security audit",
+                "penetration test",
+                "encryption"
+            ]
+        }
+    ]
+}

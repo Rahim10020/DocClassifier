@@ -1,0 +1,66 @@
+{
+    "id": "transportation",
+    "name": "Transport",
+    "nameEn": "Transportation",
+    "icon": "car",
+    "color": "#6366f1",
+    "profiles": [
+        "personal"
+    ],
+    "priority": 66,
+    "keywords": [
+        "véhicule",
+        "vehicle",
+        "voiture",
+        "car",
+        "moto",
+        "motorcycle",
+        "assurance auto",
+        "car insurance",
+        "carte grise",
+        "registration",
+        "contrôle technique",
+        "inspection",
+        "permis",
+        "license",
+        "réparation",
+        "repair"
+    ],
+    "subcategories": [
+        {
+            "id": "vehicle_documents",
+            "name": "Documents véhicule",
+            "nameEn": "Vehicle Documents",
+            "keywords": [
+                "carte grise",
+                "registration",
+                "assurance",
+                "insurance"
+            ]
+        },
+        {
+            "id": "maintenance",
+            "name": "Entretien",
+            "nameEn": "Maintenance",
+            "keywords": [
+                "réparation",
+                "repair",
+                "révision",
+                "service",
+                "garage"
+            ]
+        },
+        {
+            "id": "tickets_fines",
+            "name": "Contraventions",
+            "nameEn": "Tickets & Fines",
+            "keywords": [
+                "amende",
+                "fine",
+                "pv",
+                "ticket",
+                "contravention"
+            ]
+        }
+    ]
+}
