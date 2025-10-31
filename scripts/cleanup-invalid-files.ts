@@ -40,7 +40,7 @@ async function cleanupInvalidFiles() {
     console.log('🗑️  Pour supprimer ces documents, décommentez la section de suppression dans le script\n');
 
     // DÉCOMMENTEZ LES LIGNES SUIVANTES POUR SUPPRIMER LES DOCUMENTS INVALIDES
-    /*
+
     console.log('🗑️  Suppression des documents invalides...');
 
     const deletedDocuments = await prisma.document.deleteMany({
@@ -53,7 +53,7 @@ async function cleanupInvalidFiles() {
 
     console.log(`✅ ${deletedDocuments.count} document(s) supprimé(s)`);
 
-    // Supprimer les sessions vides
+    //Supprimer les sessions vides
     console.log('🧹 Nettoyage des sessions vides...');
 
     const sessions = await prisma.session.findMany({
@@ -76,7 +76,7 @@ async function cleanupInvalidFiles() {
         });
         console.log(`✅ ${emptySessions.length} session(s) vide(s) supprimée(s)`);
     }
-    */
+
 }
 
 cleanupInvalidFiles()
