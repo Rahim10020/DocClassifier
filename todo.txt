@@ -1,5 +1,1 @@
-## Tâches restantes
 
-- Implémenter système d'authentification (NextAuth) avec création de compte
-- Ajouter message d'information après création de compte
-- Coder la page d'accueil comme celle de LogoGenie
