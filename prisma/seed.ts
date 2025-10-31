@@ -6,6 +6,10 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('🌱 Starting seed...');
 
+    // Clear existing data first
+    console.log('🧹 Clearing existing categories...');
+    await prisma.category.deleteMany();
+
     // Charger la taxonomie
     const categories = loadTaxonomy();
 
