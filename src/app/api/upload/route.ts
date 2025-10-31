@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
 
         // Sauvegarder chaque fichier
         const savedDocuments = [];
+        const failedFiles: { name: string; error: string }[] = [];
 
         for (const file of files) {
             try {
@@ -56,7 +57,10 @@ export async function POST(request: NextRequest) {
                 savedDocuments.push(document);
             } catch (error) {
                 console.error(`Error saving file ${file.name}:`, error);
-                // Continuer avec les autres fichiers
+                failedFiles.push({
+                    name: file.name,
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                });
             }
         }
 
@@ -64,10 +68,11 @@ export async function POST(request: NextRequest) {
         await updateSessionTotalFiles(session.id, savedDocuments.length);
 
         return NextResponse.json({
-            success: true,
+            success: savedDocuments.length > 0,
             data: {
                 sessionId: session.id,
                 totalFiles: savedDocuments.length,
+                failedFiles: failedFiles.length > 0 ? failedFiles : undefined,
                 documents: savedDocuments.map(doc => ({
                     id: doc.id,
                     name: doc.originalName,
@@ -75,6 +80,9 @@ export async function POST(request: NextRequest) {
                     type: doc.fileType,
                 })),
             },
+            warning: failedFiles.length > 0
+                ? `${failedFiles.length} fichier(s) n'ont pas pu être uploadés`
+                : undefined,
         });
     } catch (error) {
         console.error('Upload error:', error);
@@ -88,9 +96,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
