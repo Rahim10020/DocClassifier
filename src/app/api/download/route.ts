@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         const zipBuffer = await readFile(result.zipPath);
 
         // Créer la réponse avec le fichier ZIP
-        const response = new NextResponse(zipBuffer, {
+        const response = new NextResponse(zipBuffer as any, {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',

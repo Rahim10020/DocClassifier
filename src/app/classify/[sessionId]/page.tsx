@@ -91,8 +91,8 @@ export default function ClassifyPage() {
             type: doc.fileType,
             size: doc.fileSize,
             content: doc.extractedText || 'Contenu non disponible',
-            pageCount: doc.pageCount,
-            wordCount: doc.wordCount,
+            pageCount: doc.pageCount || undefined,
+            wordCount: doc.wordCount || undefined,
         });
     };
 

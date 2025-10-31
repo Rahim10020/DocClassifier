@@ -4,7 +4,7 @@ export interface Session {
     id: string;
     createdAt: Date;
     expiresAt: Date;
-    profile?: string;
+    profile: string | null;
     language: string;
     totalFiles: number;
     processedFiles: number;

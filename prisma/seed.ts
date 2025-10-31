@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { loadTaxonomy } from '../src/lib/classification/taxonomy';
+import { loadTaxonomy } from '../src/lib/classification/taxonomy.js';
 
 const prisma = new PrismaClient();
 

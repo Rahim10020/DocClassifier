@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const documents = session.documents.filter((doc: Document) => doc.extractedText);
+        const documents = session.documents.filter((doc) => doc.extractedText !== null && doc.extractedText !== undefined);
 
         if (documents.length === 0) {
             return NextResponse.json(

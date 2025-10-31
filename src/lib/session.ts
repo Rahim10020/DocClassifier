@@ -19,7 +19,7 @@ export async function createSession(
         },
     });
 
-    return session;
+    return session as unknown as Session;
 }
 
 export async function getSession(sessionId: string): Promise<Session | null> {
@@ -35,10 +35,10 @@ export async function getSession(sessionId: string): Promise<Session | null> {
     // Vérifier l'expiration
     if (new Date(session.expiresAt) < new Date()) {
         await updateSessionStatus(sessionId, 'expired');
-        return { ...session, status: 'expired' };
+        return { ...session, status: 'expired' as SessionStatus } as unknown as Session;
     }
 
-    return session;
+    return session as unknown as Session;
 }
 
 export async function updateSessionStatus(
