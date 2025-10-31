@@ -28,10 +28,12 @@ export async function saveFile(sessionId: string, file: File): Promise<string> {
 }
 
 export async function readFile(sessionId: string, fileName: string): Promise<Buffer> {
-    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, fileName);
+    // Extraire uniquement le nom du fichier de base au cas où un chemin complet serait passé
+    const baseFileName = path.basename(fileName);
+    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, baseFileName);
 
     if (!await fs.pathExists(filePath)) {
-        throw new Error(`File not found: ${fileName}`);
+        throw new Error(`File not found: ${baseFileName} in session ${sessionId}`);
     }
 
     return await fs.readFile(filePath);
@@ -56,13 +58,17 @@ export async function getSessionFiles(sessionId: string): Promise<string[]> {
 }
 
 export async function getFileSize(sessionId: string, fileName: string): Promise<number> {
-    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, fileName);
+    // Extraire uniquement le nom du fichier de base au cas où un chemin complet serait passé
+    const baseFileName = path.basename(fileName);
+    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, baseFileName);
     const stats = await fs.stat(filePath);
     return stats.size;
 }
 
 export async function fileExists(sessionId: string, fileName: string): Promise<boolean> {
-    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, fileName);
+    // Extraire uniquement le nom du fichier de base au cas où un chemin complet serait passé
+    const baseFileName = path.basename(fileName);
+    const filePath = path.join(TEMP_STORAGE_PATH, sessionId, baseFileName);
     return await fs.pathExists(filePath);
 }
 
@@ -88,5 +94,7 @@ export async function cleanupExpiredSessions(): Promise<number> {
 }
 
 export function getFilePath(sessionId: string, fileName: string): string {
-    return path.join(TEMP_STORAGE_PATH, sessionId, fileName);
+    // Extraire uniquement le nom du fichier de base au cas où un chemin complet serait passé
+    const baseFileName = path.basename(fileName);
+    return path.join(TEMP_STORAGE_PATH, sessionId, baseFileName);
 }
