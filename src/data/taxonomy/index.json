@@ -1,13 +1,24 @@
 {
-    "version": "1.0",
-    "lastUpdated": "2025-10-29",
+    "version": "1.1",
+    "lastUpdated": "2025-10-31",
     "categories": [
         "academic",
+        "administration",
+        "creative",
+        "education",
+        "environmental",
+        "events",
         "financial",
-        "professional",
-        "legal",
         "health",
-        "personal"
+        "real_estate",
+        "legal",
+        "marketing",
+        "personal",
+        "personal_development",
+        "professional",
+        "science",
+        "technical",
+        "transportation"
     ],
     "profiles": [
         {
@@ -20,7 +31,9 @@
             "defaultCategories": [
                 "academic",
                 "financial",
-                "personal"
+                "personal",
+                "education",
+                "personal_development"
             ]
         },
         {
@@ -33,7 +46,9 @@
             "defaultCategories": [
                 "professional",
                 "financial",
-                "legal"
+                "legal",
+                "marketing",
+                "technical"
             ]
         },
         {
@@ -45,7 +60,10 @@
             "descriptionEn": "For scientific and academic research",
             "defaultCategories": [
                 "academic",
-                "professional"
+                "professional",
+                "science",
+                "technical",
+                "environmental"
             ]
         },
         {
@@ -59,7 +77,12 @@
                 "personal",
                 "financial",
                 "health",
-                "legal"
+                "legal",
+                "administration",
+                "real_estate",
+                "transportation",
+                "events",
+                "personal_development"
             ]
         },
         {
@@ -71,11 +94,22 @@
             "descriptionEn": "Let the system decide automatically",
             "defaultCategories": [
                 "academic",
+                "administration",
+                "creative",
+                "education",
+                "environmental",
+                "events",
                 "financial",
-                "professional",
-                "legal",
                 "health",
-                "personal"
+                "real_estate",
+                "legal",
+                "marketing",
+                "personal",
+                "personal_development",
+                "professional",
+                "science",
+                "technical",
+                "transportation"
             ]
         }
     ]

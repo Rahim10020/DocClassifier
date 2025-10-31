@@ -1,20 +1,42 @@
 import { Category, Profile } from '@/types/category';
 import academicData from '@/data/taxonomy/academic.json';
+import administrationData from '@/data/taxonomy/administration.json';
+import creativeData from '@/data/taxonomy/creative.json';
+import educationData from '@/data/taxonomy/education.json';
+import environmentalData from '@/data/taxonomy/environnement.json';
+import eventsData from '@/data/taxonomy/events.json';
 import financialData from '@/data/taxonomy/financial.json';
-import professionalData from '@/data/taxonomy/professional.json';
-import legalData from '@/data/taxonomy/legal.json';
 import healthData from '@/data/taxonomy/health.json';
+import realEstateData from '@/data/taxonomy/immobilier.json';
+import legalData from '@/data/taxonomy/legal.json';
+import marketingData from '@/data/taxonomy/marketing.json';
 import personalData from '@/data/taxonomy/personal.json';
+import personalDevelopmentData from '@/data/taxonomy/personal-development.json';
+import professionalData from '@/data/taxonomy/professional.json';
+import scienceData from '@/data/taxonomy/science.json';
+import technicalData from '@/data/taxonomy/technical.json';
+import transportationData from '@/data/taxonomy/transport.json';
 import indexData from '@/data/taxonomy/index.json';
 
 // Charger toutes les taxonomies
 const taxonomyData = {
     academic: academicData,
+    administration: administrationData,
+    creative: creativeData,
+    education: educationData,
+    environmental: environmentalData,
+    events: eventsData,
     financial: financialData,
-    professional: professionalData,
-    legal: legalData,
     health: healthData,
+    real_estate: realEstateData,
+    legal: legalData,
+    marketing: marketingData,
     personal: personalData,
+    personal_development: personalDevelopmentData,
+    professional: professionalData,
+    science: scienceData,
+    technical: technicalData,
+    transportation: transportationData,
 };
 
 export function loadTaxonomy(): Category[] {
