@@ -27,7 +27,7 @@
     "lucide-react": "^0.460.0",
     "mammoth": "^1.8.0",
     "nanoid": "^5.0.7",
-    "natural": "^6.10.0",
+    "natural": "^5.1.13",
     "next": "^15.5.4",
     "next-auth": "^4.24.11",
     "pdf-parse": "^1.1.1",
