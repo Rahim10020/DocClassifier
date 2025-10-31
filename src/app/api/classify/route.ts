@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma';
 import { classifyDocument } from '@/lib/classification/classifier';
 import { updateSessionStatus } from '@/lib/session';
 import { Profile } from '@/types/category';
-import { Document } from '@/types/document';
 
 export async function POST(request: NextRequest) {
     try {

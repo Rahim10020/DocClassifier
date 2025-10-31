@@ -5,10 +5,11 @@ import { deleteSession as deleteSessionFiles } from '@/lib/storage';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const sessionId = params.id;
+        const { id } = await params;
+        const sessionId = id;
 
         const session = await getSession(sessionId);
 
@@ -45,10 +46,11 @@ export async function GET(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const sessionId = params.id;
+        const { id } = await params;
+        const sessionId = id;
 
         // Vérifier que la session existe
         const session = await prisma.session.findUnique({
