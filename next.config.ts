@@ -7,14 +7,6 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Augmenter les limites pour les uploads de fichiers
-  api: {
-    bodyParser: {
-      sizeLimit: '200mb',
-    },
-    responseLimit: '200mb',
-  },
-
   // Headers pour permettre les uploads volumineux
   async headers() {
     return [
@@ -23,7 +15,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: '*',
+            // En production, définir ALLOWED_ORIGIN dans .env avec votre domaine
+            value: process.env.ALLOWED_ORIGIN || '*',
           },
           {
             key: 'Access-Control-Allow-Methods',

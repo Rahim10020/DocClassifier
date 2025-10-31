@@ -6,6 +6,21 @@ import { deleteSession as deleteSessionFiles } from '@/lib/storage';
 import { deleteSession } from '@/lib/session';
 import { readFile } from 'fs/promises';
 
+// Types pour l'aperçu des documents
+interface DocumentPreview {
+    id: string;
+    originalName: string;
+    mainCategory: string | null;
+    subCategory: string | null;
+    fileSize: number;
+}
+
+interface HierarchicalCategory {
+    name: string;
+    files: string[];
+    subcategories: Record<string, { name: string; files: string[] }>;
+}
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -52,7 +67,7 @@ export async function POST(request: NextRequest) {
         const zipBuffer = await readFile(result.zipPath);
 
         // Créer la réponse avec le fichier ZIP
-        const response = new NextResponse(zipBuffer as any, {
+        const response = new NextResponse(zipBuffer, {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',
@@ -141,8 +156,8 @@ export async function GET(request: NextRequest) {
     }
 }
 
-function createHierarchicalPreview(documents: any[]) {
-    const structure: Record<string, any> = {};
+function createHierarchicalPreview(documents: DocumentPreview[]): Record<string, HierarchicalCategory> {
+    const structure: Record<string, HierarchicalCategory> = {};
 
     documents.forEach(doc => {
         const category = doc.mainCategory || 'Uncategorized';
@@ -171,7 +186,7 @@ function createHierarchicalPreview(documents: any[]) {
     return structure;
 }
 
-function createFlatPreview(documents: any[]) {
+function createFlatPreview(documents: DocumentPreview[]): string[] {
     return documents.map(doc => {
         const prefix = doc.mainCategory ? `[${doc.mainCategory}]_` : '';
         return `${prefix}${doc.originalName}`;
