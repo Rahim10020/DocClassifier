@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, CheckCircle2 } from 'lucide-react';
+import { FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Document } from '@/types/document';
 import { cn } from '@/lib/utils';
@@ -9,12 +9,14 @@ import { cn } from '@/lib/utils';
 interface ProcessingAnimationProps {
     documents: Document[];
     processedCount: number;
+    failedDocuments?: string[];  // Liste des IDs en erreur
     className?: string;
 }
 
 export function ProcessingAnimation({
     documents,
     processedCount,
+    failedDocuments = [],
     className,
 }: ProcessingAnimationProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,18 +40,22 @@ export function ProcessingAnimation({
                 {visibleDocuments.map((doc, index) => {
                     const isProcessed = documents.indexOf(doc) < processedCount;
                     const isCurrent = documents.indexOf(doc) === processedCount - 1;
+                    const hasFailed = failedDocuments.includes(doc.id);
 
                     return (
                         <div
                             key={doc.id}
                             className={cn(
                                 'flex items-center gap-3 p-3 rounded-lg border transition-all',
-                                isProcessed && 'border-success bg-success-light',
-                                isCurrent && 'border-primary bg-primary-light animate-pulse',
+                                isProcessed && !hasFailed && 'border-success bg-success-light',
+                                hasFailed && 'border-error bg-error-light',
+                                isCurrent && !hasFailed && 'border-primary bg-primary-light animate-pulse',
                                 !isProcessed && !isCurrent && 'border-border bg-background'
                             )}
                         >
-                            {isProcessed ? (
+                            {hasFailed ? (
+                                <AlertCircle className="h-5 w-5 text-error shrink-0" />
+                            ) : isProcessed ? (
                                 <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
                             ) : (
                                 <FileText className="h-5 w-5 text-foreground-muted shrink-0" />
@@ -59,13 +65,18 @@ export function ProcessingAnimation({
                                 <p className="text-sm font-medium text-foreground truncate">
                                     {doc.originalName}
                                 </p>
-                                {isProcessed && doc.mainCategory && (
+                                {hasFailed && (
+                                    <p className="text-xs text-error mt-1">
+                                        ❌ Erreur lors du traitement
+                                    </p>
+                                )}
+                                {isProcessed && !hasFailed && doc.mainCategory && (
                                     <p className="text-xs text-success mt-1">
                                         ✓ Classifié dans: {doc.mainCategory}
                                         {doc.subCategory && ` > ${doc.subCategory}`}
                                     </p>
                                 )}
-                                {isCurrent && (
+                                {isCurrent && !hasFailed && (
                                     <p className="text-xs text-primary mt-1">
                                         Analyse en cours...
                                     </p>
@@ -81,6 +92,11 @@ export function ProcessingAnimation({
                         <p className="font-semibold text-success">
                             🎉 Tous les documents ont été traités !
                         </p>
+                        {failedDocuments.length > 0 && (
+                            <p className="text-sm text-error mt-2">
+                                ⚠️ {failedDocuments.length} document(s) en erreur
+                            </p>
+                        )}
                     </div>
                 )}
             </div>
