@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { useSession } from '@/hooks/useSession';
 import { useClassification } from '@/hooks/useClassification';
 import { useDragAndDrop } from '@/hooks/useDragAndDrop';
-import { loadTaxonomy } from '@/lib/classification/taxonomy';
 import { Document, DocumentPreview } from '@/types/document';
 import { Category } from '@/types/category';
 import { Filter, BarChart3 } from 'lucide-react';
@@ -33,6 +32,7 @@ export default function ClassifyPage() {
     });
 
     const [categories, setCategories] = useState<Category[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
     const [showStats, setShowStats] = useState(false);
     const [previewDocument, setPreviewDocument] = useState<DocumentPreview | null>(null);
@@ -78,10 +78,27 @@ export default function ClassifyPage() {
         onDocumentMove: handleDocumentMove,
     });
 
-    // Charger la taxonomie
+    //  Charger la taxonomie via API
     useEffect(() => {
-        const taxonomy = loadTaxonomy();
-        setCategories(taxonomy);
+        const fetchTaxonomy = async () => {
+            try {
+                setLoadingCategories(true);
+                const response = await fetch('/api/taxonomy');
+                const data = await response.json();
+
+                if (data.success) {
+                    setCategories(data.data.categories);
+                } else {
+                    console.error('Error loading taxonomy:', data.error);
+                }
+            } catch (err) {
+                console.error('Failed to fetch taxonomy:', err);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+
+        fetchTaxonomy();
     }, []);
 
     const handlePreview = (doc: Document) => {
@@ -107,12 +124,15 @@ export default function ClassifyPage() {
         return acc;
     }, {} as Record<string, number>);
 
-    if (isLoading) {
+    // Afficher un loader si taxonomie en cours de chargement
+    if (isLoading || loadingCategories) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-foreground-muted">Chargement...</p>
+                    <p className="text-foreground-muted">
+                        {loadingCategories ? 'Chargement des catégories...' : 'Chargement...'}
+                    </p>
                 </div>
             </div>
         );
