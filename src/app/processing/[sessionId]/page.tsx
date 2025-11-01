@@ -1,4 +1,3 @@
-// src/app/processing/[sessionId]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -36,7 +35,9 @@ export default function ProcessingPage() {
 
     const [hasStartedProcessing, setHasStartedProcessing] = useState(false);
 
-    // Démarrer l'extraction dès que la page se charge
+    const [extractionComplete, setExtractionComplete] = useState(false);
+
+    // Démarrer l'extraction UNE SEULE FOIS
     useEffect(() => {
         if (session && !hasStartedProcessing && session.status === 'uploading') {
             setHasStartedProcessing(true);
@@ -44,12 +45,23 @@ export default function ProcessingPage() {
         }
     }, [session, hasStartedProcessing]);
 
-    // Démarrer la classification après l'extraction
+    // Detecter la fin de l'extraction
     useEffect(() => {
-        if (session && session.status === 'extracting' && session.processedFiles === session.totalFiles) {
-            startClassification();
+        if (
+            session &&
+            session.status === 'extracting' &&
+            session.processedFiles === session.totalFiles &&
+            !extractionComplete
+        ) {
+            setExtractionComplete(true);
+            console.log('Extraction terminée, démarrage de la classification...');
+
+            // Attendre 1 seconde pour être sûr que le status est bien mis à jour
+            setTimeout(() => {
+                startClassification();
+            }, 1000);
         }
-    }, [session]);
+    }, [session, extractionComplete]);
 
     // Rediriger vers classify quand prêt
     useEffect(() => {
@@ -62,11 +74,15 @@ export default function ProcessingPage() {
 
     const startExtraction = async () => {
         try {
-            await fetch('/api/extract', {
+            console.log('Démarrage de l\'extraction...');
+            const response = await fetch('/api/extract', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId }),
             });
+
+            const data = await response.json();
+            console.log('Extraction API response:', data);
         } catch (error) {
             console.error('Extraction error:', error);
         }
@@ -74,11 +90,15 @@ export default function ProcessingPage() {
 
     const startClassification = async () => {
         try {
-            await fetch('/api/classify', {
+            console.log('🚀 Démarrage de la classification...');
+            const response = await fetch('/api/classify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId }),
             });
+
+            const data = await response.json();
+            console.log('Classification API response:', data);
         } catch (error) {
             console.error('Classification error:', error);
         }
@@ -152,7 +172,7 @@ export default function ProcessingPage() {
                         <p className="text-foreground-muted mb-2">
                             {session.totalFiles - failedDocuments.length} documents classifiés avec succès
                         </p>
-                        {/* ✅ AFFICHER LES ERREURS */}
+                        {/* AFFICHER LES ERREURS */}
                         {failedDocuments.length > 0 && (
                             <p className="text-sm text-error mb-4">
                                 ⚠️ {failedDocuments.length} document(s) n'ont pas pu être traités
