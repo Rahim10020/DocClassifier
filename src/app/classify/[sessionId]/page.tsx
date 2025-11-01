@@ -7,7 +7,6 @@ import { Header } from '@/components/shared/Header';
 import { SearchBar } from '@/components/classify/SearchBar';
 import { CategoryTree } from '@/components/classify/CategoryTree';
 import { CategoryColumn } from '@/components/classify/CategoryColumn';
-import { DocumentCard } from '@/components/classify/DocumentCard';
 import { FilterPanel } from '@/components/classify/FilterPanel';
 import { BulkActions } from '@/components/classify/BulkActions';
 import { DownloadButton } from '@/components/download/DownloadButton';
@@ -273,9 +272,22 @@ export default function ClassifyPage() {
 
                             <DragOverlay>
                                 {activeDocument && (
-                                    <div className="opacity-80">
-                                        <DocumentCard document={activeDocument} isDragging />
-                                    </div>
+                                    <Card className="opacity-90 shadow-2xl p-4 max-w-xs">
+                                        <div className="flex items-center gap-3">
+                                            <div className="text-2xl">
+                                                {activeDocument.fileType === 'pdf' ? '📄' :
+                                                    activeDocument.fileType === 'xlsx' ? '📊' : '📎'}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-foreground truncate">
+                                                    {activeDocument.originalName}
+                                                </p>
+                                                <p className="text-xs text-foreground-muted">
+                                                    {activeDocument.fileType.toUpperCase()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </Card>
                                 )}
                             </DragOverlay>
                         </DndContext>
