@@ -4,6 +4,34 @@ import { classifyDocument } from '@/lib/classification/classifier';
 import { updateSessionStatus } from '@/lib/session';
 import { Profile } from '@/types/category';
 
+async function processInBatches<T, R>(
+    items: T[],
+    batchSize: number,
+    processor: (item: T) => Promise<R>
+): Promise<R[]> {
+    const results: R[] = [];
+
+    for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        const batchResults = await Promise.allSettled(
+            batch.map(item => processor(item))
+        );
+
+        results.push(
+            ...batchResults.map((result, idx) => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    console.error(`Error processing item ${i + idx}:`, result.reason);
+                    return null as R;
+                }
+            })
+        );
+    }
+
+    return results.filter(r => r !== null);
+}
+
 export async function POST(request: NextRequest) {
     try {
         const { sessionId } = await request.json();
@@ -15,7 +43,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Récupérer la session et ses documents
         const session = await prisma.session.findUnique({
             where: { id: sessionId },
             include: { documents: true },
@@ -28,58 +55,59 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const documents = session.documents.filter((doc) => doc.extractedText !== null && doc.extractedText !== undefined);
+        // Inclure les docs AVEC ou SANS texte
+        const documents = session.documents;
 
         if (documents.length === 0) {
             return NextResponse.json(
-                { success: false, error: 'Aucun document avec texte extrait' },
+                { success: false, error: 'Aucun document trouvé' },
                 { status: 400 }
             );
         }
 
-        const results = [];
+        // Classifier par batch de 10
+        const results = await processInBatches(
+            documents,
+            10,
+            async (doc) => {
+                try {
+                    const classification = await classifyDocument({
+                        documentId: doc.id,
+                        text: doc.extractedText || '',
+                        language: doc.language || 'fr',
+                        profile: session.profile as Profile | undefined,
+                    });
 
-        // Classifier chaque document
-        for (const doc of documents) {
-            try {
-                const classification = await classifyDocument({
-                    documentId: doc.id,
-                    text: doc.extractedText!,
-                    language: doc.language || 'fr',
-                    profile: session.profile as Profile | undefined,
-                });
+                    await prisma.document.update({
+                        where: { id: doc.id },
+                        data: {
+                            mainCategory: classification.mainCategory,
+                            subCategory: classification.subCategory,
+                            confidence: classification.confidence,
+                            keywords: classification.keywords,
+                        },
+                    });
 
-                // Mettre à jour le document avec la classification
-                await prisma.document.update({
-                    where: { id: doc.id },
-                    data: {
+                    return {
+                        documentId: doc.id,
+                        name: doc.originalName,
+                        success: true,
                         mainCategory: classification.mainCategory,
                         subCategory: classification.subCategory,
                         confidence: classification.confidence,
-                        keywords: classification.keywords,
-                    },
-                });
-
-                results.push({
-                    documentId: doc.id,
-                    name: doc.originalName,
-                    success: true,
-                    mainCategory: classification.mainCategory,
-                    subCategory: classification.subCategory,
-                    confidence: classification.confidence,
-                });
-            } catch (error) {
-                console.error(`Error classifying ${doc.originalName}:`, error);
-                results.push({
-                    documentId: doc.id,
-                    name: doc.originalName,
-                    success: false,
-                    error: error instanceof Error ? error.message : 'Classification failed',
-                });
+                    };
+                } catch (error) {
+                    console.error(`Error classifying ${doc.originalName}:`, error);
+                    return {
+                        documentId: doc.id,
+                        name: doc.originalName,
+                        success: false,
+                        error: error instanceof Error ? error.message : 'Classification failed',
+                    };
+                }
             }
-        }
+        );
 
-        // Mettre à jour le statut de la session à "ready"
         await updateSessionStatus(sessionId, 'ready');
 
         return NextResponse.json({
@@ -87,7 +115,8 @@ export async function POST(request: NextRequest) {
             data: {
                 sessionId,
                 totalDocuments: documents.length,
-                classifiedDocuments: results.filter(r => r.success).length,
+                classifiedDocuments: results.filter(r => r?.success).length,
+                failedDocuments: results.filter(r => r && !r.success).length,
                 results,
             },
         });

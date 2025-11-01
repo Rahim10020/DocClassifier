@@ -5,6 +5,34 @@ import { extractText } from '@/lib/extractors';
 import { detectLanguage } from '@/lib/classification/language-detector';
 import { updateSessionStatus, incrementProcessedFiles } from '@/lib/session';
 
+async function processInBatches<T, R>(
+    items: T[],
+    batchSize: number,
+    processor: (item: T) => Promise<R>
+): Promise<R[]> {
+    const results: R[] = [];
+
+    for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        const batchResults = await Promise.allSettled(
+            batch.map(item => processor(item))
+        );
+
+        results.push(
+            ...batchResults.map((result, idx) => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    console.error(`Error processing item ${i + idx}:`, result.reason);
+                    return null as R;
+                }
+            })
+        );
+    }
+
+    return results.filter(r => r !== null);
+}
+
 export async function POST(request: NextRequest) {
     try {
         const { sessionId } = await request.json();
@@ -16,7 +44,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Récupérer tous les documents de la session
         const documents = await prisma.document.findMany({
             where: { sessionId },
             orderBy: { createdAt: 'asc' },
@@ -29,61 +56,59 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Mettre à jour le statut de la session
         await updateSessionStatus(sessionId, 'extracting');
 
-        const results = [];
+        // Traiter par batch de 10
+        const results = await processInBatches(
+            documents,
+            10,
+            async (doc) => {
+                try {
+                    const buffer = await readFile(sessionId, doc.fileName);
+                    const extraction = await extractText(buffer, doc.fileType);
 
-        // Extraire le texte de chaque document
-        for (const doc of documents) {
-            try {
-                // Lire le fichier
-                const buffer = await readFile(sessionId, doc.fileName);
+                    // Gérer les docs sans texte
+                    const hasText = extraction.text && extraction.text.trim().length > 0;
+                    const detectedLanguage = hasText
+                        ? detectLanguage(extraction.text)
+                        : 'unknown';
 
-                // Extraire le texte selon le type
-                const extraction = await extractText(buffer, doc.fileType);
+                    const wordCount = extraction.wordCount ||
+                        (hasText ? extraction.text.split(/\s+/).filter(w => w.length > 0).length : 0);
 
-                // Détecter la langue
-                const detectedLanguage = detectLanguage(extraction.text);
+                    await prisma.document.update({
+                        where: { id: doc.id },
+                        data: {
+                            extractedText: extraction.text || null,  // null si vide
+                            language: detectedLanguage,
+                            pageCount: extraction.pageCount,
+                            wordCount,
+                        },
+                    });
 
-                // Compter les mots
-                const wordCount = extraction.wordCount ||
-                    extraction.text.split(/\s+/).filter(w => w.length > 0).length;
+                    await incrementProcessedFiles(sessionId);
 
-                // Mettre à jour le document
-                await prisma.document.update({
-                    where: { id: doc.id },
-                    data: {
-                        extractedText: extraction.text,
+                    return {
+                        documentId: doc.id,
+                        name: doc.originalName,
+                        success: true,
                         language: detectedLanguage,
-                        pageCount: extraction.pageCount,
                         wordCount,
-                    },
-                });
-
-                // Incrémenter le compteur de fichiers traités
-                await incrementProcessedFiles(sessionId);
-
-                results.push({
-                    documentId: doc.id,
-                    name: doc.originalName,
-                    success: true,
-                    language: detectedLanguage,
-                    wordCount,
-                    pageCount: extraction.pageCount,
-                });
-            } catch (error) {
-                console.error(`Error extracting ${doc.originalName}:`, error);
-                results.push({
-                    documentId: doc.id,
-                    name: doc.originalName,
-                    success: false,
-                    error: error instanceof Error ? error.message : 'Extraction failed',
-                });
+                        pageCount: extraction.pageCount,
+                        hasText,  // Info si texte présent
+                    };
+                } catch (error) {
+                    console.error(`Error extracting ${doc.originalName}:`, error);
+                    return {
+                        documentId: doc.id,
+                        name: doc.originalName,
+                        success: false,
+                        error: error instanceof Error ? error.message : 'Extraction failed',
+                    };
+                }
             }
-        }
+        );
 
-        // Mettre à jour le statut vers "classifying"
         await updateSessionStatus(sessionId, 'classifying');
 
         return NextResponse.json({
@@ -91,7 +116,8 @@ export async function POST(request: NextRequest) {
             data: {
                 sessionId,
                 totalDocuments: documents.length,
-                processedDocuments: results.filter(r => r.success).length,
+                processedDocuments: results.filter(r => r?.success).length,
+                failedDocuments: results.filter(r => r && !r.success).length,
                 results,
             },
         });
