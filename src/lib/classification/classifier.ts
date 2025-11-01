@@ -16,6 +16,20 @@ export async function classifyDocument(
 ): Promise<DocumentClassification> {
     const { documentId, text, language, profile } = input;
 
+
+
+    // Si pas de texte (PDF scanné, image), classifier comme "Images"
+    if (!text || text.trim().length === 0) {
+        return {
+            documentId,
+            mainCategory: 'Images et Scans',
+            subCategory: 'Documents scannés',
+            confidence: 0.95,
+            keywords: ['scan', 'image', 'no-text'],
+            alternativeCategories: [],
+        };
+    }
+
     // 1. Extraction des mots-clés
     const keywords = extractKeywords(text, {
         language: language as 'fr' | 'en',
@@ -23,6 +37,7 @@ export async function classifyDocument(
     });
 
     if (keywords.length === 0) {
+        // Texte présent mais pas de mots-clés exploitables
         return {
             documentId,
             mainCategory: 'Uncategorized',

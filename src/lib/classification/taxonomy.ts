@@ -13,6 +13,7 @@ import marketingData from '@/data/taxonomy/marketing.json';
 import personalData from '@/data/taxonomy/personal.json';
 import personalDevelopmentData from '@/data/taxonomy/personal-development.json';
 import professionalData from '@/data/taxonomy/professional.json';
+import imagesData from '@/data/taxonomy/images.json';
 import scienceData from '@/data/taxonomy/science.json';
 import technicalData from '@/data/taxonomy/technical.json';
 import transportationData from '@/data/taxonomy/transport.json';
@@ -29,6 +30,7 @@ const taxonomyData = {
     financial: financialData,
     health: healthData,
     real_estate: realEstateData,
+    images: imagesData,
     legal: legalData,
     marketing: marketingData,
     personal: personalData,

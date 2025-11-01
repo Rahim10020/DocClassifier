@@ -1,0 +1,48 @@
+{
+    "id": "images",
+    "name": "Images et Scans",
+    "nameEn": "Images & Scans",
+    "icon": "image",
+    "color": "#ec4899",
+    "profiles": [
+        "personal",
+        "professional",
+        "student",
+        "researcher",
+        "auto"
+    ],
+    "priority": 50,
+    "keywords": [
+        "scan",
+        "photo",
+        "image",
+        "picture",
+        "screenshot",
+        "capture"
+    ],
+    "subcategories": [
+        {
+            "id": "scanned_documents",
+            "name": "Documents scannés",
+            "nameEn": "Scanned Documents",
+            "keywords": [
+                "scan",
+                "scanned",
+                "numérisé",
+                "digitized"
+            ]
+        },
+        {
+            "id": "photos",
+            "name": "Photos",
+            "nameEn": "Photos",
+            "keywords": [
+                "photo",
+                "picture",
+                "image",
+                "jpg",
+                "png"
+            ]
+        }
+    ]
+}
