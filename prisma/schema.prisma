@@ -1,3 +1,4 @@
+// prisma/schema.prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -49,6 +50,8 @@ model Document {
   
   @@index([sessionId])
   @@index([mainCategory])
+  @@index([language])
+  @@index([fileType])
 }
 
 model Category {
