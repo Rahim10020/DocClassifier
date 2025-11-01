@@ -1,3 +1,4 @@
+// src/app/processing/[sessionId]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ export default function ProcessingPage() {
     const {
         session,
         documents,
+        failedDocuments,
         isLoading,
         error,
         isProcessing,
@@ -147,9 +149,15 @@ export default function ProcessingPage() {
                         <h2 className="text-2xl font-semibold text-foreground mb-2">
                             🎉 Classification terminée !
                         </h2>
-                        <p className="text-foreground-muted mb-6">
-                            Tous vos documents ont été classifiés avec succès.
+                        <p className="text-foreground-muted mb-2">
+                            {session.totalFiles - failedDocuments.length} documents classifiés avec succès
                         </p>
+                        {/* ✅ AFFICHER LES ERREURS */}
+                        {failedDocuments.length > 0 && (
+                            <p className="text-sm text-error mb-4">
+                                ⚠️ {failedDocuments.length} document(s) n'ont pas pu être traités
+                            </p>
+                        )}
                         <p className="text-sm text-foreground-muted mb-6">
                             Redirection automatique...
                         </p>
@@ -203,6 +211,7 @@ export default function ProcessingPage() {
                         <ProcessingAnimation
                             documents={documents}
                             processedCount={session.processedFiles}
+                            failedDocuments={failedDocuments}
                         />
                     )}
 

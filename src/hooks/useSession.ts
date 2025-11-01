@@ -13,6 +13,7 @@ export function useSession(options: UseSessionOptions) {
 
     const [session, setSession] = useState<Session | null>(null);
     const [documents, setDocuments] = useState<Document[]>([]);
+    const [failedDocuments, setFailedDocuments] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +30,17 @@ export function useSession(options: UseSessionOptions) {
 
             if (data.data.documents) {
                 setDocuments(data.data.documents);
+
+                // Identifier les docs en erreur
+                const failed = data.data.documents
+                    .filter((doc: Document) =>
+                        !doc.mainCategory ||
+                        doc.mainCategory === 'Error' ||
+                        doc.confidence === 0
+                    )
+                    .map((doc: Document) => doc.id);
+
+                setFailedDocuments(failed);
             }
 
             setError(null);
@@ -123,6 +135,7 @@ export function useSession(options: UseSessionOptions) {
     return {
         session,
         documents,
+        failedDocuments,
         isLoading,
         error,
         isProcessing,
