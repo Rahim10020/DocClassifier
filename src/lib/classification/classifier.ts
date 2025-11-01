@@ -51,7 +51,7 @@ export async function classifyDocument(
     const taxonomy = getTaxonomyByProfile(profile);
 
     // 3. Scoring contre la taxonomie
-    const scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language);
+    const scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language, text);
 
     // 4. Sélection de la meilleure catégorie
     const bestMatch = findBestMatch(scores);
