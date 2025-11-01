@@ -82,4 +82,4 @@ export const ACCEPTED_FILE_TYPES: Record<FileType, string[]> = {
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 export const MAX_TOTAL_SIZE = 200 * 1024 * 1024; // 200MB
-export const MAX_FILES = 100;
+export const MAX_FILES = 50;
