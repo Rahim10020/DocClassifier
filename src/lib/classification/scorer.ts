@@ -18,14 +18,31 @@ function normalizeKeywords(keywords: string[], language: string): string[] {
     return keywords.map(k => stemKeyword(k, language));
 }
 
+// Calculer le poids d'un mot-clé selon sa fréquence dans le doc
+function calculateKeywordWeight(
+    keyword: string,
+    documentText: string,
+    documentLength: number
+): number {
+    const regex = new RegExp(`\\b${keyword}\\w*\\b`, 'gi');
+    const matches = documentText.match(regex);
+    const frequency = matches ? matches.length : 0;
+
+    // TF-IDF simplifié : (fréquence du mot / longueur du doc)
+    // Plafonné à 0.1 pour éviter qu'un mot très répété domine trop
+    return Math.min(frequency / Math.max(documentLength, 1), 0.1);
+}
+
 export function scoreAgainstTaxonomy(
     documentKeywords: string[],
     categories: Category[],
     profile?: string,
-    language: string = 'fr'
+    language: string = 'fr',
+    documentText?: string  // AJOUTÉ: texte complet pour calculer les poids
 ): ScoreResult[] {
     const scores: ScoreResult[] = [];
     const normalizedDocKeywords = normalizeKeywords(documentKeywords, language);
+    const documentLength = documentText ? documentText.split(/\s+/).length : documentKeywords.length;
 
     for (const category of categories) {
         // Filtrer par profil si spécifié (sauf si "auto")
@@ -43,10 +60,26 @@ export function scoreAgainstTaxonomy(
 
         if (intersection.length === 0) continue;
 
-        // Score = (mots communs / total mots doc) * (priorité catégorie / 100)
-        const baseScore = intersection.length / Math.max(normalizedDocKeywords.length, 1);
+        // Score amélioré avec pondération par fréquence
+        let weightedScore = 0;
+
+        if (documentText) {
+            // Calculer le score pondéré par la fréquence de chaque mot-clé
+            intersection.forEach(keyword => {
+                const weight = calculateKeywordWeight(keyword, documentText, documentLength);
+                weightedScore += weight;
+            });
+
+            // Normaliser par le nombre de mots-clés trouvés
+            weightedScore = weightedScore / Math.max(intersection.length, 1);
+        } else {
+            // Fallback si pas de texte complet
+            weightedScore = intersection.length / Math.max(normalizedDocKeywords.length, 1);
+        }
+
+        // Appliquer le bonus de priorité
         const priorityBonus = category.priority / 100;
-        const score = baseScore * priorityBonus;
+        const score = weightedScore * priorityBonus;
 
         scores.push({
             categoryId: category.id,
@@ -61,7 +94,9 @@ export function scoreAgainstTaxonomy(
                 const subScore = calculateSubCategoryScore(
                     normalizedDocKeywords,
                     subCat,
-                    language
+                    language,
+                    documentText,
+                    documentLength
                 );
 
                 if (subScore > score * 0.5) {
@@ -84,15 +119,30 @@ export function scoreAgainstTaxonomy(
 export function calculateSubCategoryScore(
     documentKeywords: string[],
     subCategory: Category,
-    language: string = 'fr'
+    language: string = 'fr',
+    documentText?: string,
+    documentLength?: number
 ): number {
     const subKeywords = normalizeKeywords(subCategory.keywords, language);
     const intersection = documentKeywords.filter(k => subKeywords.includes(k));
 
     if (intersection.length === 0) return 0;
 
+    // Utiliser le même système de pondération
+    let weightedScore = 0;
+
+    if (documentText && documentLength) {
+        intersection.forEach(keyword => {
+            const weight = calculateKeywordWeight(keyword, documentText, documentLength);
+            weightedScore += weight;
+        });
+        weightedScore = weightedScore / Math.max(intersection.length, 1);
+    } else {
+        weightedScore = intersection.length / Math.max(documentKeywords.length, 1);
+    }
+
     // Score plus élevé pour les sous-catégories car plus spécifiques
-    return (intersection.length / Math.max(documentKeywords.length, 1)) * 1.2;
+    return weightedScore * 1.2;
 }
 
 export function calculateConfidenceScore(
