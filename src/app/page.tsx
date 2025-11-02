@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useUpload } from '@/hooks/useUpload';
 import { Profile } from '@/types/category';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Shield, Target } from 'lucide-react';
 
 export default function HomePage() {
     const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined);
@@ -32,45 +32,45 @@ export default function HomePage() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-background">
             <Header showLanguageSwitch />
 
-            <main className="flex-1 container mx-auto px-4 py-12">
+            <main className="flex-1 container mx-auto px-6 py-16">
                 {/* Hero Section */}
-                <div className="text-center mb-12 animate-fade-in">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light text-primary text-sm font-medium mb-4">
+                <div className="text-center mb-16 animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light text-primary text-sm font-medium mb-6 shadow-sm">
                         <Sparkles className="h-4 w-4" />
                         Classification intelligente propulsée par IA
                     </div>
-                    <h1 className="text-5xl font-bold text-foreground mb-4">
+                    <h1 className="text-6xl font-bold text-foreground mb-6 leading-tight">
                         Classifiez vos documents
                         <br />
                         <span className="text-primary">en quelques secondes</span>
                     </h1>
-                    <p className="text-xl text-foreground-muted max-w-2xl mx-auto">
+                    <p className="text-xl text-foreground-muted max-w-2xl mx-auto leading-relaxed">
                         Uploadez vos fichiers, laissez notre IA les organiser automatiquement
                         par catégories, puis téléchargez-les structurés.
                     </p>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
-                    <Card className="p-6 text-center">
-                        <p className="text-3xl font-bold text-primary mb-1">100</p>
-                        <p className="text-sm text-foreground-muted">fichiers max</p>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
+                    <Card hover className="p-8 text-center">
+                        <p className="text-4xl font-bold text-primary mb-2">50</p>
+                        <p className="text-sm text-foreground-muted font-medium">fichiers max</p>
                     </Card>
-                    <Card className="p-6 text-center">
-                        <p className="text-3xl font-bold text-primary mb-1">200 MB</p>
-                        <p className="text-sm text-foreground-muted">taille totale</p>
+                    <Card hover className="p-8 text-center">
+                        <p className="text-4xl font-bold text-primary mb-2">200 MB</p>
+                        <p className="text-sm text-foreground-muted font-medium">taille totale</p>
                     </Card>
-                    <Card className="p-6 text-center">
-                        <p className="text-3xl font-bold text-primary mb-1">2h</p>
-                        <p className="text-sm text-foreground-muted">session active</p>
+                    <Card hover className="p-8 text-center">
+                        <p className="text-4xl font-bold text-primary mb-2">2h</p>
+                        <p className="text-sm text-foreground-muted font-medium">session active</p>
                     </Card>
                 </div>
 
                 {/* Profile Selector */}
-                <div className="max-w-5xl mx-auto mb-8">
+                <div className="max-w-6xl mx-auto mb-12">
                     <ProfileSelector
                         selected={selectedProfile}
                         onSelect={setSelectedProfile}
@@ -85,8 +85,8 @@ export default function HomePage() {
                     />
 
                     {error && (
-                        <Card className="p-4 border-error bg-error-light">
-                            <p className="text-error font-medium">{error}</p>
+                        <Card className="p-6 bg-error-light shadow-md border-0">
+                            <p className="text-error font-medium text-center">{error}</p>
                         </Card>
                     )}
 
@@ -98,11 +98,12 @@ export default function HomePage() {
                                 disabled={isUploading}
                             />
 
-                            <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center justify-between gap-4 pt-4">
                                 <Button
                                     variant="outline"
                                     onClick={clearFiles}
                                     disabled={isUploading}
+                                    size="lg"
                                 >
                                     Tout effacer
                                 </Button>
@@ -111,7 +112,7 @@ export default function HomePage() {
                                     onClick={uploadFiles}
                                     disabled={!canUpload}
                                     size="lg"
-                                    className="gap-2"
+                                    className="gap-2 px-8"
                                 >
                                     {isUploading ? (
                                         <>
@@ -131,36 +132,36 @@ export default function HomePage() {
                 </div>
 
                 {/* Features */}
-                <div className="max-w-5xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-2xl">🚀</span>
+                <div className="max-w-6xl mx-auto mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <Card hover className="p-8 text-center">
+                        <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                            <Zap className="h-8 w-8 text-primary" />
                         </div>
-                        <h3 className="font-semibold text-foreground mb-2">Rapide</h3>
-                        <p className="text-sm text-foreground-muted">
-                            Classification instantanée de centaines de documents en quelques secondes
+                        <h3 className="font-semibold text-foreground mb-3 text-lg">Rapide</h3>
+                        <p className="text-sm text-foreground-muted leading-relaxed">
+                            Classification instantanée de dizaines de documents en quelques secondes
                         </p>
-                    </div>
+                    </Card>
 
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-success-light rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-2xl">🔒</span>
+                    <Card hover className="p-8 text-center">
+                        <div className="w-16 h-16 bg-success-light rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                            <Shield className="h-8 w-8 text-success" />
                         </div>
-                        <h3 className="font-semibold text-foreground mb-2">Sécurisé</h3>
-                        <p className="text-sm text-foreground-muted">
+                        <h3 className="font-semibold text-foreground mb-3 text-lg">Sécurisé</h3>
+                        <p className="text-sm text-foreground-muted leading-relaxed">
                             Vos fichiers sont automatiquement supprimés après 2 heures
                         </p>
-                    </div>
+                    </Card>
 
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-warning-light rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-2xl">🎯</span>
+                    <Card hover className="p-8 text-center">
+                        <div className="w-16 h-16 bg-warning-light rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                            <Target className="h-8 w-8 text-warning" />
                         </div>
-                        <h3 className="font-semibold text-foreground mb-2">Intelligent</h3>
-                        <p className="text-sm text-foreground-muted">
+                        <h3 className="font-semibold text-foreground mb-3 text-lg">Intelligent</h3>
+                        <p className="text-sm text-foreground-muted leading-relaxed">
                             IA entraînée pour reconnaître automatiquement le type de vos documents
                         </p>
-                    </div>
+                    </Card>
                 </div>
             </main>
 
