@@ -1,1 +1,2 @@
-- la prochaine fois, dire a claude de ne pas mettre des emojis dans le code,
+- la prochaine fois, dire a claude de ne pas mettre des emojis dans le code et de use &apos; a la place des apostrphes
+    il y a des soucis avec ca quand je fais le build

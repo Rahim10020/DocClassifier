@@ -126,7 +126,7 @@ export default function ProcessingPage() {
                             {error || 'Session introuvable'}
                         </p>
                         <Button onClick={() => router.push('/')} size="lg">
-                            Retour à l'accueil
+                            Retour à l&apos;accueil
                         </Button>
                     </Card>
                 </main>

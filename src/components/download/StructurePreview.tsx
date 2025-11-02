@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Folder, File, Loader2, ChevronRight, ChevronDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 
 interface StructurePreviewProps {
     sessionId: string;
@@ -61,13 +60,14 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
         });
     };
 
-    const renderHierarchicalPreview = (preview: any) => {
-        return Object.entries(preview).map(([category, data]: [string, any]) => {
+    const renderHierarchicalPreview = (preview: Record<string, unknown>) => {
+        return Object.entries(preview).map(([category, data]: [string, unknown]) => {
+            const categoryData = data as { files: string[]; subcategories?: Record<string, { files: string[] }> };
             const isExpanded = expandedFolders.has(category);
-            const hasSubcategories = Object.keys(data.subcategories || {}).length > 0;
-            const totalFiles = data.files.length +
-                Object.values(data.subcategories || {}).reduce(
-                    (sum: number, sub: any) => sum + sub.files.length,
+            const hasSubcategories = Object.keys(categoryData.subcategories || {}).length > 0;
+            const totalFiles = categoryData.files.length +
+                Object.values(categoryData.subcategories || {}).reduce(
+                    (sum: number, sub: { files: string[] }) => sum + sub.files.length,
                     0
                 );
 
@@ -77,7 +77,7 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
                         onClick={() => toggleFolder(category)}
                         className="flex items-center gap-2 py-1 hover:bg-background-secondary rounded px-2 w-full text-left"
                     >
-                        {hasSubcategories || data.files.length > 0 ? (
+                        {hasSubcategories || categoryData.files.length > 0 ? (
                             isExpanded ? (
                                 <ChevronDown className="h-4 w-4 text-foreground-muted" />
                             ) : (
@@ -98,7 +98,7 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
                     {isExpanded && (
                         <div className="ml-6 mt-1 space-y-1">
                             {/* Files in main category */}
-                            {data.files.map((file: string, index: number) => (
+                            {categoryData.files.map((file: string, index: number) => (
                                 <div key={index} className="flex items-center gap-2 py-1 px-2">
                                     <File className="h-3 w-3 text-foreground-muted" />
                                     <span className="text-xs text-foreground">{file}</span>
@@ -106,7 +106,7 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
                             ))}
 
                             {/* Subcategories */}
-                            {Object.entries(data.subcategories || {}).map(([subName, subData]: [string, any]) => {
+                            {Object.entries(categoryData.subcategories || {}).map(([subName, subData]: [string, { files: string[] }]) => {
                                 const subId = `${category}-${subName}`;
                                 const isSubExpanded = expandedFolders.has(subId);
 
@@ -165,7 +165,7 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
                 <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span className="text-sm text-foreground-muted">
-                        Génération de l'aperçu...
+                        Génération de l&apos;aperçu...
                     </span>
                 </div>
             </Card>

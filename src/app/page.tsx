@@ -120,7 +120,7 @@ export default function HomePage() {
                                         </>
                                     ) : (
                                         <>
-                                            Lancer l'analyse
+                                            Lancer l&apos;analyse
                                             <ArrowRight className="h-5 w-5" />
                                         </>
                                     )}

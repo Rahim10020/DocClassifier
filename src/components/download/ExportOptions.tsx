@@ -19,7 +19,7 @@ export function ExportOptions({ options, onChange, onShowPreview }: ExportOption
             {/* Structure Selection */}
             <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">
-                    Structure de l'archive
+                    Structure de l&apos;archive
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                     <Card

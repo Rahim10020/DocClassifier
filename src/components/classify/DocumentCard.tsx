@@ -25,7 +25,6 @@ export function DocumentCard({
     isSelected = false,
     onSelect,
     onPreview,
-    isDragging = false,
 }: DocumentCardProps) {
     const {
         attributes,

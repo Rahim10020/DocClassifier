@@ -140,7 +140,7 @@ export default function ClassifyPage() {
                 <main className="flex-1 flex items-center justify-center px-6">
                     <Card className="p-8 text-center max-w-md shadow-lg">
                         <p className="text-error mb-4 font-medium">{error || 'Session introuvable'}</p>
-                        <Button onClick={() => router.push('/')}>Retour à l'accueil</Button>
+                        <Button onClick={() => router.push('/')}>Retour à l&apos;accueil</Button>
                     </Card>
                 </main>
             </div>

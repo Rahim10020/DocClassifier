@@ -40,7 +40,7 @@ export function Footer({ className }: FooterProps) {
                             </li>
                             <li>
                                 <a href="#" className="hover:text-primary transition-colors">
-                                    Conditions d'utilisation
+                                    Conditions d&apos;utilisation
                                 </a>
                             </li>
                         </ul>

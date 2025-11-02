@@ -40,7 +40,7 @@ export function ProcessingAnimation({
             <h3 className="font-semibold text-foreground mb-6 text-lg">Documents en cours de traitement</h3>
 
             <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2">
-                {visibleDocuments.map((doc, index) => {
+                {visibleDocuments.map((doc) => {
                     const isProcessed = documents.indexOf(doc) < processedCount;
                     const isCurrent = documents.indexOf(doc) === processedCount - 1;
                     const hasFailed = failedDocuments.includes(doc.id);
