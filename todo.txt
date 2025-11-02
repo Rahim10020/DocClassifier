@@ -1,2 +1,21 @@
-- la prochaine fois, dire a claude de ne pas mettre des emojis dans le code et de use &apos; a la place des apostrphes
-    il y a des soucis avec ca quand je fais le build
+- la prochaine fois, dire a claude de ne pas mettre des emojis dans le code et de use &apos; a la place des apostrophes
+    il y a des soucis avec ca quand je fais le build.
+
+-- ERREURS:
+E-marketing e-commerce doper ses ventes.pdf
+❌ Erreur lors du traitement
+
+Les 5 clés pour prendre les bonnes décisions.pdf
+❌ Erreur lors du traitement
+
+5 minutes pour convaincre.pdf
+❌ Erreur lors du traitement
+
+Atomic habits.pdf
+❌ Erreur lors du traitement
+
+Le Pouvoir des habitudes.pdf
+❌ Erreur lors du traitement
+
+🎉 Tous les documents ont été traités !
+⚠️ 6 document(s) en erreur
