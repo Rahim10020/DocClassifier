@@ -66,9 +66,10 @@ export function DocumentCard({
             ref={setNodeRef}
             style={style}
             className={cn(
-                'p-4 transition-all hover:shadow-md',
-                isSelected && 'ring-2 ring-primary bg-primary-light',
-                isSortableDragging && 'cursor-grabbing shadow-lg scale-105'
+                'p-4 transition-all duration-200 group cursor-pointer',
+                'shadow-sm hover:shadow-lg hover:-translate-y-1',
+                isSelected && 'ring-2 ring-primary bg-primary-light shadow-md',
+                isSortableDragging && 'cursor-grabbing shadow-2xl scale-105 rotate-2'
             )}
         >
             <div className="flex items-start gap-3">
@@ -76,7 +77,7 @@ export function DocumentCard({
                 <button
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-foreground-muted hover:text-foreground mt-1"
+                    className="cursor-grab active:cursor-grabbing text-foreground-muted hover:text-foreground mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                     <GripVertical className="h-5 w-5" />
                 </button>
@@ -87,37 +88,41 @@ export function DocumentCard({
                         type="checkbox"
                         checked={isSelected}
                         onChange={onSelect}
-                        className="mt-1.5 cursor-pointer"
+                        className="mt-2 cursor-pointer w-4 h-4 rounded border-2 border-border text-primary focus:ring-2 focus:ring-primary transition-all"
                     />
                 )}
 
                 {/* File icon */}
-                <div className="text-2xl shrink-0">{getFileIcon()}</div>
+                <div className="text-3xl shrink-0 mt-0.5">{getFileIcon()}</div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <Tooltip content={document.originalName}>
-                        <h4 className="font-medium text-foreground truncate">
+                        <h4 className="font-medium text-foreground truncate text-sm leading-snug">
                             {document.originalName}
                         </h4>
                     </Tooltip>
 
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        <Badge variant="outline" className="text-xs">
+                    <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+                        <Badge variant="outline" className="text-xs font-medium shadow-xs">
                             {document.fileType.toUpperCase()}
                         </Badge>
 
-                        <span className="text-xs text-foreground-muted">
+                        <span className="text-xs text-foreground-muted font-medium">
                             {formatFileSize(document.fileSize)}
                         </span>
 
                         {document.confidence !== null && document.confidence !== undefined && (
                             <Badge
                                 variant="outline"
-                                style={{ borderColor: confidenceColor, color: confidenceColor }}
-                                className="text-xs"
+                                style={{
+                                    borderColor: confidenceColor,
+                                    color: confidenceColor,
+                                    backgroundColor: `${confidenceColor}10`
+                                }}
+                                className="text-xs font-semibold shadow-xs"
                             >
-                                {confidenceLabel} ({Math.round(document.confidence * 100)}%)
+                                {confidenceLabel} {Math.round(document.confidence * 100)}%
                             </Badge>
                         )}
 
@@ -130,17 +135,17 @@ export function DocumentCard({
 
                     {/* Keywords preview */}
                     {document.keywords && document.keywords.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
+                        <div className="mt-3 flex flex-wrap gap-1.5">
                             {document.keywords.slice(0, 3).map((keyword, index) => (
                                 <span
                                     key={index}
-                                    className="text-xs px-2 py-0.5 rounded-full bg-background-tertiary text-foreground-muted"
+                                    className="text-xs px-2 py-1 rounded-lg bg-background-secondary text-foreground-muted font-medium shadow-xs"
                                 >
                                     {keyword}
                                 </span>
                             ))}
                             {document.keywords.length > 3 && (
-                                <span className="text-xs text-foreground-muted">
+                                <span className="text-xs text-foreground-muted font-medium px-2 py-1">
                                     +{document.keywords.length - 3}
                                 </span>
                             )}
@@ -150,7 +155,12 @@ export function DocumentCard({
 
                 {/* Preview button */}
                 {onPreview && (
-                    <Button variant="ghost" size="icon" onClick={onPreview} className="shrink-0">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onPreview}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
                         <Eye className="h-4 w-4" />
                     </Button>
                 )}
