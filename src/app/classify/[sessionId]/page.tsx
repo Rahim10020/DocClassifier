@@ -18,7 +18,7 @@ import { useClassification } from '@/hooks/useClassification';
 import { useDragAndDrop } from '@/hooks/useDragAndDrop';
 import { Document, DocumentPreview } from '@/types/document';
 import { Category } from '@/types/category';
-import { Filter, BarChart3 } from 'lucide-react';
+import { Filter, BarChart3, Loader2 } from 'lucide-react';
 
 export default function ClassifyPage() {
     const params = useParams();
@@ -77,7 +77,7 @@ export default function ClassifyPage() {
         onDocumentMove: handleDocumentMove,
     });
 
-    //  Charger la taxonomie via API
+    // Charger la taxonomie via API
     useEffect(() => {
         const fetchTaxonomy = async () => {
             try {
@@ -117,19 +117,17 @@ export default function ClassifyPage() {
         deselectAll();
     };
 
-    // Compter les documents par catégorie
     const documentCounts = categories.reduce((acc, cat) => {
         acc[cat.id] = documentsByCategory[cat.id]?.length || 0;
         return acc;
     }, {} as Record<string, number>);
 
-    // Afficher un loader si taxonomie en cours de chargement
     if (isLoading || loadingCategories) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">
-                    <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-foreground-muted">
+                    <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-foreground-muted font-medium">
                         {loadingCategories ? 'Chargement des catégories...' : 'Chargement...'}
                     </p>
                 </div>
@@ -139,12 +137,12 @@ export default function ClassifyPage() {
 
     if (error || !session) {
         return (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col bg-background">
                 <Header />
-                <main className="flex-1 flex items-center justify-center">
-                    <Card className="p-8 text-center">
-                        <p className="text-error mb-4">{error || 'Session introuvable'}</p>
-                        <Button onClick={() => router.push('/')}>Retour</Button>
+                <main className="flex-1 flex items-center justify-center px-6">
+                    <Card className="p-8 text-center max-w-md shadow-lg">
+                        <p className="text-error mb-4 font-medium">{error || 'Session introuvable'}</p>
+                        <Button onClick={() => router.push('/')}>Retour à l'accueil</Button>
                     </Card>
                 </main>
             </div>
@@ -177,8 +175,8 @@ export default function ClassifyPage() {
             </Header>
 
             <div className="flex-1 flex overflow-hidden">
-                {/* Sidebar */}
-                <aside className="w-80 border-r border-border bg-background overflow-y-auto p-4">
+                {/* Sidebar - Background au lieu de border */}
+                <aside className="w-80 bg-background-secondary overflow-y-auto p-6 shadow-sm">
                     <CategoryTree
                         categories={categories}
                         documentCounts={documentCounts}
@@ -186,7 +184,7 @@ export default function ClassifyPage() {
                     />
 
                     {showFilters && (
-                        <div className="mt-4">
+                        <div className="mt-6 animate-slide-in">
                             <FilterPanel
                                 filters={filters}
                                 categories={presentCategories.filter((cat): cat is string => cat !== undefined)}
@@ -205,24 +203,24 @@ export default function ClassifyPage() {
                     )}
 
                     {showStats && (
-                        <Card className="mt-4 p-4">
-                            <h3 className="font-semibold text-foreground mb-3">Statistiques</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
+                        <Card className="mt-6 p-6 shadow-md animate-slide-in">
+                            <h3 className="font-semibold text-foreground mb-4 text-lg">Statistiques</h3>
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between items-center py-2">
                                     <span className="text-foreground-muted">Total:</span>
-                                    <span className="font-medium">{stats.total}</span>
+                                    <span className="font-semibold text-lg">{stats.total}</span>
                                 </div>
-                                <div className="flex justify-between">
+                                <div className="flex justify-between items-center py-2">
                                     <span className="text-foreground-muted">Classifiés:</span>
-                                    <span className="font-medium text-success">{stats.categorized}</span>
+                                    <span className="font-semibold text-success text-lg">{stats.categorized}</span>
                                 </div>
-                                <div className="flex justify-between">
+                                <div className="flex justify-between items-center py-2">
                                     <span className="text-foreground-muted">Non classifiés:</span>
-                                    <span className="font-medium text-warning">{stats.uncategorized}</span>
+                                    <span className="font-semibold text-warning text-lg">{stats.uncategorized}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-foreground-muted">Confiance moy:</span>
-                                    <span className="font-medium">{stats.avgConfidence}%</span>
+                                <div className="flex justify-between items-center py-2 pt-3 border-t border-border">
+                                    <span className="text-foreground-muted">Confiance moyenne:</span>
+                                    <span className="font-semibold text-primary text-lg">{stats.avgConfidence}%</span>
                                 </div>
                             </div>
                         </Card>
@@ -231,12 +229,12 @@ export default function ClassifyPage() {
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-hidden flex flex-col">
-                    {/* Search Bar */}
-                    <div className="border-b border-border bg-background p-4">
+                    {/* Search Bar - Padding au lieu de border */}
+                    <div className="bg-background-elevated shadow-sm p-6">
                         <SearchBar value={searchQuery} onChange={setSearchQuery} />
                         {selectedDocuments.size > 0 && (
-                            <div className="mt-2 flex items-center gap-2">
-                                <span className="text-sm text-foreground-muted">
+                            <div className="mt-3 flex items-center gap-3 animate-fade-in">
+                                <span className="text-sm text-foreground-muted font-medium">
                                     {selectedDocuments.size} sélectionné{selectedDocuments.size > 1 ? 's' : ''}
                                 </span>
                                 <Button variant="ghost" size="sm" onClick={selectAll}>
@@ -250,14 +248,14 @@ export default function ClassifyPage() {
                     </div>
 
                     {/* Kanban View */}
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden">
+                    <div className="flex-1 overflow-x-auto overflow-y-hidden bg-background-secondary">
                         <DndContext
                             sensors={sensors}
                             onDragStart={handleDragStart}
                             onDragEnd={handleDragEnd}
                             onDragCancel={handleDragCancel}
                         >
-                            <div className="flex gap-4 p-4 h-full">
+                            <div className="flex gap-6 p-6 h-full">
                                 {categories.map((category) => (
                                     <CategoryColumn
                                         key={category.id}
@@ -272,7 +270,7 @@ export default function ClassifyPage() {
 
                             <DragOverlay>
                                 {activeDocument && (
-                                    <Card className="opacity-90 shadow-2xl p-4 max-w-xs">
+                                    <Card className="opacity-90 shadow-2xl p-4 max-w-xs scale-105">
                                         <div className="flex items-center gap-3">
                                             <div className="text-2xl">
                                                 {activeDocument.fileType === 'pdf' ? '📄' :
