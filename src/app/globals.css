@@ -5,22 +5,20 @@
 @tailwind utilities;
 
 :root {
-    /* Backgrounds */
-    --background: #ffffff;
-    --background-secondary: #f8fafc;
-    --background-tertiary: #f1f5f9;
+    /* Backgrounds - Plus de profondeur */
+    --background: #fafbfc;
+    --background-secondary: #f4f6f8;
+    --background-tertiary: #e9ecef;
+    --background-elevated: #ffffff;
 
     /* Foregrounds */
-    --foreground: #0f172a;
-    /* Texte principal */
-    --foreground-muted: #64748b;
-    /* Texte secondaire */
+    --foreground: #1a202c;
+    --foreground-muted: #718096;
 
-    /* Primary */
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
-    /* Bleu hover */
-    --primary-light: #dbeafe;
+    /* Primary - Plus moderne */
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: #eef2ff;
 
     /* Success */
     --success: #10b981;
@@ -34,7 +32,7 @@
     --error: #ef4444;
     --error-light: #fee2e2;
 
-    /* Borders */
+    /* Borders - Plus subtils */
     --border: #e2e8f0;
     --border-hover: #cbd5e1;
 
@@ -42,14 +40,16 @@
     --card: #ffffff;
     --card-hover: #f8fafc;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
+    /* Shadows - Le nouveau système */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 
     /* Couleurs catégories */
-    --category-academic: #3b82f6;
+    --category-academic: #6366f1;
     --category-financial: #10b981;
     --category-professional: #f59e0b;
     --category-legal: #8b5cf6;
@@ -58,4 +58,79 @@
     --category-research: #6366f1;
     --category-tech: #14b8a6;
     --category-personal-development: #f97316;
+    --category-images: #ec4899;
+}
+
+/* Animations personnalisées */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--foreground-muted);
+}
+
+/* Transitions globales smooth */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
