@@ -15,7 +15,7 @@ export function Footer({ className }: FooterProps) {
                     <div>
                         <h3 className="font-semibold text-foreground mb-3">Classifier</h3>
                         <p className="text-sm text-foreground-muted">
-                            Classifiez automatiquement vos documents en toute simplicité. Rapide, sécurisé et sans inscription.
+                            Classifiez automatiquement vos documents en toute simplicité. Rapide et sécurisé.
                         </p>
                     </div>
 
@@ -26,11 +26,6 @@ export function Footer({ className }: FooterProps) {
                             <li>
                                 <a href="#" className="hover:text-primary transition-colors">
                                     Comment ça marche
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-primary transition-colors">
-                                    FAQ
                                 </a>
                             </li>
                             <li>
