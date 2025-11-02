@@ -43,30 +43,33 @@ export function CategoryColumn({
         <div
             ref={setNodeRef}
             className={cn(
-                'flex flex-col h-full min-w-[320px] max-w-[400px]',
+                'flex flex-col h-full min-w-[360px] max-w-[400px]',
                 className
             )}
         >
-            {/* Column Header */}
+            {/* Column Header - Shadow au lieu de border */}
             <Card
                 className={cn(
-                    'p-4 mb-4 border-l-4 transition-all',
-                    isOver && 'bg-primary-light border-primary shadow-lg'
+                    'p-5 mb-4 shadow-md transition-all duration-300',
+                    isOver && 'shadow-xl scale-[1.02] bg-primary-light ring-2 ring-primary'
                 )}
-                style={{
-                    borderLeftColor: category.color || 'var(--primary)',
-                }}
             >
+                <div
+                    className="h-1 w-12 rounded-full mb-4 transition-all"
+                    style={{
+                        backgroundColor: category.color || 'var(--primary)',
+                    }}
+                />
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                         {category.icon && (
-                            <span className="text-xl">{category.icon}</span>
+                            <span className="text-2xl">{category.icon}</span>
                         )}
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-foreground truncate">
+                            <h3 className="font-semibold text-foreground truncate text-lg">
                                 {category.name}
                             </h3>
-                            <p className="text-sm text-foreground-muted">
+                            <p className="text-sm text-foreground-muted font-medium">
                                 {documents.length} document{documents.length !== 1 ? 's' : ''}
                             </p>
                         </div>
@@ -85,21 +88,24 @@ export function CategoryColumn({
             </Card>
 
             {/* Documents List */}
-            <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+            <div className="flex-1 overflow-y-auto space-y-3 pr-2">
                 <SortableContext items={documentIds} strategy={verticalListSortingStrategy}>
                     {documents.length === 0 ? (
                         <div
                             className={cn(
-                                'flex items-center justify-center h-32 border-2 border-dashed rounded-lg transition-all',
+                                'flex flex-col items-center justify-center h-40 rounded-2xl transition-all duration-300',
                                 isOver
-                                    ? 'border-primary bg-primary-light'
-                                    : 'border-border bg-background-secondary'
+                                    ? 'bg-primary-light shadow-lg scale-[1.02]'
+                                    : 'bg-background-elevated shadow-sm'
                             )}
                         >
-                            <p className="text-sm text-foreground-muted text-center px-4">
+                            <div className="text-4xl mb-3 opacity-50">
+                                {category.icon || '📁'}
+                            </div>
+                            <p className="text-sm text-foreground-muted text-center px-4 font-medium">
                                 {isOver
                                     ? 'Déposez le document ici'
-                                    : 'Aucun document dans cette catégorie'}
+                                    : 'Aucun document'}
                             </p>
                         </div>
                     ) : (
