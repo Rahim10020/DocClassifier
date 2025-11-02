@@ -77,7 +77,7 @@ export default function ProcessingPage() {
     useEffect(() => {
         if (
             session &&
-            session.status === 'extracting' &&
+            session.status === 'classifying' &&
             session.processedFiles === session.totalFiles &&
             !extractionComplete
         ) {
