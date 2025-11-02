@@ -28,64 +28,70 @@ export function FileList({ files, onRemove, disabled = false }: FileListProps) {
     };
 
     return (
-        <Card className="p-4">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-foreground">
+        <Card className="p-6 shadow-md">
+            <div className="flex items-center justify-between mb-5">
+                <h3 className="font-semibold text-foreground text-lg">
                     Fichiers sélectionnés ({files.length})
                 </h3>
-                <p className="text-sm text-foreground-muted">
+                <p className="text-sm text-foreground-muted font-medium">
                     Total: {formatFileSize(files.reduce((sum, f) => sum + f.size, 0))}
                 </p>
             </div>
 
-            <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                 {files.map((file) => (
-                    <div
+                    <Card
                         key={file.id}
+                        hover
                         className={cn(
-                            'flex items-center gap-3 p-3 rounded-lg border border-border bg-background hover:bg-background-secondary transition-colors',
-                            file.status === 'error' && 'border-error bg-error-light'
+                            'p-4 transition-all duration-200',
+                            'shadow-sm hover:shadow-md',
+                            file.status === 'error' && 'bg-error-light shadow-md ring-2 ring-error'
                         )}
                     >
-                        {getFileIcon(file.type)}
-
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">
-                                {file.name}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-foreground-muted">
-                                    {formatFileSize(file.size)}
-                                </span>
-                                <span className="text-xs text-foreground-muted">•</span>
-                                <span className="text-xs text-foreground-muted uppercase">
-                                    {file.type}
-                                </span>
+                        <div className="flex items-center gap-4">
+                            <div className="shrink-0">
+                                {getFileIcon(file.type)}
                             </div>
+
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">
+                                    {file.name}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1.5">
+                                    <span className="text-xs text-foreground-muted font-medium">
+                                        {formatFileSize(file.size)}
+                                    </span>
+                                    <span className="text-xs text-foreground-muted">•</span>
+                                    <span className="text-xs text-foreground-muted uppercase font-medium">
+                                        {file.type}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {file.status === 'uploading' && (
+                                <div className="text-xs text-primary font-medium px-3 py-1.5 bg-primary-light rounded-lg">
+                                    Envoi...
+                                </div>
+                            )}
+
+                            {file.status === 'error' && (
+                                <div className="text-xs text-error font-medium px-3 py-1.5 bg-error-light rounded-lg">
+                                    Erreur
+                                </div>
+                            )}
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onRemove(file.id)}
+                                disabled={disabled}
+                                className="shrink-0"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
-
-                        {file.status === 'uploading' && (
-                            <div className="text-xs text-primary">
-                                Envoi...
-                            </div>
-                        )}
-
-                        {file.status === 'error' && (
-                            <div className="text-xs text-error">
-                                Erreur
-                            </div>
-                        )}
-
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => onRemove(file.id)}
-                            disabled={disabled}
-                            className="shrink-0"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    </Card>
                 ))}
             </div>
         </Card>
