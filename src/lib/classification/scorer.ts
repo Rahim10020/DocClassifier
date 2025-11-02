@@ -24,7 +24,9 @@ function calculateKeywordWeight(
     documentText: string,
     documentLength: number
 ): number {
-    const regex = new RegExp(`\\b${keyword}\\w*\\b`, 'gi');
+    // Échapper les caractères spéciaux de la regex
+    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escapedKeyword}\\w*\\b`, 'gi');
     const matches = documentText.match(regex);
     const frequency = matches ? matches.length : 0;
 
