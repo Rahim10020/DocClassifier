@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Document } from '@/types/document';
 import { Category } from '@/types/category';
 import { groupBy } from '@/lib/utils';
@@ -9,7 +9,7 @@ interface UseClassificationOptions {
 }
 
 export function useClassification(options: UseClassificationOptions) {
-    const { documents, categories = [] } = options;
+    const { documents } = options;
 
     const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set());
     const [searchQuery, setSearchQuery] = useState('');

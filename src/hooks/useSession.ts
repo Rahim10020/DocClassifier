@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Session, SessionStatus } from '@/types/session';
+import { Session } from '@/types/session';
 import { Document } from '@/types/document';
 
 interface UseSessionOptions {

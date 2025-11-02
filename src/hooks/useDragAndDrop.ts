@@ -1,10 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
-    DndContext,
     DragEndEvent,
     DragStartEvent,
-    DragOverlay,
-    closestCenter,
     PointerSensor,
     useSensor,
     useSensors,
@@ -14,11 +11,10 @@ import { Document } from '@/types/document';
 interface UseDragAndDropOptions {
     documents: Document[];
     onDocumentMove: (documentId: string, newCategory: string, newSubCategory?: string) => Promise<void>;
-    onError?: (error: string) => void;
 }
 
 export function useDragAndDrop(options: UseDragAndDropOptions) {
-    const { documents, onDocumentMove, onError } = options;
+    const { documents, onDocumentMove } = options;
 
     const [activeId, setActiveId] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -62,12 +58,10 @@ export function useDragAndDrop(options: UseDragAndDropOptions) {
             try {
                 await onDocumentMove(documentId, category, subCategory);
             } catch (error) {
-                if (onError) {
-                    onError(error instanceof Error ? error.message : 'Erreur lors du déplacement');
-                }
+                console.error('Erreur lors du déplacement:', error);
             }
         },
-        [onDocumentMove, onError]
+        [onDocumentMove]
     );
 
     const handleDragCancel = useCallback(() => {

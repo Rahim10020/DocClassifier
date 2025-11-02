@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateZip, cleanupZip } from '@/lib/zip/generator';
 import { downloadRequestSchema } from '@/lib/validators/session-validator';
-import { deleteSession as deleteSessionFiles } from '@/lib/storage';
-import { deleteSession } from '@/lib/session';
 import { readFile } from 'fs/promises';
+import { Document } from '@/types/document';
 
 // Types pour l'aperçu des documents
 interface DocumentPreview {
@@ -61,13 +60,23 @@ export async function POST(request: NextRequest) {
         }
 
         // Générer le ZIP
-        const result = await generateZip(sessionId, session.documents, options);
+        const documents: Document[] = session.documents.map(doc => ({
+            ...doc,
+            extractedText: doc.extractedText ?? undefined,
+            language: doc.language ?? undefined,
+            mainCategory: doc.mainCategory ?? undefined,
+            subCategory: doc.subCategory ?? undefined,
+            confidence: doc.confidence ?? undefined,
+            pageCount: doc.pageCount ?? undefined,
+            wordCount: doc.wordCount ?? undefined,
+        }));
+        const result = await generateZip(sessionId, documents, options);
 
         // Lire le fichier ZIP
         const zipBuffer = await readFile(result.zipPath);
 
         // Créer la réponse avec le fichier ZIP
-        const response = new NextResponse(zipBuffer, {
+        const response = new NextResponse(new Uint8Array(zipBuffer), {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',
@@ -109,7 +118,7 @@ export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
         const sessionId = searchParams.get('sessionId');
-        const structure = searchParams.get('structure') as 'flat' | 'hierarchical' || 'hierarchical';
+        const structure = (searchParams.get('structure') as 'flat' | 'hierarchical') || 'hierarchical';
 
         if (!sessionId) {
             return NextResponse.json(

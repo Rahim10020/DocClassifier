@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/types/document';

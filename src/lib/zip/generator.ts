@@ -14,7 +14,7 @@ export interface ZipGenerationResult {
 
 export async function generateZip(
     sessionId: string,
-    documents: any[],
+    documents: Document[],
     options: ExportOptions
 ): Promise<ZipGenerationResult> {
     const zipPath = path.join('./temp', `${sessionId}.zip`);

@@ -23,7 +23,6 @@ export default function HomePage() {
         uploadFiles,
         isUploading,
         error,
-        totalSize,
         fileCount,
         canUpload,
     } = useUpload({

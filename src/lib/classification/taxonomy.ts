@@ -44,7 +44,7 @@ const taxonomyData = {
 export function loadTaxonomy(): Category[] {
     const categories: Category[] = [];
 
-    for (const [key, data] of Object.entries(taxonomyData)) {
+    for (const [, data] of Object.entries(taxonomyData)) {
         const category: Category = {
             id: data.id,
             name: data.name,

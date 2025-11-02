@@ -10,11 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function LanguageSwitch() {
-    const [language, setLanguage] = useState<'fr' | 'en'>('fr');
     const [open, setOpen] = useState(false);
 
     const handleLanguageChange = (lang: 'fr' | 'en') => {
-        setLanguage(lang);
         setOpen(false);
         // TODO: Implémenter le changement de langue global
         console.log('Language changed to:', lang);

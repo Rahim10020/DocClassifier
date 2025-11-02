@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Header } from '@/components/shared/Header';
 import { StepIndicator } from '@/components/processing/StepIndicator';
@@ -22,11 +22,8 @@ export default function ProcessingPage() {
         failedDocuments,
         isLoading,
         error,
-        isProcessing,
         isReady,
         isExpired,
-        hasError,
-        progress,
     } = useSession({
         sessionId,
         autoRefresh: true,
@@ -36,13 +33,45 @@ export default function ProcessingPage() {
     const [hasStartedProcessing, setHasStartedProcessing] = useState(false);
     const [extractionComplete, setExtractionComplete] = useState(false);
 
+    const startExtraction = useCallback(async () => {
+        try {
+            console.log('🚀 Démarrage de l\'extraction...');
+            const response = await fetch('/api/extract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId }),
+            });
+
+            const data = await response.json();
+            console.log('✅ Extraction API response:', data);
+        } catch (error) {
+            console.error('❌ Extraction error:', error);
+        }
+    }, [sessionId]);
+
+    const startClassification = useCallback(async () => {
+        try {
+            console.log('🚀 Démarrage de la classification...');
+            const response = await fetch('/api/classify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId }),
+            });
+
+            const data = await response.json();
+            console.log('✅ Classification API response:', data);
+        } catch (error) {
+            console.error('❌ Classification error:', error);
+        }
+    }, [sessionId]);
+
     // Démarrer l'extraction UNE SEULE FOIS
     useEffect(() => {
         if (session && !hasStartedProcessing && session.status === 'uploading') {
             setHasStartedProcessing(true);
             startExtraction();
         }
-    }, [session, hasStartedProcessing]);
+    }, [session, hasStartedProcessing, startExtraction]);
 
     // DÉTECTER LA FIN DE L'EXTRACTION
     useEffect(() => {
@@ -59,7 +88,7 @@ export default function ProcessingPage() {
                 startClassification();
             }, 1000);
         }
-    }, [session, extractionComplete]);
+    }, [session, extractionComplete, startClassification]);
 
     // Rediriger vers classify quand prêt
     useEffect(() => {
@@ -69,38 +98,6 @@ export default function ProcessingPage() {
             }, 2000);
         }
     }, [isReady, sessionId, router]);
-
-    const startExtraction = async () => {
-        try {
-            console.log('🚀 Démarrage de l\'extraction...');
-            const response = await fetch('/api/extract', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId }),
-            });
-
-            const data = await response.json();
-            console.log('✅ Extraction API response:', data);
-        } catch (error) {
-            console.error('❌ Extraction error:', error);
-        }
-    };
-
-    const startClassification = async () => {
-        try {
-            console.log('🚀 Démarrage de la classification...');
-            const response = await fetch('/api/classify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId }),
-            });
-
-            const data = await response.json();
-            console.log('✅ Classification API response:', data);
-        } catch (error) {
-            console.error('❌ Classification error:', error);
-        }
-    };
 
     if (isLoading) {
         return (
@@ -178,7 +175,7 @@ export default function ProcessingPage() {
                         </p>
                         {failedDocuments.length > 0 && (
                             <p className="text-sm text-error mb-6 font-medium">
-                                ⚠️ {failedDocuments.length} document(s) n'ont pas pu être traités
+                                ⚠️ {failedDocuments.length} document(s) n&apos;ont pas pu être traités
                             </p>
                         )}
                         <p className="text-sm text-foreground-muted mb-8">

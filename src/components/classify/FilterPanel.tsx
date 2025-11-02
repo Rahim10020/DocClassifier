@@ -16,7 +16,7 @@ interface FilterPanelProps {
     };
     categories: string[];
     fileTypes: string[];
-    onChange: (filters: any) => void;
+    onChange: (filters: FilterPanelProps['filters']) => void;
     onReset: () => void;
     className?: string;
 }

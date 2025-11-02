@@ -32,6 +32,9 @@ export function ProcessingAnimation({
         currentIndex + 1
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const index = 0; // This variable is not used but kept for potential future use
+
     return (
         <Card className={cn('p-8 shadow-lg', className)}>
             <h3 className="font-semibold text-foreground mb-6 text-lg">Documents en cours de traitement</h3>

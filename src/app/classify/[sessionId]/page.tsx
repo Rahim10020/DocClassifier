@@ -66,9 +66,7 @@ export default function ClassifyPage() {
 
     const {
         sensors,
-        activeId,
         activeDocument,
-        isDragging,
         handleDragStart,
         handleDragEnd,
         handleDragCancel,

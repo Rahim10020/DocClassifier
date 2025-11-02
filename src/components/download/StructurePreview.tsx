@@ -14,7 +14,7 @@ interface PreviewData {
     structure: string;
     totalFiles: number;
     totalSize: number;
-    preview: any;
+    preview: Record<string, unknown> | string[];
 }
 
 export function StructurePreview({ sessionId, structure }: StructurePreviewProps) {
@@ -193,8 +193,8 @@ export function StructurePreview({ sessionId, structure }: StructurePreviewProps
 
             <div className="max-h-[400px] overflow-y-auto rounded-lg border border-border bg-background-secondary p-3">
                 {structure === 'hierarchical'
-                    ? renderHierarchicalPreview(data.preview)
-                    : renderFlatPreview(data.preview)}
+                    ? renderHierarchicalPreview(data.preview as Record<string, unknown>)
+                    : renderFlatPreview(data.preview as string[])}
             </div>
         </Card>
     );
