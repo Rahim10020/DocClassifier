@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { FolderTree } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -27,9 +27,13 @@ export function Logo({ size = 'md', showText = true, className }: LogoProps) {
             href="/"
             className={cn('flex items-center gap-2 font-bold text-foreground hover:opacity-80 transition-opacity', className)}
         >
-            <div className="flex items-center justify-center bg-primary text-white rounded-lg p-1.5">
-                <FolderTree className={sizes[size]} />
-            </div>
+            <Image
+                src="/favicon.ico"
+                alt="Classifier Logo"
+                width={32}
+                height={32}
+                className={cn(sizes[size], 'rounded')}
+            />
             {showText && (
                 <span className={textSizes[size]}>
                     Classifier
