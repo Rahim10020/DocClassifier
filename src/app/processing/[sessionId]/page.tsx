@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Header } from '@/components/shared/Header';
 import { StepIndicator } from '@/components/processing/StepIndicator';
@@ -33,7 +33,15 @@ export default function ProcessingPage() {
     const [hasStartedProcessing, setHasStartedProcessing] = useState(false);
     const [extractionComplete, setExtractionComplete] = useState(false);
 
+    // Utiliser des refs pour éviter les appels multiples
+    const extractionStartedRef = useRef(false);
+    const classificationStartedRef = useRef(false);
+    const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const startExtraction = useCallback(async () => {
+        if (extractionStartedRef.current) return;
+        extractionStartedRef.current = true;
+
         try {
             console.log('🚀 Démarrage de l\'extraction...');
             const response = await fetch('/api/extract', {
@@ -46,10 +54,14 @@ export default function ProcessingPage() {
             console.log('✅ Extraction API response:', data);
         } catch (error) {
             console.error('❌ Extraction error:', error);
+            extractionStartedRef.current = false; // Permettre de réessayer en cas d'erreur
         }
     }, [sessionId]);
 
     const startClassification = useCallback(async () => {
+        if (classificationStartedRef.current) return;
+        classificationStartedRef.current = true;
+
         try {
             console.log('🚀 Démarrage de la classification...');
             const response = await fetch('/api/classify', {
@@ -62,6 +74,7 @@ export default function ProcessingPage() {
             console.log('✅ Classification API response:', data);
         } catch (error) {
             console.error('❌ Classification error:', error);
+            classificationStartedRef.current = false; // Permettre de réessayer en cas d'erreur
         }
     }, [sessionId]);
 
@@ -71,7 +84,7 @@ export default function ProcessingPage() {
             setHasStartedProcessing(true);
             startExtraction();
         }
-    }, [session, hasStartedProcessing, startExtraction]);
+    }, [session?.status]); // Dépend uniquement du status
 
     // DÉTECTER LA FIN DE L'EXTRACTION
     useEffect(() => {
@@ -84,19 +97,29 @@ export default function ProcessingPage() {
             setExtractionComplete(true);
             console.log('✅ Extraction terminée, démarrage de la classification...');
 
-            setTimeout(() => {
+            // Utiliser un timeout avec cleanup
+            const timeout = setTimeout(() => {
                 startClassification();
             }, 1000);
-        }
-    }, [session, extractionComplete, startClassification]);
 
-    // Rediriger vers classify quand prêt
+            return () => clearTimeout(timeout);
+        }
+    }, [session?.status, session?.processedFiles, session?.totalFiles, extractionComplete, startClassification]);
+
+    // Rediriger vers classify quand prêt avec cleanup approprié
     useEffect(() => {
         if (isReady) {
-            setTimeout(() => {
+            redirectTimeoutRef.current = setTimeout(() => {
                 router.push(`/classify/${sessionId}`);
             }, 2000);
         }
+
+        return () => {
+            if (redirectTimeoutRef.current) {
+                clearTimeout(redirectTimeoutRef.current);
+                redirectTimeoutRef.current = null;
+            }
+        };
     }, [isReady, sessionId, router]);
 
     if (isLoading) {

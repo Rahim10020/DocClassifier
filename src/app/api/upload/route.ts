@@ -11,9 +11,27 @@ export async function POST(request: NextRequest) {
 
         // Parser le FormData
         const formData = await request.formData();
-        const files = formData.getAll('files') as File[];
-        const profile = formData.get('profile') as string | null;
-        const language = (formData.get('language') as string) || 'fr';
+        const filesRaw = formData.getAll('files');
+        const profileRaw = formData.get('profile');
+        const languageRaw = formData.get('language');
+
+        // Validation des types
+        const files: File[] = [];
+        for (const fileRaw of filesRaw) {
+            if (!(fileRaw instanceof File)) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        error: 'Format de fichier invalide',
+                    },
+                    { status: 400 }
+                );
+            }
+            files.push(fileRaw);
+        }
+
+        const profile = profileRaw && typeof profileRaw === 'string' ? profileRaw : undefined;
+        const language = languageRaw && typeof languageRaw === 'string' ? languageRaw : 'fr';
 
         // Validation des fichiers
         const validation = validateFiles(files);
@@ -29,7 +47,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Créer la session
-        const session = await createSession(profile || undefined, language);
+        const session = await createSession(profile, language);
 
         // Sauvegarder chaque fichier
         const savedDocuments = [];

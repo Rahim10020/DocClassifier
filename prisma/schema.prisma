@@ -7,8 +7,82 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Session {
+// ============= AUTHENTICATION =============
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials provider
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      AuthSession[]
+  classificationSessions ClassificationSession[]
+  categories    CustomCategory[]
+  tags          Tag[]
+  sharedSessions SharedSession[]
+  apiKeys       ApiKey[]
+
+  // Settings
+  theme         String    @default("system") // light, dark, system
+  language      String    @default("fr")
+  defaultProfile String?
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============= CLASSIFICATION =============
+
+model ClassificationSession {
   id             String    @id @default(cuid())
+  userId         String?   // Nullable for anonymous users
+  user           User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name           String?   // User-defined name
   createdAt      DateTime  @default(now())
   expiresAt      DateTime
   profile        String?
@@ -16,42 +90,121 @@ model Session {
   totalFiles     Int       @default(0)
   processedFiles Int       @default(0)
   status         String    @default("uploading")
-  
+
+  // Stats
+  totalSize      BigInt    @default(0)
+  processingTime Int?      // in seconds
+
   documents      Document[]
-  
+  sharedWith     SharedSession[]
+
+  @@index([userId])
   @@index([expiresAt])
   @@index([status])
+  @@index([createdAt])
 }
 
 model Document {
   id             String    @id @default(cuid())
   sessionId      String
-  session        Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
+  session        ClassificationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
   originalName   String
   fileName       String
   fileType       String
   fileSize       Int
   filePath       String
-  
+  fileHash       String?   // For duplicate detection
+
   extractedText  String?   @db.Text
   language       String?
-  
+  hasOcr         Boolean   @default(false)
+
   mainCategory   String?
   subCategory    String?
   confidence     Float?
   keywords       String[]
-  
+
   pageCount      Int?
   wordCount      Int?
-  
+
+  // Custom categorization
+  customTags     DocumentTag[]
+
   createdAt      DateTime  @default(now())
-  
+  updatedAt      DateTime  @updatedAt
+
   @@index([sessionId])
   @@index([mainCategory])
   @@index([language])
   @@index([fileType])
+  @@index([fileHash])
 }
+
+// ============= CUSTOM CATEGORIES & TAGS =============
+
+model CustomCategory {
+  id             String     @id @default(cuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  nameEn         String?
+  description    String?
+
+  parentId       String?
+  parent         CustomCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children       CustomCategory[] @relation("CategoryHierarchy")
+
+  keywords       String[]
+  priority       Int        @default(0)
+
+  icon           String?
+  color          String?
+
+  isPublic       Boolean    @default(false) // Can be shared with community
+  usageCount     Int        @default(0)
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([parentId])
+  @@index([isPublic])
+}
+
+model Tag {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  color          String?
+
+  documents      DocumentTag[]
+
+  createdAt      DateTime    @default(now())
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model DocumentTag {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  tagId      String
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([documentId, tagId])
+  @@index([documentId])
+  @@index([tagId])
+}
+
+// ============= GLOBAL CATEGORIES (System) =============
 
 model Category {
   id             String     @id @default(cuid())
@@ -60,17 +213,60 @@ model Category {
   parentId       String?
   parent         Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
   children       Category[] @relation("CategoryToCategory")
-  
+
   profiles       String[]
   keywords       String[]
   priority       Int        @default(0)
-  
+
   icon           String?
   color          String?
-  
+
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-  
+
   @@index([parentId])
   @@index([priority])
+}
+
+// ============= SHARING & COLLABORATION =============
+
+model SharedSession {
+  id                    String                @id @default(cuid())
+  sessionId             String
+  session               ClassificationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  sharedWithUserId      String
+  sharedWithUser        User                  @relation(fields: [sharedWithUserId], references: [id], onDelete: Cascade)
+
+  permission            String                @default("view") // view, edit
+
+  createdAt             DateTime              @default(now())
+  expiresAt             DateTime?
+
+  @@unique([sessionId, sharedWithUserId])
+  @@index([sessionId])
+  @@index([sharedWithUserId])
+}
+
+// ============= API KEYS =============
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  key         String   @unique
+
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+
+  // Rate limiting
+  requestCount Int     @default(0)
+  rateLimit    Int     @default(1000) // requests per hour
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([key])
 }
