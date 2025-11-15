@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/toast';
+import { SessionProvider } from '@/components/providers/SessionProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
     subsets: ['latin'],
@@ -29,12 +31,16 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="fr" suppressHydrationWarning>
-            <body className={`${plusJakartaSans.variable} font-sans antialiased bg-background text-foreground`}>
-                <ErrorBoundary>
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
-                </ErrorBoundary>
+            <body className={`${plusJakartaSans.variable} font-sans antialiased bg-background text-foreground transition-colors duration-200`}>
+                <SessionProvider>
+                    <ThemeProvider>
+                        <ErrorBoundary>
+                            <ToastProvider>
+                                {children}
+                            </ToastProvider>
+                        </ErrorBoundary>
+                    </ThemeProvider>
+                </SessionProvider>
             </body>
         </html>
     );
