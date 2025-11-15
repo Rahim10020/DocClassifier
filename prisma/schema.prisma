@@ -132,7 +132,7 @@ model Document {
   customTags     DocumentTag[]
 
   createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  updatedAt      DateTime  @default(now()) @updatedAt
 
   @@index([sessionId])
   @@index([mainCategory])
