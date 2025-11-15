@@ -33,18 +33,23 @@ export async function PUT(request: NextRequest) {
             );
         }
 
-        // Mettre à jour les documents si fournis
+        // Mettre à jour les documents si fournis (en parallèle pour meilleure performance)
         if (documents && documents.length > 0) {
-            for (const doc of documents) {
-                await prisma.document.update({
-                    where: { id: doc.id },
-                    data: {
-                        mainCategory: doc.mainCategory,
-                        subCategory: doc.subCategory,
-                        confidence: doc.confidence,
-                    },
-                });
-            }
+            await Promise.all(
+                documents.map(doc =>
+                    prisma.document.update({
+                        where: { id: doc.id },
+                        data: {
+                            mainCategory: doc.mainCategory,
+                            subCategory: doc.subCategory,
+                            confidence: doc.confidence,
+                        },
+                    }).catch(error => {
+                        console.error(`Erreur lors de la mise à jour du document ${doc.id}:`, error);
+                        throw error;
+                    })
+                )
+            );
         }
 
         // Mettre à jour le statut de la session si fourni
@@ -86,6 +91,21 @@ export async function PATCH(request: NextRequest) {
         if (!documentId) {
             return NextResponse.json(
                 { success: false, error: 'Document ID manquant' },
+                { status: 400 }
+            );
+        }
+
+        // Validation des catégories
+        if (mainCategory && typeof mainCategory !== 'string') {
+            return NextResponse.json(
+                { success: false, error: 'Catégorie principale invalide' },
+                { status: 400 }
+            );
+        }
+
+        if (subCategory && typeof subCategory !== 'string') {
+            return NextResponse.json(
+                { success: false, error: 'Sous-catégorie invalide' },
                 { status: 400 }
             );
         }

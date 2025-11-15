@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Session } from '@/types/session';
 import { Document } from '@/types/document';
 
@@ -17,7 +17,15 @@ export function useSession(options: UseSessionOptions) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Utiliser un ref pour éviter les race conditions avec setInterval
+    const isFetchingRef = useRef(false);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
     const fetchSession = useCallback(async () => {
+        // Éviter les appels concurrents
+        if (isFetchingRef.current) return;
+
+        isFetchingRef.current = true;
         try {
             const response = await fetch(`/api/session/${sessionId}`);
             const data = await response.json();
@@ -48,15 +56,23 @@ export function useSession(options: UseSessionOptions) {
             setError(err instanceof Error ? err.message : 'Erreur inconnue');
         } finally {
             setIsLoading(false);
+            isFetchingRef.current = false;
         }
     }, [sessionId]);
 
+    // Chargement initial
     useEffect(() => {
         fetchSession();
-    }, [fetchSession]);
+    }, [sessionId]); // Dépend uniquement de sessionId
 
     // Auto-refresh pour suivre la progression
     useEffect(() => {
+        // Nettoyer l'intervalle précédent
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
         if (!autoRefresh || !session) return;
 
         // Ne pas rafraîchir si la session est terminée ou en erreur
@@ -64,12 +80,17 @@ export function useSession(options: UseSessionOptions) {
             return;
         }
 
-        const interval = setInterval(() => {
+        intervalRef.current = setInterval(() => {
             fetchSession();
         }, refreshInterval);
 
-        return () => clearInterval(interval);
-    }, [autoRefresh, refreshInterval, session, fetchSession]);
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [autoRefresh, refreshInterval, session?.status, fetchSession]);
 
     const updateDocument = useCallback(async (documentId: string, updates: Partial<Document>) => {
         try {

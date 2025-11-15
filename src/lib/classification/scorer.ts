@@ -24,15 +24,27 @@ function calculateKeywordWeight(
     documentText: string,
     documentLength: number
 ): number {
+    // Protection contre ReDoS : limiter la longueur des mots-clés
+    if (keyword.length > 100) {
+        keyword = keyword.substring(0, 100);
+    }
+
     // Échapper les caractères spéciaux de la regex
     const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedKeyword}\\w*\\b`, 'gi');
-    const matches = documentText.match(regex);
-    const frequency = matches ? matches.length : 0;
 
-    // TF-IDF simplifié : (fréquence du mot / longueur du doc)
-    // Plafonné à 0.1 pour éviter qu'un mot très répété domine trop
-    return Math.min(frequency / Math.max(documentLength, 1), 0.1);
+    try {
+        const regex = new RegExp(`\\b${escapedKeyword}\\w*\\b`, 'gi');
+        const matches = documentText.match(regex);
+        const frequency = matches ? matches.length : 0;
+
+        // TF-IDF simplifié : (fréquence du mot / longueur du doc)
+        // Plafonné à 0.1 pour éviter qu'un mot très répété domine trop
+        return Math.min(frequency / Math.max(documentLength, 1), 0.1);
+    } catch (error) {
+        // En cas d'erreur regex, retourner 0
+        console.error('Erreur lors du calcul du poids du mot-clé:', error);
+        return 0;
+    }
 }
 
 export function scoreAgainstTaxonomy(

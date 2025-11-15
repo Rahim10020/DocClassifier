@@ -87,7 +87,11 @@ export async function POST(request: NextRequest) {
 
         // Nettoyer le ZIP temporaire après l'envoi
         setTimeout(async () => {
-            await cleanupZip(result.zipPath);
+            try {
+                await cleanupZip(result.zipPath);
+            } catch (error) {
+                console.error('Erreur lors du nettoyage du ZIP:', error);
+            }
         }, 1000);
 
         // Optionnel : Supprimer la session après le téléchargement
