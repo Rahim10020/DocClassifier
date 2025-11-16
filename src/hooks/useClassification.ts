@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Document } from '@/types/document';
 import { Category } from '@/types/category';
 import { groupBy } from '@/lib/utils';
+import { SYSTEM_CATEGORIES } from '@/lib/classification/constants';
 
 interface UseClassificationOptions {
     documents: Document[];
@@ -57,7 +58,7 @@ export function useClassification(options: UseClassificationOptions) {
     // Statistiques
     const stats = useMemo(() => {
         const total = documents.length;
-        const categorized = documents.filter(d => d.mainCategory && d.mainCategory !== 'Uncategorized').length;
+        const categorized = documents.filter(d => d.mainCategory && d.mainCategory !== SYSTEM_CATEGORIES.UNCATEGORIZED).length;
         const uncategorized = total - categorized;
 
         const avgConfidence = documents

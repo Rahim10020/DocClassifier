@@ -1,5 +1,6 @@
 import natural from 'natural';
 import { Category } from '@/types/category';
+import { SYSTEM_CATEGORIES } from './constants';
 
 export interface ScoreResult {
     categoryId: string;
@@ -183,7 +184,7 @@ export function findBestMatch(scores: ScoreResult[]): {
 } {
     if (scores.length === 0) {
         return {
-            mainCategory: 'Uncategorized',
+            mainCategory: SYSTEM_CATEGORIES.UNCATEGORIZED,
             confidence: 0,
             alternatives: [],
         };

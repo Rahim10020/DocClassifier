@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sessionUpdateSchema } from '@/lib/validators/session-validator';
+import { loadTaxonomy } from '@/lib/classification/taxonomy';
 
 export async function PUT(request: NextRequest) {
     try {
@@ -110,12 +111,54 @@ export async function PATCH(request: NextRequest) {
             );
         }
 
+        // Valider que la catégorie existe dans la taxonomie
+        if (mainCategory && mainCategory.trim() !== '') {
+            const taxonomy = loadTaxonomy();
+            const categoryExists = taxonomy.some(cat =>
+                cat.name === mainCategory ||
+                cat.nameEn === mainCategory
+            );
+
+            if (!categoryExists) {
+                return NextResponse.json(
+                    {
+                        success: false,
+                        error: `La catégorie "${mainCategory}" n'existe pas dans la taxonomie`
+                    },
+                    { status: 400 }
+                );
+            }
+
+            // Valider que la sous-catégorie appartient à la catégorie principale
+            if (subCategory && subCategory.trim() !== '') {
+                const category = taxonomy.find(cat =>
+                    cat.name === mainCategory ||
+                    cat.nameEn === mainCategory
+                );
+
+                const subcategoryExists = category?.children?.some(sub =>
+                    sub.name === subCategory ||
+                    sub.nameEn === subCategory
+                );
+
+                if (!subcategoryExists) {
+                    return NextResponse.json(
+                        {
+                            success: false,
+                            error: `La sous-catégorie "${subCategory}" n'appartient pas à "${mainCategory}"`
+                        },
+                        { status: 400 }
+                    );
+                }
+            }
+        }
+
         // Mettre à jour un seul document
         const updatedDocument = await prisma.document.update({
             where: { id: documentId },
             data: {
-                mainCategory,
-                subCategory,
+                mainCategory: mainCategory || null,
+                subCategory: subCategory || null,
             },
         });
 
