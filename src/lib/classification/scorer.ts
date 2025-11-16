@@ -10,16 +10,36 @@ export interface ScoreResult {
     matchedKeywords: string[];
 }
 
+// Cache pour les normalisations de mots-clés
+const stemCache = new Map<string, string>();
+
+// Limite de taille de texte pour le calcul de fréquence (10000 caractères)
+const MAX_TEXT_LENGTH_FOR_FREQUENCY = 10000;
+
 function stemKeyword(keyword: string, language: string): string {
+    const cacheKey = `${language}:${keyword.toLowerCase()}`;
+
+    // Vérifier le cache d'abord
+    if (stemCache.has(cacheKey)) {
+        return stemCache.get(cacheKey)!;
+    }
+
     const stemmer = language === 'fr' ? natural.PorterStemmerFr : natural.PorterStemmer;
-    return stemmer.stem(keyword.toLowerCase());
+    const stemmed = stemmer.stem(keyword.toLowerCase());
+
+    // Limiter la taille du cache (max 10000 entrées)
+    if (stemCache.size < 10000) {
+        stemCache.set(cacheKey, stemmed);
+    }
+
+    return stemmed;
 }
 
 function normalizeKeywords(keywords: string[], language: string): string[] {
     return keywords.map(k => stemKeyword(k, language));
 }
 
-// Calculer le poids d'un mot-clé selon sa fréquence dans le doc
+// Calculer le poids d'un mot-clé selon sa fréquence dans le doc (optimisé)
 function calculateKeywordWeight(
     keyword: string,
     documentText: string,
@@ -30,19 +50,29 @@ function calculateKeywordWeight(
         keyword = keyword.substring(0, 100);
     }
 
-    // Échapper les caractères spéciaux de la regex
-    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Limiter la taille du texte pour éviter les calculs coûteux
+    const textToSearch = documentText.length > MAX_TEXT_LENGTH_FOR_FREQUENCY
+        ? documentText.substring(0, MAX_TEXT_LENGTH_FOR_FREQUENCY)
+        : documentText;
 
     try {
-        const regex = new RegExp(`\\b${escapedKeyword}\\w*\\b`, 'gi');
-        const matches = documentText.match(regex);
-        const frequency = matches ? matches.length : 0;
+        // Utiliser une approche plus simple sans regex complexe
+        const lowerText = textToSearch.toLowerCase();
+        const lowerKeyword = keyword.toLowerCase();
+
+        // Compter les occurrences avec split (plus rapide que regex)
+        let count = 0;
+        let pos = 0;
+        while ((pos = lowerText.indexOf(lowerKeyword, pos)) !== -1) {
+            count++;
+            pos += lowerKeyword.length;
+        }
 
         // TF-IDF simplifié : (fréquence du mot / longueur du doc)
         // Plafonné à 0.1 pour éviter qu'un mot très répété domine trop
-        return Math.min(frequency / Math.max(documentLength, 1), 0.1);
+        return Math.min(count / Math.max(documentLength, 1), 0.1);
     } catch (error) {
-        // En cas d'erreur regex, retourner 0
+        // En cas d'erreur, retourner 0
         console.error('Erreur lors du calcul du poids du mot-clé:', error);
         return 0;
     }
@@ -57,6 +87,10 @@ export function scoreAgainstTaxonomy(
 ): ScoreResult[] {
     const scores: ScoreResult[] = [];
     const normalizedDocKeywords = normalizeKeywords(documentKeywords, language);
+
+    // Utiliser un Set pour des recherches O(1) au lieu de O(n)
+    const normalizedDocKeywordsSet = new Set(normalizedDocKeywords);
+
     const documentLength = documentText ? documentText.split(/\s+/).length : documentKeywords.length;
 
     for (const category of categories) {
@@ -68,9 +102,9 @@ export function scoreAgainstTaxonomy(
         // Normaliser les mots-clés de la catégorie
         const categoryKeywords = normalizeKeywords(category.keywords, language);
 
-        // Calcul de l'intersection
-        const intersection = normalizedDocKeywords.filter(k =>
-            categoryKeywords.includes(k)
+        // Calcul de l'intersection (optimisé avec Set)
+        const intersection = categoryKeywords.filter(k =>
+            normalizedDocKeywordsSet.has(k)
         );
 
         if (intersection.length === 0) continue;

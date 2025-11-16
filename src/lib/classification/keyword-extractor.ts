@@ -7,6 +7,9 @@ export interface KeywordExtractionOptions {
     minLength?: number;
 }
 
+// Limite de taille de texte pour l'extraction (50000 caractères = ~10000 mots)
+const MAX_TEXT_LENGTH_FOR_EXTRACTION = 50000;
+
 export function extractKeywords(
     text: string,
     options: KeywordExtractionOptions = {}
@@ -22,8 +25,13 @@ export function extractKeywords(
     }
 
     try {
+        // Limiter la taille du texte pour éviter les traitements trop longs
+        const processedText = text.length > MAX_TEXT_LENGTH_FOR_EXTRACTION
+            ? text.substring(0, MAX_TEXT_LENGTH_FOR_EXTRACTION)
+            : text;
+
         // Extraction via keyword-extractor
-        const extractedKeywords = keywordExtractor.extract(text, {
+        const extractedKeywords = keywordExtractor.extract(processedText, {
             language: language === 'fr' ? 'french' : 'english',
             remove_digits: false,
             return_changed_case: true,
@@ -53,13 +61,25 @@ export function extractKeywordsWithFrequency(
     const keywords = extractKeywords(text, { language, maxKeywords: 100 });
     const frequencyMap = new Map<string, number>();
 
-    const lowerText = text.toLowerCase();
+    // Limiter la taille du texte pour le calcul de fréquence
+    const textToSearch = text.length > MAX_TEXT_LENGTH_FOR_EXTRACTION
+        ? text.substring(0, MAX_TEXT_LENGTH_FOR_EXTRACTION)
+        : text;
+
+    const lowerText = textToSearch.toLowerCase();
 
     keywords.forEach(keyword => {
-        // Compter les occurrences
-        const regex = new RegExp(`\\b${keyword}\\w*\\b`, 'gi');
-        const matches = lowerText.match(regex);
-        frequencyMap.set(keyword, matches ? matches.length : 1);
+        // Compter les occurrences de manière optimisée (sans regex)
+        const lowerKeyword = keyword.toLowerCase();
+        let count = 0;
+        let pos = 0;
+
+        while ((pos = lowerText.indexOf(lowerKeyword, pos)) !== -1) {
+            count++;
+            pos += lowerKeyword.length;
+        }
+
+        frequencyMap.set(keyword, count || 1);
     });
 
     return frequencyMap;
@@ -86,13 +106,29 @@ export function calculateTFIDF(
     const keywords = extractKeywords(documentText, { language });
     const tfidfMap = new Map<string, number>();
 
+    // Limiter la taille des textes
+    const limitedDocText = documentText.length > MAX_TEXT_LENGTH_FOR_EXTRACTION
+        ? documentText.substring(0, MAX_TEXT_LENGTH_FOR_EXTRACTION)
+        : documentText;
+
     keywords.forEach(keyword => {
-        // TF: Term Frequency
-        const tf = (documentText.toLowerCase().match(new RegExp(keyword, 'g')) || []).length / keywords.length;
+        const lowerKeyword = keyword.toLowerCase();
+
+        // TF: Term Frequency (optimisé avec indexOf)
+        const lowerText = limitedDocText.toLowerCase();
+        let count = 0;
+        let pos = 0;
+
+        while ((pos = lowerText.indexOf(lowerKeyword, pos)) !== -1) {
+            count++;
+            pos += lowerKeyword.length;
+        }
+
+        const tf = count / Math.max(keywords.length, 1);
 
         // IDF: Inverse Document Frequency
         const docsWithKeyword = allDocuments.filter(doc =>
-            doc.toLowerCase().includes(keyword)
+            doc.toLowerCase().includes(lowerKeyword)
         ).length;
         const idf = Math.log(allDocuments.length / (docsWithKeyword + 1));
 

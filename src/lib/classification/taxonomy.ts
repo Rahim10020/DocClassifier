@@ -43,7 +43,16 @@ const taxonomyData = {
     uncategorized: uncategorizedData,
 };
 
+// Cache global pour la taxonomie
+let cachedTaxonomy: Category[] | null = null;
+let cachedTaxonomyByProfile: Map<string, Category[]> = new Map();
+
 export function loadTaxonomy(): Category[] {
+    // Retourner le cache si disponible
+    if (cachedTaxonomy) {
+        return cachedTaxonomy;
+    }
+
     const categories: Category[] = [];
 
     for (const [, data] of Object.entries(taxonomyData)) {
@@ -71,19 +80,31 @@ export function loadTaxonomy(): Category[] {
         categories.push(category);
     }
 
+    // Mettre en cache
+    cachedTaxonomy = categories;
     return categories;
 }
 
 export function getTaxonomyByProfile(profile?: Profile): Category[] {
+    // Utiliser le cache par profil
+    const cacheKey = profile || 'auto';
+    if (cachedTaxonomyByProfile.has(cacheKey)) {
+        return cachedTaxonomyByProfile.get(cacheKey)!;
+    }
+
     const allCategories = loadTaxonomy();
 
     if (!profile || profile === 'auto') {
+        cachedTaxonomyByProfile.set(cacheKey, allCategories);
         return allCategories;
     }
 
-    return allCategories.filter(category =>
+    const filtered = allCategories.filter(category =>
         category.profiles.includes(profile)
     );
+
+    cachedTaxonomyByProfile.set(cacheKey, filtered);
+    return filtered;
 }
 
 export function getCategoryById(categoryId: string): Category | null {
