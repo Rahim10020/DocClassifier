@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession, deleteSession as deleteSessionStorage } from '@/lib/session';
 import { deleteSession as deleteSessionFiles } from '@/lib/storage';
+import { serializeBigInt } from '@/lib/utils';
 
 export async function GET(
     request: NextRequest,
@@ -30,7 +31,7 @@ export async function GET(
 
         return NextResponse.json({
             success: true,
-            data: session,
+            data: serializeBigInt(session),
         });
     } catch (error) {
         console.error('Get session error:', error);
@@ -53,7 +54,7 @@ export async function DELETE(
         const sessionId = id;
 
         // Vérifier que la session existe
-        const session = await prisma.session.findUnique({
+        const session = await prisma.classificationSession.findUnique({
             where: { id: sessionId },
         });
 

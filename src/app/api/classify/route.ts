@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const session = await prisma.session.findUnique({
+        const session = await prisma.classificationSession.findUnique({
             where: { id: sessionId },
             include: { documents: true },
         });

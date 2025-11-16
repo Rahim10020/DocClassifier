@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         const { sessionId, options } = validation.data;
 
         // Récupérer la session et ses documents
-        const session = await prisma.session.findUnique({
+        const session = await prisma.classificationSession.findUnique({
             where: { id: sessionId },
             include: { documents: true },
         });

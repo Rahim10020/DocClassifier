@@ -10,7 +10,7 @@ export async function createSession(
 ): Promise<Session> {
     const expiresAt = calculateSessionExpiry(SESSION_DURATION_HOURS);
 
-    const session = await prisma.session.create({
+    const session = await prisma.classificationSession.create({
         data: {
             profile,
             language,
@@ -23,7 +23,7 @@ export async function createSession(
 }
 
 export async function getSession(sessionId: string): Promise<Session | null> {
-    const session = await prisma.session.findUnique({
+    const session = await prisma.classificationSession.findUnique({
         where: { id: sessionId },
         include: {
             documents: true,
@@ -45,7 +45,7 @@ export async function updateSessionStatus(
     sessionId: string,
     status: SessionStatus
 ): Promise<void> {
-    await prisma.session.update({
+    await prisma.classificationSession.update({
         where: { id: sessionId },
         data: { status },
     });
@@ -55,14 +55,14 @@ export async function updateSessionProgress(
     sessionId: string,
     processedFiles: number
 ): Promise<void> {
-    await prisma.session.update({
+    await prisma.classificationSession.update({
         where: { id: sessionId },
         data: { processedFiles },
     });
 }
 
 export async function incrementProcessedFiles(sessionId: string): Promise<number> {
-    const session = await prisma.session.update({
+    const session = await prisma.classificationSession.update({
         where: { id: sessionId },
         data: {
             processedFiles: {
@@ -75,13 +75,13 @@ export async function incrementProcessedFiles(sessionId: string): Promise<number
 }
 
 export async function deleteSession(sessionId: string): Promise<void> {
-    await prisma.session.delete({
+    await prisma.classificationSession.delete({
         where: { id: sessionId },
     });
 }
 
 export async function cleanupExpiredSessions(): Promise<number> {
-    const result = await prisma.session.deleteMany({
+    const result = await prisma.classificationSession.deleteMany({
         where: {
             expiresAt: {
                 lt: new Date(),
@@ -103,7 +103,7 @@ export async function updateSessionTotalFiles(
     sessionId: string,
     totalFiles: number
 ): Promise<void> {
-    await prisma.session.update({
+    await prisma.classificationSession.update({
         where: { id: sessionId },
         data: { totalFiles },
     });

@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest) {
         const { sessionId, documents, status } = validation.data;
 
         // Vérifier que la session existe
-        const session = await prisma.session.findUnique({
+        const session = await prisma.classificationSession.findUnique({
             where: { id: sessionId },
         });
 
@@ -54,14 +54,14 @@ export async function PUT(request: NextRequest) {
 
         // Mettre à jour le statut de la session si fourni
         if (status) {
-            await prisma.session.update({
+            await prisma.classificationSession.update({
                 where: { id: sessionId },
                 data: { status },
             });
         }
 
         // Récupérer la session mise à jour
-        const updatedSession = await prisma.session.findUnique({
+        const updatedSession = await prisma.classificationSession.findUnique({
             where: { id: sessionId },
             include: { documents: true },
         });
