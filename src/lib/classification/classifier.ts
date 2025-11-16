@@ -37,11 +37,18 @@ export async function classifyDocument(
 
     // 1. Extraction des mots-clés
     const extractStart = Date.now();
-    const keywords = extractKeywords(text, {
-        language: language as 'fr' | 'en',
-        maxKeywords: 30,
-    });
-    console.log(`[Classification] Extraction de ${keywords.length} mots-clés - ${documentId} (${Date.now() - extractStart}ms)`);
+    let keywords: string[] = [];
+
+    try {
+        keywords = extractKeywords(text, {
+            language: language as 'fr' | 'en',
+            maxKeywords: 30,
+        });
+        console.log(`[Classification] Extraction de ${keywords.length} mots-clés - ${documentId} (${Date.now() - extractStart}ms)`);
+    } catch (extractError) {
+        console.error(`[Classification] Erreur extraction mots-clés - ${documentId}:`, extractError);
+        keywords = [];
+    }
 
     if (keywords.length === 0) {
         console.log(`[Classification] Aucun mot-clé extrait - ${documentId} (${Date.now() - startTime}ms)`);
@@ -58,13 +65,37 @@ export async function classifyDocument(
 
     // 2. Charger la taxonomie appropriée
     const taxonomyStart = Date.now();
-    const taxonomy = getTaxonomyByProfile(profile);
-    console.log(`[Classification] Taxonomie chargée: ${taxonomy.length} catégories - ${documentId} (${Date.now() - taxonomyStart}ms)`);
+    let taxonomy;
+
+    try {
+        taxonomy = getTaxonomyByProfile(profile);
+        console.log(`[Classification] Taxonomie chargée: ${taxonomy.length} catégories - ${documentId} (${Date.now() - taxonomyStart}ms)`);
+
+        if (!taxonomy || taxonomy.length === 0) {
+            throw new Error('Taxonomie vide ou non disponible');
+        }
+    } catch (taxonomyError) {
+        console.error(`[Classification] Erreur chargement taxonomie - ${documentId}:`, taxonomyError);
+        return {
+            documentId,
+            mainCategory: SYSTEM_CATEGORIES.UNCATEGORIZED,
+            confidence: 0,
+            keywords: [],
+            alternativeCategories: [],
+        };
+    }
 
     // 3. Scoring contre la taxonomie
     const scoringStart = Date.now();
-    const scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language, text);
-    console.log(`[Classification] Scoring calculé: ${scores.length} scores - ${documentId} (${Date.now() - scoringStart}ms)`);
+    let scores;
+
+    try {
+        scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language, text);
+        console.log(`[Classification] Scoring calculé: ${scores.length} scores - ${documentId} (${Date.now() - scoringStart}ms)`);
+    } catch (scoringError) {
+        console.error(`[Classification] Erreur lors du scoring - ${documentId}:`, scoringError);
+        scores = [];
+    }
 
     // 4. Sélection de la meilleure catégorie
     const bestMatch = findBestMatch(scores);

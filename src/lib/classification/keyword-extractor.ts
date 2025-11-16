@@ -31,19 +31,46 @@ export function extractKeywords(
             : text;
 
         // Extraction via keyword-extractor
-        const extractedKeywords = keywordExtractor.extract(processedText, {
-            language: language === 'fr' ? 'french' : 'english',
-            remove_digits: false,
-            return_changed_case: true,
-            remove_duplicates: true,
-        });
+        let extractedKeywords: string[] = [];
+
+        try {
+            const result = keywordExtractor.extract(processedText, {
+                language: language === 'fr' ? 'french' : 'english',
+                remove_digits: false,
+                return_changed_case: true,
+                remove_duplicates: true,
+            });
+
+            // Vérifier que le résultat est bien un tableau
+            extractedKeywords = Array.isArray(result) ? result : [];
+        } catch (extractError) {
+            console.error('keyword-extractor.extract failed:', extractError);
+            // Fallback: extraire manuellement les mots simples
+            extractedKeywords = processedText
+                .toLowerCase()
+                .split(/\s+/)
+                .filter(word => word.length >= minLength && /^[a-zàâäéèêëïîôùûüÿæœç]+$/i.test(word))
+                .slice(0, 100);
+        }
+
+        if (extractedKeywords.length === 0) {
+            console.warn('No keywords extracted from text');
+            return [];
+        }
 
         // Stemming pour normalisation
         const stemmer = language === 'fr' ? natural.PorterStemmerFr : natural.PorterStemmer;
 
         const normalizedKeywords = extractedKeywords
-            .filter(keyword => keyword.length >= minLength)
-            .map(keyword => stemmer.stem(keyword.toLowerCase()))
+            .filter(keyword => keyword && keyword.length >= minLength)
+            .map(keyword => {
+                try {
+                    return stemmer.stem(keyword.toLowerCase());
+                } catch (stemError) {
+                    console.error('Stemming error for keyword:', keyword, stemError);
+                    return keyword.toLowerCase();
+                }
+            })
             .filter((keyword, index, self) => self.indexOf(keyword) === index); // Remove duplicates
 
         // Limiter le nombre de mots-clés

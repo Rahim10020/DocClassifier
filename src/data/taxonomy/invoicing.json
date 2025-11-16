@@ -1,0 +1,125 @@
+{
+    "id": "invoicing",
+    "name": "Facturation et Contrats",
+    "nameEn": "Invoicing & Contracts",
+    "icon": "file-text",
+    "color": "#10b981",
+    "profiles": [
+        "personal",
+        "professional",
+        "student",
+        "auto"
+    ],
+    "priority": 85,
+    "keywords": [
+        "facture",
+        "invoice",
+        "devis",
+        "quote",
+        "contrat",
+        "contract",
+        "bon",
+        "commande",
+        "order",
+        "paiement",
+        "payment",
+        "montant",
+        "amount",
+        "total",
+        "tva",
+        "vat",
+        "ht",
+        "ttc",
+        "prix",
+        "price",
+        "tarif",
+        "rate",
+        "prestation",
+        "service",
+        "livraison",
+        "delivery",
+        "fournisseur",
+        "supplier",
+        "client",
+        "customer",
+        "référence",
+        "reference",
+        "numéro",
+        "number",
+        "date",
+        "échéance",
+        "due",
+        "remise",
+        "discount",
+        "acompte",
+        "deposit",
+        "solde",
+        "balance"
+    ],
+    "subcategories": [
+        {
+            "id": "invoices",
+            "name": "Factures",
+            "nameEn": "Invoices",
+            "keywords": [
+                "facture",
+                "invoice",
+                "facturation",
+                "billing",
+                "payé",
+                "paid",
+                "impayé",
+                "unpaid",
+                "émise",
+                "issued"
+            ]
+        },
+        {
+            "id": "quotes",
+            "name": "Devis",
+            "nameEn": "Quotes",
+            "keywords": [
+                "devis",
+                "quote",
+                "estimation",
+                "estimate",
+                "proposition",
+                "proposal",
+                "offre",
+                "offer"
+            ]
+        },
+        {
+            "id": "contracts",
+            "name": "Contrats",
+            "nameEn": "Contracts",
+            "keywords": [
+                "contrat",
+                "contract",
+                "accord",
+                "agreement",
+                "convention",
+                "clause",
+                "signature",
+                "signé",
+                "signed",
+                "partie",
+                "party"
+            ]
+        },
+        {
+            "id": "purchase_orders",
+            "name": "Bons de commande",
+            "nameEn": "Purchase Orders",
+            "keywords": [
+                "bon",
+                "commande",
+                "order",
+                "achat",
+                "purchase",
+                "approvisionnement",
+                "procurement"
+            ]
+        }
+    ]
+}
