@@ -17,6 +17,7 @@ import imagesData from '@/data/taxonomy/images.json';
 import scienceData from '@/data/taxonomy/science.json';
 import technicalData from '@/data/taxonomy/technical.json';
 import transportationData from '@/data/taxonomy/transport.json';
+import uncategorizedData from '@/data/taxonomy/uncategorized.json';
 import indexData from '@/data/taxonomy/index.json';
 
 // Charger toutes les taxonomies
@@ -39,6 +40,7 @@ const taxonomyData = {
     science: scienceData,
     technical: technicalData,
     transportation: transportationData,
+    uncategorized: uncategorizedData,
 };
 
 export function loadTaxonomy(): Category[] {

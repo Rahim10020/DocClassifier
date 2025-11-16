@@ -303,7 +303,9 @@ function DocumentRow({
             ) : (
                 <div className="flex items-center gap-2">
                     <div className="text-sm">
-                        <span className="text-foreground font-medium">{document.mainCategory}</span>
+                        <span className="text-foreground font-medium">
+                            {document.mainCategory || 'Non classifié'}
+                        </span>
                         {document.subCategory && (
                             <span className="text-foreground-muted"> › {document.subCategory}</span>
                         )}

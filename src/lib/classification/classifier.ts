@@ -3,6 +3,7 @@ import { scoreAgainstTaxonomy, findBestMatch } from './scorer';
 import { getTaxonomyByProfile } from './taxonomy';
 import { DocumentClassification, AlternativeCategory } from '@/types/document';
 import { Profile } from '@/types/category';
+import { SYSTEM_CATEGORIES } from './constants';
 
 export interface ClassificationInput {
     documentId: string;
@@ -22,9 +23,9 @@ export async function classifyDocument(
     if (!text || text.trim().length === 0) {
         return {
             documentId,
-            mainCategory: 'Images et Scans',
+            mainCategory: SYSTEM_CATEGORIES.IMAGES,
             subCategory: 'Documents scannés',
-            confidence: 0.95,
+            confidence: 0.6, // Confiance modérée car classification par défaut
             keywords: ['scan', 'image', 'no-text'],
             alternativeCategories: [],
         };
@@ -40,7 +41,7 @@ export async function classifyDocument(
         // Texte présent mais pas de mots-clés exploitables
         return {
             documentId,
-            mainCategory: 'Uncategorized',
+            mainCategory: SYSTEM_CATEGORIES.UNCATEGORIZED,
             confidence: 0,
             keywords: [],
             alternativeCategories: [],
@@ -86,9 +87,10 @@ export async function classifyDocuments(
             results.push(classification);
         } catch (error) {
             console.error(`Error classifying document ${input.documentId}:`, error);
+            // En cas d'erreur, marquer comme non classifié plutôt que "Error"
             results.push({
                 documentId: input.documentId,
-                mainCategory: 'Error',
+                mainCategory: SYSTEM_CATEGORIES.UNCATEGORIZED,
                 confidence: 0,
                 keywords: [],
                 alternativeCategories: [],

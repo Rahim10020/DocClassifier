@@ -1,0 +1,22 @@
+{
+    "id": "uncategorized",
+    "name": "Non classifié",
+    "nameEn": "Uncategorized",
+    "icon": "help-circle",
+    "color": "#9ca3af",
+    "profiles": [
+        "personal",
+        "professional",
+        "student",
+        "researcher",
+        "auto"
+    ],
+    "priority": 10,
+    "keywords": [
+        "unknown",
+        "unclassified",
+        "misc",
+        "other"
+    ],
+    "subcategories": []
+}

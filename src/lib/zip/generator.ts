@@ -5,6 +5,7 @@ import path from 'path';
 import { Document } from '@/types/document';
 import { ExportOptions } from '@/types/session';
 import { getFilePath } from '../storage';
+import { SYSTEM_CATEGORIES } from '../classification/constants';
 
 export interface ZipGenerationResult {
     zipPath: string;
@@ -60,7 +61,7 @@ function addFilesHierarchical(
 ): void {
     // Grouper par catégorie
     const grouped = documents.reduce((acc, doc) => {
-        const category = doc.mainCategory || 'Uncategorized';
+        const category = doc.mainCategory || SYSTEM_CATEGORIES.UNCATEGORIZED;
         if (!acc[category]) {
             acc[category] = [];
         }
@@ -116,7 +117,7 @@ function generateReadme(documents: Document[], structure: string): string {
     if (structure === 'hierarchical') {
         // Grouper par catégorie
         const grouped = documents.reduce((acc, doc) => {
-            const category = doc.mainCategory || 'Uncategorized';
+            const category = doc.mainCategory || SYSTEM_CATEGORIES.UNCATEGORIZED;
             if (!acc[category]) {
                 acc[category] = [];
             }
@@ -136,7 +137,7 @@ function generateReadme(documents: Document[], structure: string): string {
         }
     } else {
         documents.forEach((doc, index) => {
-            const category = doc.mainCategory || 'Uncategorized';
+            const category = doc.mainCategory || SYSTEM_CATEGORIES.UNCATEGORIZED;
             const subCat = doc.subCategory ? ` > ${doc.subCategory}` : '';
             const confidence = doc.confidence ? `(${Math.round(doc.confidence * 100)}%)` : '';
             lines.push(`${index + 1}. [${category}${subCat}] ${doc.originalName} ${confidence}`);
@@ -151,7 +152,7 @@ function generateReadme(documents: Document[], structure: string): string {
 
     // Compter par catégorie
     const categoryCounts = documents.reduce((acc, doc) => {
-        const category = doc.mainCategory || 'Uncategorized';
+        const category = doc.mainCategory || SYSTEM_CATEGORIES.UNCATEGORIZED;
         acc[category] = (acc[category] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);

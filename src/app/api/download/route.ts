@@ -4,6 +4,7 @@ import { generateZip, cleanupZip } from '@/lib/zip/generator';
 import { downloadRequestSchema } from '@/lib/validators/session-validator';
 import { readFile } from 'fs/promises';
 import { Document } from '@/types/document';
+import { SYSTEM_CATEGORIES } from '@/lib/classification/constants';
 
 // Types pour l'aperçu des documents
 interface DocumentPreview {
@@ -173,7 +174,7 @@ function createHierarchicalPreview(documents: DocumentPreview[]): Record<string,
     const structure: Record<string, HierarchicalCategory> = {};
 
     documents.forEach(doc => {
-        const category = doc.mainCategory || 'Uncategorized';
+        const category = doc.mainCategory || SYSTEM_CATEGORIES.UNCATEGORIZED;
 
         if (!structure[category]) {
             structure[category] = {

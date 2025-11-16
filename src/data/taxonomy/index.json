@@ -11,6 +11,7 @@
         "financial",
         "health",
         "real_estate",
+        "images",
         "legal",
         "marketing",
         "personal",
@@ -18,7 +19,8 @@
         "professional",
         "science",
         "technical",
-        "transportation"
+        "transportation",
+        "uncategorized"
     ],
     "profiles": [
         {
@@ -33,7 +35,8 @@
                 "financial",
                 "personal",
                 "education",
-                "personal_development"
+                "personal_development",
+                "uncategorized"
             ]
         },
         {
@@ -48,7 +51,8 @@
                 "financial",
                 "legal",
                 "marketing",
-                "technical"
+                "technical",
+                "uncategorized"
             ]
         },
         {
@@ -63,7 +67,8 @@
                 "professional",
                 "science",
                 "technical",
-                "environmental"
+                "environmental",
+                "uncategorized"
             ]
         },
         {
@@ -82,7 +87,8 @@
                 "real_estate",
                 "transportation",
                 "events",
-                "personal_development"
+                "personal_development",
+                "uncategorized"
             ]
         },
         {
@@ -110,7 +116,8 @@
                 "professional",
                 "science",
                 "technical",
-                "transportation"
+                "transportation",
+                "uncategorized"
             ]
         }
     ]
