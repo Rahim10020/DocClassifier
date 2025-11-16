@@ -71,11 +71,20 @@ export async function POST(request: NextRequest) {
             10,
             async (doc) => {
                 try {
+                    console.log(`[API Classify] Starting classification for: ${doc.originalName}`);
+
                     const classification = await classifyDocument({
                         documentId: doc.id,
                         text: doc.extractedText || '',
                         language: doc.language || 'fr',
                         profile: session.profile as Profile | undefined,
+                    });
+
+                    console.log(`[API Classify] Classification result for ${doc.originalName}:`, {
+                        mainCategory: classification.mainCategory,
+                        subCategory: classification.subCategory,
+                        confidence: classification.confidence,
+                        keywordsCount: classification.keywords?.length || 0,
                     });
 
                     await prisma.document.update({
@@ -88,6 +97,8 @@ export async function POST(request: NextRequest) {
                         },
                     });
 
+                    console.log(`[API Classify] ✓ Document updated in DB: ${doc.originalName}`);
+
                     return {
                         documentId: doc.id,
                         name: doc.originalName,
@@ -97,7 +108,7 @@ export async function POST(request: NextRequest) {
                         confidence: classification.confidence,
                     };
                 } catch (error) {
-                    console.error(`Error classifying ${doc.originalName}:`, error);
+                    console.error(`[API Classify] ❌ Error classifying ${doc.originalName}:`, error);
                     return {
                         documentId: doc.id,
                         name: doc.originalName,

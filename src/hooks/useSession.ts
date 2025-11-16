@@ -40,11 +40,14 @@ export function useSession(options: UseSessionOptions) {
                 setDocuments(data.data.documents);
 
                 // Identifier les docs en erreur
+                // Un document a échoué SI :
+                // - Il n'a PAS de mainCategory (null ou undefined)
+                // - OU sa mainCategory est 'Error'
+                // Note: confidence === 0 n'est PAS une erreur (c'est le cas pour "Non classifié")
                 const failed = data.data.documents
                     .filter((doc: Document) =>
                         !doc.mainCategory ||
-                        doc.mainCategory === 'Error' ||
-                        doc.confidence === 0
+                        doc.mainCategory === 'Error'
                     )
                     .map((doc: Document) => doc.id);
 
