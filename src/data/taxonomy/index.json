@@ -12,6 +12,7 @@
         "health",
         "real_estate",
         "images",
+        "invoicing",
         "legal",
         "marketing",
         "personal",
@@ -33,6 +34,7 @@
             "defaultCategories": [
                 "academic",
                 "financial",
+                "invoicing",
                 "personal",
                 "education",
                 "personal_development",
@@ -49,6 +51,7 @@
             "defaultCategories": [
                 "professional",
                 "financial",
+                "invoicing",
                 "legal",
                 "marketing",
                 "technical",
@@ -81,6 +84,7 @@
             "defaultCategories": [
                 "personal",
                 "financial",
+                "invoicing",
                 "health",
                 "legal",
                 "administration",
@@ -109,6 +113,7 @@
                 "health",
                 "real_estate",
                 "images",
+                "invoicing",
                 "legal",
                 "marketing",
                 "personal",
