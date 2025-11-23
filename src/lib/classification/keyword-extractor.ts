@@ -1,15 +1,65 @@
+/**
+ * @fileoverview Module d'extraction de mots-clés pour la classification.
+ *
+ * Ce module utilise des algorithmes NLP pour extraire les mots-clés significatifs
+ * d'un texte. Il combine la bibliothèque keyword-extractor avec le stemming
+ * de Natural.js pour normaliser les résultats.
+ *
+ * Fonctionnalités :
+ * - Extraction de mots-clés avec suppression des mots vides
+ * - Support multilingue (français et anglais)
+ * - Calcul de fréquence et TF-IDF
+ * - Protection contre les textes trop longs
+ *
+ * @module classification/keyword-extractor
+ * @author DocClassifier Team
+ */
+
 import keywordExtractor from 'keyword-extractor';
 import natural from 'natural';
 
+/**
+ * Options de configuration pour l'extraction de mots-clés.
+ *
+ * @interface KeywordExtractionOptions
+ * @property {'fr' | 'en'} [language='fr'] - Langue du texte à analyser
+ * @property {number} [maxKeywords=20] - Nombre maximum de mots-clés à retourner
+ * @property {number} [minLength=3] - Longueur minimale d'un mot-clé valide
+ */
 export interface KeywordExtractionOptions {
     language?: 'fr' | 'en';
     maxKeywords?: number;
     minLength?: number;
 }
 
-// Limite de taille de texte pour l'extraction (50000 caractères = ~10000 mots)
+/**
+ * Limite maximale de caractères pour l'extraction.
+ * Équivaut à environ 10000 mots, suffisant pour la plupart des documents.
+ * @constant {number}
+ */
 const MAX_TEXT_LENGTH_FOR_EXTRACTION = 50000;
 
+/**
+ * Extrait les mots-clés significatifs d'un texte.
+ *
+ * Le processus d'extraction :
+ * 1. Limite le texte à MAX_TEXT_LENGTH_FOR_EXTRACTION caractères
+ * 2. Utilise keyword-extractor pour identifier les termes importants
+ * 3. Applique le stemming (Porter Stemmer) pour normaliser
+ * 4. Supprime les doublons et filtre par longueur minimale
+ *
+ * @function extractKeywords
+ * @param {string} text - Texte source pour l'extraction
+ * @param {KeywordExtractionOptions} [options={}] - Options d'extraction
+ * @returns {string[]} Tableau de mots-clés normalisés et dédupliqués
+ *
+ * @example
+ * const keywords = extractKeywords('Le rapport financier annuel...', {
+ *   language: 'fr',
+ *   maxKeywords: 30
+ * });
+ * // ['rapport', 'financ', 'annuel', ...]
+ */
 export function extractKeywords(
     text: string,
     options: KeywordExtractionOptions = {}
@@ -81,6 +131,21 @@ export function extractKeywords(
     }
 }
 
+/**
+ * Extrait les mots-clés avec leur fréquence d'apparition dans le texte.
+ *
+ * Utile pour pondérer l'importance des mots-clés dans l'algorithme
+ * de scoring TF-IDF.
+ *
+ * @function extractKeywordsWithFrequency
+ * @param {string} text - Texte source
+ * @param {'fr' | 'en'} [language='fr'] - Langue du texte
+ * @returns {Map<string, number>} Map des mots-clés avec leur nombre d'occurrences
+ *
+ * @example
+ * const freqMap = extractKeywordsWithFrequency(text, 'fr');
+ * freqMap.get('facture'); // 5 (apparaît 5 fois)
+ */
 export function extractKeywordsWithFrequency(
     text: string,
     language: 'fr' | 'en' = 'fr'
@@ -112,6 +177,21 @@ export function extractKeywordsWithFrequency(
     return frequencyMap;
 }
 
+/**
+ * Récupère les N mots-clés les plus fréquents d'un texte.
+ *
+ * Combine l'extraction et le calcul de fréquence pour retourner
+ * les termes les plus représentatifs du document.
+ *
+ * @function getTopKeywords
+ * @param {string} text - Texte source
+ * @param {number} [count=10] - Nombre de mots-clés à retourner
+ * @param {'fr' | 'en'} [language='fr'] - Langue du texte
+ * @returns {string[]} Les N mots-clés les plus fréquents, triés par fréquence décroissante
+ *
+ * @example
+ * const top5 = getTopKeywords(documentText, 5, 'fr');
+ */
 export function getTopKeywords(
     text: string,
     count: number = 10,
@@ -125,6 +205,24 @@ export function getTopKeywords(
         .map(([keyword]) => keyword);
 }
 
+/**
+ * Calcule le score TF-IDF des mots-clés d'un document par rapport à un corpus.
+ *
+ * TF-IDF (Term Frequency - Inverse Document Frequency) :
+ * - TF : Fréquence du terme dans le document
+ * - IDF : Rareté du terme dans le corpus global
+ * - TF-IDF = TF * IDF (termes fréquents mais rares ont un score élevé)
+ *
+ * @function calculateTFIDF
+ * @param {string} documentText - Texte du document à analyser
+ * @param {string[]} allDocuments - Corpus de tous les documents pour l'IDF
+ * @param {'fr' | 'en'} [language='fr'] - Langue des documents
+ * @returns {Map<string, number>} Map des mots-clés avec leur score TF-IDF
+ *
+ * @example
+ * const tfidf = calculateTFIDF(doc, allDocs, 'fr');
+ * // Les termes spécifiques au document auront un score élevé
+ */
 export function calculateTFIDF(
     documentText: string,
     allDocuments: string[],

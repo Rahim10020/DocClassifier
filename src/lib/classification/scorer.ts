@@ -1,7 +1,28 @@
+/**
+ * @fileoverview Module de scoring pour la classification de documents.
+ *
+ * Ce module implémente les algorithmes de scoring TF-IDF pondéré pour évaluer
+ * la correspondance entre les mots-clés d'un document et les catégories de la taxonomie.
+ * Il inclut des optimisations de performance (cache, protection ReDoS).
+ *
+ * @module classification/scorer
+ * @author DocClassifier Team
+ */
+
 import natural from 'natural';
 import { Category } from '@/types/category';
 import { SYSTEM_CATEGORIES } from './constants';
 
+/**
+ * Interface représentant le résultat du scoring d'une catégorie.
+ *
+ * @interface ScoreResult
+ * @property {string} categoryId - Identifiant unique de la catégorie
+ * @property {string} categoryName - Nom d'affichage de la catégorie
+ * @property {string} [subCategory] - Nom de la sous-catégorie si applicable
+ * @property {number} score - Score de correspondance calculé (0-1)
+ * @property {string[]} matchedKeywords - Mots-clés du document ayant matché avec la catégorie
+ */
 export interface ScoreResult {
     categoryId: string;
     categoryName: string;
@@ -10,12 +31,35 @@ export interface ScoreResult {
     matchedKeywords: string[];
 }
 
-// Cache pour les normalisations de mots-clés
+/**
+ * Cache LRU pour les mots-clés normalisés (stemmés).
+ * Limite : 10000 entrées pour optimiser la mémoire.
+ * @type {Map<string, string>}
+ */
 const stemCache = new Map<string, string>();
 
-// Limite de taille de texte pour le calcul de fréquence (10000 caractères)
+/**
+ * Limite maximale de caractères du texte pour le calcul de fréquence.
+ * Utilisée pour éviter les calculs trop coûteux sur de grands documents.
+ * @constant {number}
+ */
 const MAX_TEXT_LENGTH_FOR_FREQUENCY = 10000;
 
+/**
+ * Normalise un mot-clé en appliquant le stemming (racinisation).
+ *
+ * Utilise le Porter Stemmer approprié selon la langue et met en cache
+ * les résultats pour optimiser les performances.
+ *
+ * @function stemKeyword
+ * @param {string} keyword - Mot-clé à normaliser
+ * @param {string} language - Code de langue ('fr' ou 'en')
+ * @returns {string} Mot-clé normalisé (racine)
+ *
+ * @example
+ * stemKeyword('documents', 'fr'); // 'document'
+ * stemKeyword('running', 'en');   // 'run'
+ */
 function stemKeyword(keyword: string, language: string): string {
     const cacheKey = `${language}:${keyword.toLowerCase()}`;
 
@@ -35,11 +79,31 @@ function stemKeyword(keyword: string, language: string): string {
     return stemmed;
 }
 
+/**
+ * Normalise un tableau de mots-clés en appliquant le stemming à chacun.
+ *
+ * @function normalizeKeywords
+ * @param {string[]} keywords - Tableau de mots-clés à normaliser
+ * @param {string} language - Code de langue
+ * @returns {string[]} Tableau de mots-clés normalisés
+ */
 function normalizeKeywords(keywords: string[], language: string): string[] {
     return keywords.map(k => stemKeyword(k, language));
 }
 
-// Calculer le poids d'un mot-clé selon sa fréquence dans le doc (optimisé)
+/**
+ * Calcule le poids TF d'un mot-clé basé sur sa fréquence dans le document.
+ *
+ * Inclut des protections contre :
+ * - ReDoS : limitation de la longueur des mots-clés à 100 caractères
+ * - Performance : limitation du texte analysé à MAX_TEXT_LENGTH_FOR_FREQUENCY
+ *
+ * @function calculateKeywordWeight
+ * @param {string} keyword - Mot-clé à évaluer
+ * @param {string} documentText - Texte complet du document
+ * @param {number} documentLength - Nombre de mots dans le document
+ * @returns {number} Poids TF normalisé (0-0.1)
+ */
 function calculateKeywordWeight(
     keyword: string,
     documentText: string,
@@ -78,12 +142,39 @@ function calculateKeywordWeight(
     }
 }
 
+/**
+ * Calcule les scores de correspondance d'un document contre toutes les catégories.
+ *
+ * Pour chaque catégorie :
+ * 1. Filtre par profil utilisateur si spécifié
+ * 2. Calcule l'intersection des mots-clés
+ * 3. Applique la pondération TF-IDF
+ * 4. Ajoute le bonus de priorité de la catégorie
+ * 5. Teste les sous-catégories pour une classification plus fine
+ *
+ * @function scoreAgainstTaxonomy
+ * @param {string[]} documentKeywords - Mots-clés extraits du document
+ * @param {Category[]} categories - Catégories de la taxonomie à tester
+ * @param {string} [profile] - Profil utilisateur pour filtrer les catégories
+ * @param {string} [language='fr'] - Langue du document
+ * @param {string} [documentText] - Texte complet pour le calcul TF-IDF
+ * @returns {ScoreResult[]} Tableau de scores triés par score décroissant
+ *
+ * @example
+ * const scores = scoreAgainstTaxonomy(
+ *   ['facture', 'paiement', 'montant'],
+ *   taxonomy,
+ *   'professional',
+ *   'fr',
+ *   documentFullText
+ * );
+ */
 export function scoreAgainstTaxonomy(
     documentKeywords: string[],
     categories: Category[],
     profile?: string,
     language: string = 'fr',
-    documentText?: string  // AJOUTÉ: texte complet pour calculer les poids
+    documentText?: string
 ): ScoreResult[] {
     const scores: ScoreResult[] = [];
     const normalizedDocKeywords = normalizeKeywords(documentKeywords, language);
@@ -165,6 +256,20 @@ export function scoreAgainstTaxonomy(
     return scores.sort((a, b) => b.score - a.score);
 }
 
+/**
+ * Calcule le score de correspondance pour une sous-catégorie spécifique.
+ *
+ * Les sous-catégories bénéficient d'un bonus de 1.2x car elles représentent
+ * une classification plus précise et spécifique.
+ *
+ * @function calculateSubCategoryScore
+ * @param {string[]} documentKeywords - Mots-clés normalisés du document
+ * @param {Category} subCategory - Sous-catégorie à évaluer
+ * @param {string} [language='fr'] - Langue du document
+ * @param {string} [documentText] - Texte complet pour pondération TF
+ * @param {number} [documentLength] - Longueur du document en mots
+ * @returns {number} Score de la sous-catégorie (avec bonus 1.2x)
+ */
 export function calculateSubCategoryScore(
     documentKeywords: string[],
     subCategory: Category,
@@ -194,6 +299,20 @@ export function calculateSubCategoryScore(
     return weightedScore * 1.2;
 }
 
+/**
+ * Calcule un score de confiance basé sur l'écart entre les deux meilleurs scores.
+ *
+ * La confiance est plus élevée lorsque le meilleur score domine clairement :
+ * - 0.9 : score > 0.7 et écart > 0.2 (très confiant)
+ * - 0.75 : score > 0.5 et écart > 0.15 (confiant)
+ * - 0.6 : score > 0.3 et écart > 0.1 (moyennement confiant)
+ * - 0.5 : sinon (peu confiant)
+ *
+ * @function calculateConfidenceScore
+ * @param {number} topScore - Score de la meilleure catégorie
+ * @param {number} secondScore - Score de la deuxième meilleure catégorie
+ * @returns {number} Score de confiance (0-1)
+ */
 export function calculateConfidenceScore(
     topScore: number,
     secondScore: number
@@ -210,6 +329,21 @@ export function calculateConfidenceScore(
     return 0.5;
 }
 
+/**
+ * Trouve la meilleure correspondance parmi les scores calculés.
+ *
+ * Retourne la catégorie avec le score le plus élevé, calcule la confiance,
+ * et fournit jusqu'à 3 alternatives pour permettre à l'utilisateur de
+ * corriger manuellement si nécessaire.
+ *
+ * @function findBestMatch
+ * @param {ScoreResult[]} scores - Tableau de scores triés par score décroissant
+ * @returns {Object} Objet contenant la meilleure catégorie et les alternatives
+ * @returns {string} returns.mainCategory - Nom de la catégorie principale
+ * @returns {string} [returns.subCategory] - Nom de la sous-catégorie si applicable
+ * @returns {number} returns.confidence - Score de confiance (0-1)
+ * @returns {ScoreResult[]} returns.alternatives - Top 3 des catégories alternatives
+ */
 export function findBestMatch(scores: ScoreResult[]): {
     mainCategory: string;
     subCategory?: string;
