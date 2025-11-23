@@ -1,9 +1,29 @@
+/**
+ * @fileoverview Hook de gestion des uploads de fichiers.
+ *
+ * Ce hook gère le cycle de vie complet d'un upload :
+ * validation des fichiers, construction du FormData, envoi au serveur,
+ * et redirection vers la page de traitement.
+ *
+ * @module hooks/useUpload
+ * @author DocClassifier Team
+ */
+
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { DocumentUpload } from '@/types/document';
 import { Profile } from '@/types/category';
 import { validateFiles } from '@/lib/validators/file-validator';
 
+/**
+ * Options de configuration du hook useUpload.
+ *
+ * @interface UseUploadOptions
+ * @property {Profile} [profile] - Profil de classification à utiliser
+ * @property {string} [language] - Langue des documents
+ * @property {Function} [onSuccess] - Callback après upload réussi
+ * @property {Function} [onError] - Callback en cas d'erreur
+ */
 interface UseUploadOptions {
     profile?: Profile;
     language?: string;
@@ -11,6 +31,28 @@ interface UseUploadOptions {
     onError?: (error: string) => void;
 }
 
+/**
+ * Hook pour gérer l'upload de fichiers.
+ *
+ * Fonctionnalités :
+ * - Ajout et suppression de fichiers avec validation
+ * - Upload vers l'API avec création de session
+ * - Suivi de la progression
+ * - Redirection automatique après succès
+ *
+ * @function useUpload
+ * @param {UseUploadOptions} [options={}] - Options de configuration
+ * @returns {Object} État et méthodes de gestion d'upload
+ *
+ * @example
+ * const {
+ *   files,
+ *   addFiles,
+ *   uploadFiles,
+ *   isUploading,
+ *   canUpload
+ * } = useUpload({ profile: 'student' });
+ */
 export function useUpload(options: UseUploadOptions = {}) {
     const router = useRouter();
     const [files, setFiles] = useState<DocumentUpload[]>([]);

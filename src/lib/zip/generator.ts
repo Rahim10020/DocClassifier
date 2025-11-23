@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Générateur d'archives ZIP pour l'export des documents.
+ *
+ * Ce module permet de créer des archives ZIP contenant les documents
+ * classifiés avec différentes structures (hiérarchique ou plate) et
+ * un fichier README optionnel avec les statistiques.
+ *
+ * @module zip/generator
+ * @author DocClassifier Team
+ */
+
 import archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import fs from 'fs-extra';
@@ -7,12 +18,40 @@ import { ExportOptions } from '@/types/session';
 import { getFilePath } from '../storage';
 import { SYSTEM_CATEGORIES } from '../classification/constants';
 
+/**
+ * Résultat de la génération d'une archive ZIP.
+ *
+ * @interface ZipGenerationResult
+ * @property {string} zipPath - Chemin vers le fichier ZIP créé
+ * @property {number} size - Taille de l'archive en octets
+ * @property {number} fileCount - Nombre de fichiers dans l'archive
+ */
 export interface ZipGenerationResult {
     zipPath: string;
     size: number;
     fileCount: number;
 }
 
+/**
+ * Génère une archive ZIP des documents classifiés.
+ *
+ * Crée un fichier ZIP avec les documents organisés selon la structure
+ * choisie (hiérarchique par catégorie ou plate avec préfixes).
+ *
+ * @async
+ * @function generateZip
+ * @param {string} sessionId - Identifiant de la session
+ * @param {Document[]} documents - Documents à inclure dans l'archive
+ * @param {ExportOptions} options - Options d'export (structure, readme)
+ * @returns {Promise<ZipGenerationResult>} Informations sur l'archive créée
+ *
+ * @example
+ * const result = await generateZip('abc123', documents, {
+ *   structure: 'hierarchical',
+ *   includeReadme: true
+ * });
+ * console.log(`Archive créée: ${result.zipPath}, ${result.size} octets`);
+ */
 export async function generateZip(
     sessionId: string,
     documents: Document[],
@@ -54,6 +93,17 @@ export async function generateZip(
     });
 }
 
+/**
+ * Ajoute les fichiers à l'archive avec une structure hiérarchique.
+ *
+ * Les fichiers sont organisés en dossiers par catégorie principale,
+ * puis par sous-catégorie si disponible.
+ *
+ * @function addFilesHierarchical
+ * @param {archiver.Archiver} archive - Instance de l'archiveur
+ * @param {string} sessionId - Identifiant de la session
+ * @param {Document[]} documents - Documents à ajouter
+ */
 function addFilesHierarchical(
     archive: archiver.Archiver,
     sessionId: string,
@@ -82,6 +132,17 @@ function addFilesHierarchical(
     }
 }
 
+/**
+ * Ajoute les fichiers à l'archive avec une structure plate.
+ *
+ * Les fichiers sont placés à la racine avec un préfixe indiquant
+ * leur catégorie (ex: [Factures]_document.pdf).
+ *
+ * @function addFilesFlat
+ * @param {archiver.Archiver} archive - Instance de l'archiveur
+ * @param {string} sessionId - Identifiant de la session
+ * @param {Document[]} documents - Documents à ajouter
+ */
 function addFilesFlat(
     archive: archiver.Archiver,
     sessionId: string,
@@ -98,6 +159,17 @@ function addFilesFlat(
     });
 }
 
+/**
+ * Génère le contenu du fichier README pour l'archive.
+ *
+ * Crée un fichier texte contenant la liste des documents classifiés
+ * et des statistiques sur la répartition par catégorie.
+ *
+ * @function generateReadme
+ * @param {Document[]} documents - Documents de la session
+ * @param {string} structure - Type de structure ('hierarchical' ou 'flat')
+ * @returns {string} Contenu du fichier README
+ */
 function generateReadme(documents: Document[], structure: string): string {
     const lines: string[] = [];
 
@@ -170,6 +242,14 @@ function generateReadme(documents: Document[], structure: string): string {
     return lines.join('\n');
 }
 
+/**
+ * Supprime un fichier ZIP temporaire.
+ *
+ * @async
+ * @function cleanupZip
+ * @param {string} zipPath - Chemin du fichier ZIP à supprimer
+ * @returns {Promise<void>}
+ */
 export async function cleanupZip(zipPath: string): Promise<void> {
     if (await fs.pathExists(zipPath)) {
         await fs.remove(zipPath);

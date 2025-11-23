@@ -1,10 +1,34 @@
+/**
+ * @fileoverview API route pour la taxonomie des catégories.
+ *
+ * Ce endpoint retourne la taxonomie de classification, les profils
+ * disponibles et les couleurs des catégories. Les données sont mises
+ * en cache pendant 1 heure.
+ *
+ * @module api/taxonomy
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { loadTaxonomy, getTaxonomyByProfile, getProfileInfo, getCategoryColors } from '@/lib/classification/taxonomy';
 import { Profile } from '@/types/category';
 
-//  Cache la taxonomie pendant 1 heure (elle change rarement)
+/** Cache la taxonomie pendant 1 heure (elle change rarement) */
 export const revalidate = 3600;
 
+/**
+ * Récupération de la taxonomie et métadonnées.
+ *
+ * Selon le paramètre 'type', retourne :
+ * - 'profiles' : informations sur les profils disponibles
+ * - 'colors' : couleurs des catégories
+ * - défaut : taxonomie complète ou filtrée par profil
+ *
+ * @async
+ * @function GET
+ * @param {NextRequest} request - Requête avec type et profile optionnels
+ * @returns {Promise<NextResponse>} Données demandées avec cache HTTP
+ */
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);

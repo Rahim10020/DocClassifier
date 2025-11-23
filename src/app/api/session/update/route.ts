@@ -1,8 +1,29 @@
+/**
+ * @fileoverview API route pour la mise à jour des sessions et documents.
+ *
+ * Ce endpoint permet de modifier les métadonnées d'une session
+ * (statut, documents) et les catégories des documents individuels.
+ *
+ * @module api/session/update
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sessionUpdateSchema } from '@/lib/validators/session-validator';
 import { loadTaxonomy } from '@/lib/classification/taxonomy';
 
+/**
+ * Mise à jour complète d'une session.
+ *
+ * Permet de modifier plusieurs documents et le statut d'une session
+ * en une seule requête.
+ *
+ * @async
+ * @function PUT
+ * @param {NextRequest} request - Requête avec sessionId, documents et status
+ * @returns {Promise<NextResponse>} Session mise à jour avec ses documents
+ */
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json();
@@ -84,6 +105,17 @@ export async function PUT(request: NextRequest) {
     }
 }
 
+/**
+ * Mise à jour d'un document individuel.
+ *
+ * Modifie la catégorie et sous-catégorie d'un seul document.
+ * Valide que les catégories existent dans la taxonomie.
+ *
+ * @async
+ * @function PATCH
+ * @param {NextRequest} request - Requête avec documentId, mainCategory, subCategory
+ * @returns {Promise<NextResponse>} Document mis à jour
+ */
 export async function PATCH(request: NextRequest) {
     try {
         const body = await request.json();
