@@ -1,9 +1,30 @@
+/**
+ * @fileoverview API route pour l'upload de fichiers.
+ *
+ * Ce endpoint gère la réception des fichiers, leur validation,
+ * la création d'une session et le stockage sur disque.
+ *
+ * @module api/upload
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createSession, updateSessionTotalFiles } from '@/lib/session';
 import { saveFile, ensureStorageDirectory } from '@/lib/storage';
 import { validateFiles } from '@/lib/validators/file-validator';
 
+/**
+ * Upload de fichiers et création de session.
+ *
+ * Reçoit les fichiers via FormData, les valide, crée une session
+ * et sauvegarde les fichiers sur le disque.
+ *
+ * @async
+ * @function POST
+ * @param {NextRequest} request - Requête avec FormData (files, profile, language)
+ * @returns {Promise<NextResponse>} Session ID et liste des documents créés
+ */
 export async function POST(request: NextRequest) {
     try {
         // Assurer que le dossier de stockage existe

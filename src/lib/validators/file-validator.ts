@@ -1,11 +1,29 @@
+/**
+ * @fileoverview Validation des fichiers uploadés.
+ *
+ * Ce module fournit des fonctions pour valider les fichiers avant leur
+ * traitement : type MIME, extension, taille, et contraintes globales.
+ *
+ * @module validators/file-validator
+ * @author DocClassifier Team
+ */
+
 import { z } from 'zod';
 import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE, MAX_TOTAL_SIZE, MAX_FILES } from '@/types/document';
 
+/**
+ * Erreur de validation d'un fichier.
+ * @interface ValidationError
+ */
 export interface ValidationError {
     file: string;
     error: string;
 }
 
+/**
+ * Résultat complet de la validation d'un ensemble de fichiers.
+ * @interface ValidationResult
+ */
 export interface ValidationResult {
     valid: boolean;
     errors: ValidationError[];
@@ -14,6 +32,15 @@ export interface ValidationResult {
 
 const ACCEPTED_MIME_TYPES = Object.values(ACCEPTED_FILE_TYPES).flat();
 
+/**
+ * Valide un fichier individuel.
+ *
+ * Vérifie : type MIME, extension, taille, et que le fichier n'est pas vide.
+ *
+ * @function validateFile
+ * @param {File} file - Fichier à valider
+ * @returns {ValidationError | null} Erreur ou null si valide
+ */
 export function validateFile(file: File): ValidationError | null {
     // Vérifier le type MIME
     if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
@@ -51,6 +78,15 @@ export function validateFile(file: File): ValidationError | null {
     return null;
 }
 
+/**
+ * Valide un ensemble de fichiers.
+ *
+ * Vérifie : nombre de fichiers, taille totale, doublons, et chaque fichier.
+ *
+ * @function validateFiles
+ * @param {File[]} files - Tableau de fichiers à valider
+ * @returns {ValidationResult} Résultat avec erreurs et warnings
+ */
 export function validateFiles(files: File[]): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: string[] = [];
@@ -104,6 +140,10 @@ export function validateFiles(files: File[]): ValidationResult {
     };
 }
 
+/**
+ * Schéma Zod pour la validation des données d'upload.
+ * @type {z.ZodObject}
+ */
 export const uploadSchema = z.object({
     files: z.array(z.instanceof(File)).min(1).max(MAX_FILES),
     profile: z.enum(['student', 'professional', 'researcher', 'personal', 'auto']).optional(),
@@ -112,6 +152,13 @@ export const uploadSchema = z.object({
 
 export type UploadInput = z.infer<typeof uploadSchema>;
 
+/**
+ * Valide les données d'entrée d'un upload avec Zod.
+ *
+ * @function validateUploadInput
+ * @param {unknown} input - Données à valider
+ * @returns {Object} Résultat avec success, data ou error
+ */
 export function validateUploadInput(input: unknown): { success: boolean; data?: UploadInput; error?: string } {
     try {
         const result = uploadSchema.parse(input);

@@ -1,3 +1,13 @@
+/**
+ * @fileoverview API route pour l'extraction de texte des documents.
+ *
+ * Ce endpoint extrait le contenu textuel des documents uploadés
+ * et détecte leur langue pour la classification ultérieure.
+ *
+ * @module api/extract
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { readFile } from '@/lib/storage';
@@ -5,6 +15,18 @@ import { extractText } from '@/lib/extractors';
 import { detectLanguage } from '@/lib/classification/language-detector';
 import { updateSessionStatus, incrementProcessedFiles } from '@/lib/session';
 
+/**
+ * Traite des éléments par lots pour éviter la surcharge mémoire.
+ *
+ * @async
+ * @function processInBatches
+ * @template T - Type des éléments à traiter
+ * @template R - Type des résultats
+ * @param {T[]} items - Éléments à traiter
+ * @param {number} batchSize - Taille des lots
+ * @param {Function} processor - Fonction de traitement
+ * @returns {Promise<R[]>} Résultats du traitement
+ */
 async function processInBatches<T, R>(
     items: T[],
     batchSize: number,
@@ -33,6 +55,17 @@ async function processInBatches<T, R>(
     return results.filter(r => r !== null);
 }
 
+/**
+ * Extraction du texte des documents d'une session.
+ *
+ * Lit chaque fichier, extrait son contenu textuel et détecte la langue.
+ * Le traitement est effectué par lots de 10 documents.
+ *
+ * @async
+ * @function POST
+ * @param {NextRequest} request - Requête avec sessionId
+ * @returns {Promise<NextResponse>} Résultats d'extraction par document
+ */
 export async function POST(request: NextRequest) {
     try {
         const { sessionId } = await request.json();

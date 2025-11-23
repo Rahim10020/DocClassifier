@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Configuration de l'authentification NextAuth.js.
+ *
+ * Ce module configure les options d'authentification pour l'application,
+ * incluant les providers OAuth (Google, GitHub) et l'authentification
+ * par credentials (email/mot de passe).
+ *
+ * @module lib/auth
+ * @author DocClassifier Team
+ */
+
 import { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import GoogleProvider from 'next-auth/providers/google';
@@ -6,6 +17,18 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
+/**
+ * Configuration des options NextAuth.
+ *
+ * Providers configurés :
+ * - Google OAuth 2.0
+ * - GitHub OAuth
+ * - Credentials (email/password)
+ *
+ * Stratégie de session : JWT
+ *
+ * @type {NextAuthOptions}
+ */
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma) as any,
     providers: [

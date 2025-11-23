@@ -1,9 +1,31 @@
+/**
+ * @fileoverview API route pour la classification des documents.
+ *
+ * Ce endpoint classifie les documents extraits en utilisant le moteur
+ * NLP (TF-IDF, mots-clés) pour assigner des catégories et sous-catégories.
+ *
+ * @module api/classify
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { classifyDocument } from '@/lib/classification/classifier';
 import { updateSessionStatus } from '@/lib/session';
 import { Profile } from '@/types/category';
 
+/**
+ * Traite des éléments par lots pour éviter la surcharge mémoire.
+ *
+ * @async
+ * @function processInBatches
+ * @template T - Type des éléments à traiter
+ * @template R - Type des résultats
+ * @param {T[]} items - Éléments à traiter
+ * @param {number} batchSize - Taille des lots
+ * @param {Function} processor - Fonction de traitement
+ * @returns {Promise<R[]>} Résultats du traitement
+ */
 async function processInBatches<T, R>(
     items: T[],
     batchSize: number,
@@ -32,6 +54,18 @@ async function processInBatches<T, R>(
     return results.filter(r => r !== null);
 }
 
+/**
+ * Classification des documents d'une session.
+ *
+ * Récupère les documents avec leur texte extrait et les classifie
+ * en utilisant le profil de la session. Le traitement est effectué
+ * par lots de 10 documents.
+ *
+ * @async
+ * @function POST
+ * @param {NextRequest} request - Requête avec sessionId
+ * @returns {Promise<NextResponse>} Résultats de classification par document
+ */
 export async function POST(request: NextRequest) {
     try {
         const { sessionId } = await request.json();

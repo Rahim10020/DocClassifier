@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Module principal de classification de documents.
+ *
+ * Ce module orchestre le processus complet de classification automatique des documents
+ * en utilisant des algorithmes NLP (extraction de mots-clés, scoring TF-IDF).
+ *
+ * @module classification/classifier
+ * @author DocClassifier Team
+ */
+
 import { extractKeywords } from './keyword-extractor';
 import { scoreAgainstTaxonomy, findBestMatch } from './scorer';
 import { getTaxonomyByProfile } from './taxonomy';
@@ -5,6 +15,15 @@ import { DocumentClassification, AlternativeCategory } from '@/types/document';
 import { Profile } from '@/types/category';
 import { SYSTEM_CATEGORIES } from './constants';
 
+/**
+ * Interface définissant les données d'entrée pour la classification d'un document.
+ *
+ * @interface ClassificationInput
+ * @property {string} documentId - Identifiant unique du document à classifier
+ * @property {string} text - Contenu textuel extrait du document
+ * @property {string} language - Code de langue détectée ('fr' ou 'en')
+ * @property {Profile} [profile] - Profil de classification optionnel (student, professional, etc.)
+ */
 export interface ClassificationInput {
     documentId: string;
     text: string;
@@ -12,6 +31,30 @@ export interface ClassificationInput {
     profile?: Profile;
 }
 
+/**
+ * Classifie un document unique en analysant son contenu textuel.
+ *
+ * Le processus de classification suit les étapes suivantes :
+ * 1. Vérification du texte (documents sans texte → catégorie "Images")
+ * 2. Extraction des mots-clés via NLP
+ * 3. Chargement de la taxonomie appropriée selon le profil
+ * 4. Scoring contre toutes les catégories
+ * 5. Sélection de la meilleure correspondance avec calcul de confiance
+ *
+ * @async
+ * @function classifyDocument
+ * @param {ClassificationInput} input - Données d'entrée du document à classifier
+ * @returns {Promise<DocumentClassification>} Résultat de classification avec catégorie, confiance et alternatives
+ *
+ * @example
+ * const result = await classifyDocument({
+ *   documentId: 'doc-123',
+ *   text: 'Contenu du document...',
+ *   language: 'fr',
+ *   profile: 'student'
+ * });
+ * console.log(result.mainCategory); // 'Documents académiques'
+ */
 export async function classifyDocument(
     input: ClassificationInput
 ): Promise<DocumentClassification> {
@@ -124,6 +167,24 @@ export async function classifyDocument(
     };
 }
 
+/**
+ * Classifie un lot de documents de manière séquentielle.
+ *
+ * Traite chaque document individuellement et agrège les résultats.
+ * En cas d'erreur sur un document, celui-ci est marqué comme "Non classifié"
+ * plutôt que de faire échouer le lot entier.
+ *
+ * @async
+ * @function classifyDocuments
+ * @param {ClassificationInput[]} inputs - Tableau des documents à classifier
+ * @returns {Promise<DocumentClassification[]>} Tableau des résultats de classification
+ *
+ * @example
+ * const results = await classifyDocuments([
+ *   { documentId: 'doc-1', text: '...', language: 'fr' },
+ *   { documentId: 'doc-2', text: '...', language: 'en' }
+ * ]);
+ */
 export async function classifyDocuments(
     inputs: ClassificationInput[]
 ): Promise<DocumentClassification[]> {
@@ -156,6 +217,22 @@ export async function classifyDocuments(
     return results;
 }
 
+/**
+ * Reclassifie un document avec un nouveau profil.
+ *
+ * Permet de relancer la classification d'un document existant
+ * en utilisant un profil différent pour obtenir des résultats plus adaptés.
+ *
+ * @function reclassifyDocument
+ * @param {string} documentId - Identifiant du document à reclassifier
+ * @param {string} text - Contenu textuel du document
+ * @param {string} language - Code de langue du document
+ * @param {Profile} [newProfile] - Nouveau profil à utiliser pour la classification
+ * @returns {Promise<DocumentClassification>} Nouveau résultat de classification
+ *
+ * @example
+ * const newResult = await reclassifyDocument('doc-123', text, 'fr', 'professional');
+ */
 export function reclassifyDocument(
     documentId: string,
     text: string,

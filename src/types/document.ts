@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Types pour les documents et leur classification.
+ *
+ * Ce module définit les interfaces et types pour la gestion des documents
+ * uploadés, leur extraction de texte et leur classification.
+ *
+ * @module types/document
+ * @author DocClassifier Team
+ */
+
+/**
+ * Document stocké dans la base de données.
+ * @interface Document
+ */
 export interface Document {
     id: string;
     sessionId: string;
@@ -17,6 +31,10 @@ export interface Document {
     createdAt: Date;
 }
 
+/**
+ * Document en cours d'upload avec état de progression.
+ * @interface DocumentUpload
+ */
 export interface DocumentUpload {
     file: File;
     id: string;
@@ -28,6 +46,10 @@ export interface DocumentUpload {
     error?: string;
 }
 
+/**
+ * Résultat de l'extraction de texte d'un document.
+ * @interface DocumentExtraction
+ */
 export interface DocumentExtraction {
     documentId: string;
     text: string;
@@ -37,6 +59,10 @@ export interface DocumentExtraction {
     metadata?: Record<string, unknown>;
 }
 
+/**
+ * Résultat de la classification d'un document.
+ * @interface DocumentClassification
+ */
 export interface DocumentClassification {
     documentId: string;
     mainCategory: string;
@@ -46,6 +72,10 @@ export interface DocumentClassification {
     alternativeCategories?: AlternativeCategory[];
 }
 
+/**
+ * Catégorie alternative suggérée par le classificateur.
+ * @interface AlternativeCategory
+ */
 export interface AlternativeCategory {
     categoryId: string;
     categoryName: string;
@@ -54,6 +84,10 @@ export interface AlternativeCategory {
     matchedKeywords: string[];
 }
 
+/**
+ * Aperçu d'un document pour l'affichage.
+ * @interface DocumentPreview
+ */
 export interface DocumentPreview {
     id: string;
     name: string;
@@ -64,8 +98,16 @@ export interface DocumentPreview {
     wordCount?: number;
 }
 
+/**
+ * Types de fichiers supportés.
+ * @typedef {string} FileType
+ */
 export type FileType = 'pdf' | 'docx' | 'doc' | 'txt' | 'md' | 'rtf' | 'xlsx' | 'xls' | 'csv' | 'odt' | 'ods';
 
+/**
+ * Mapping des extensions vers leurs types MIME acceptés.
+ * @constant {Record<FileType, string[]>}
+ */
 export const ACCEPTED_FILE_TYPES: Record<FileType, string[]> = {
     pdf: ['application/pdf'],
     docx: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
@@ -80,6 +122,9 @@ export const ACCEPTED_FILE_TYPES: Record<FileType, string[]> = {
     ods: ['application/vnd.oasis.opendocument.spreadsheet'],
 };
 
-export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-export const MAX_TOTAL_SIZE = 200 * 1024 * 1024; // 200MB
+/** Taille maximale d'un fichier : 50 MB */
+export const MAX_FILE_SIZE = 50 * 1024 * 1024;
+/** Taille maximale totale : 200 MB */
+export const MAX_TOTAL_SIZE = 200 * 1024 * 1024;
+/** Nombre maximum de fichiers par session */
 export const MAX_FILES = 50;

@@ -1,14 +1,53 @@
+/**
+ * @fileoverview Hook de gestion de la classification des documents.
+ *
+ * Ce hook fournit des fonctionnalités avancées pour manipuler les documents
+ * classifiés : filtrage, recherche, sélection, actions en masse et statistiques.
+ *
+ * @module hooks/useClassification
+ * @author DocClassifier Team
+ */
+
 import { useState, useCallback, useMemo } from 'react';
 import { Document } from '@/types/document';
 import { Category } from '@/types/category';
 import { groupBy } from '@/lib/utils';
 import { SYSTEM_CATEGORIES } from '@/lib/classification/constants';
 
+/**
+ * Options de configuration du hook useClassification.
+ *
+ * @interface UseClassificationOptions
+ * @property {Document[]} documents - Liste des documents à gérer
+ * @property {Category[]} [categories] - Catégories disponibles
+ */
 interface UseClassificationOptions {
     documents: Document[];
     categories?: Category[];
 }
 
+/**
+ * Hook pour gérer la classification et la manipulation des documents.
+ *
+ * Fonctionnalités :
+ * - Filtrage par catégorie, type de fichier, confiance
+ * - Recherche par nom de fichier
+ * - Sélection multiple pour actions en masse
+ * - Statistiques de classification
+ * - Groupement par catégorie
+ *
+ * @function useClassification
+ * @param {UseClassificationOptions} options - Options de configuration
+ * @returns {Object} État et méthodes de gestion de classification
+ *
+ * @example
+ * const {
+ *   documents,
+ *   stats,
+ *   toggleDocumentSelection,
+ *   moveSelectedToCategory
+ * } = useClassification({ documents: sessionDocs });
+ */
 export function useClassification(options: UseClassificationOptions) {
     const { documents } = options;
 

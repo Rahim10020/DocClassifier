@@ -1,13 +1,57 @@
+/**
+ * @fileoverview Hook de gestion des sessions de classification.
+ *
+ * Ce hook fournit une interface complète pour gérer une session de classification :
+ * récupération des données, mise à jour des documents, suppression de session,
+ * et rafraîchissement automatique pendant le traitement.
+ *
+ * @module hooks/useSession
+ * @author DocClassifier Team
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Session } from '@/types/session';
 import { Document } from '@/types/document';
 
+/**
+ * Options de configuration du hook useSession.
+ *
+ * @interface UseSessionOptions
+ * @property {string} sessionId - Identifiant de la session à gérer
+ * @property {boolean} [autoRefresh=false] - Activer le rafraîchissement automatique
+ * @property {number} [refreshInterval=2000] - Intervalle de rafraîchissement en ms
+ */
 interface UseSessionOptions {
     sessionId: string;
     autoRefresh?: boolean;
     refreshInterval?: number;
 }
 
+/**
+ * Hook pour gérer une session de classification.
+ *
+ * Fonctionnalités :
+ * - Chargement initial et rafraîchissement automatique
+ * - Mise à jour des documents (catégorie, sous-catégorie)
+ * - Détection des documents en erreur
+ * - Calcul de la progression
+ *
+ * @function useSession
+ * @param {UseSessionOptions} options - Options de configuration
+ * @returns {Object} État et méthodes de gestion de session
+ *
+ * @example
+ * const {
+ *   session,
+ *   documents,
+ *   isLoading,
+ *   progress,
+ *   updateDocument,
+ * } = useSession({
+ *   sessionId: 'abc123',
+ *   autoRefresh: true
+ * });
+ */
 export function useSession(options: UseSessionOptions) {
     const { sessionId, autoRefresh = false, refreshInterval = 2000 } = options;
 

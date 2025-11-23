@@ -1,3 +1,13 @@
+/**
+ * @fileoverview API route pour le téléchargement des documents classifiés.
+ *
+ * Ce endpoint génère une archive ZIP des documents avec la structure
+ * choisie (hiérarchique ou plate) et un README optionnel.
+ *
+ * @module api/download
+ * @author DocClassifier Team
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateZip, cleanupZip } from '@/lib/zip/generator';
@@ -6,7 +16,11 @@ import { readFile } from 'fs/promises';
 import { Document } from '@/types/document';
 import { SYSTEM_CATEGORIES } from '@/lib/classification/constants';
 
-// Types pour l'aperçu des documents
+/**
+ * Aperçu d'un document pour la prévisualisation.
+ *
+ * @interface DocumentPreview
+ */
 interface DocumentPreview {
     id: string;
     originalName: string;
@@ -15,12 +29,28 @@ interface DocumentPreview {
     fileSize: number;
 }
 
+/**
+ * Structure hiérarchique d'une catégorie pour l'aperçu.
+ *
+ * @interface HierarchicalCategory
+ */
 interface HierarchicalCategory {
     name: string;
     files: string[];
     subcategories: Record<string, { name: string; files: string[] }>;
 }
 
+/**
+ * Génération et téléchargement de l'archive ZIP.
+ *
+ * Crée une archive avec les documents organisés selon les options
+ * spécifiées et la retourne en téléchargement.
+ *
+ * @async
+ * @function POST
+ * @param {NextRequest} request - Requête avec sessionId et options
+ * @returns {Promise<NextResponse>} Fichier ZIP en téléchargement
+ */
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -118,7 +148,17 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// Endpoint pour obtenir un aperçu de la structure avant téléchargement
+/**
+ * Aperçu de la structure de l'archive avant téléchargement.
+ *
+ * Retourne une prévisualisation de l'organisation des fichiers
+ * selon la structure choisie.
+ *
+ * @async
+ * @function GET
+ * @param {NextRequest} request - Requête avec sessionId et structure
+ * @returns {Promise<NextResponse>} Aperçu de la structure
+ */
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
@@ -170,6 +210,13 @@ export async function GET(request: NextRequest) {
     }
 }
 
+/**
+ * Crée un aperçu hiérarchique de la structure des documents.
+ *
+ * @function createHierarchicalPreview
+ * @param {DocumentPreview[]} documents - Documents à organiser
+ * @returns {Record<string, HierarchicalCategory>} Structure hiérarchique
+ */
 function createHierarchicalPreview(documents: DocumentPreview[]): Record<string, HierarchicalCategory> {
     const structure: Record<string, HierarchicalCategory> = {};
 
@@ -200,6 +247,13 @@ function createHierarchicalPreview(documents: DocumentPreview[]): Record<string,
     return structure;
 }
 
+/**
+ * Crée un aperçu plat de la structure des documents.
+ *
+ * @function createFlatPreview
+ * @param {DocumentPreview[]} documents - Documents à organiser
+ * @returns {string[]} Liste des noms de fichiers avec préfixes
+ */
 function createFlatPreview(documents: DocumentPreview[]): string[] {
     return documents.map(doc => {
         const prefix = doc.mainCategory ? `[${doc.mainCategory}]_` : '';
