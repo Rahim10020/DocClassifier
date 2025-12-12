@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { classifyDocument } from '@/lib/classification/classifier';
 import { updateSessionStatus } from '@/lib/session';
 import { Profile } from '@/types/category';
@@ -123,12 +124,15 @@ export async function POST(request: NextRequest) {
 
                     await prisma.document.update({
                         where: { id: doc.id },
-                        data: {
+                        data: ({
                             mainCategory: classification.mainCategory,
                             subCategory: classification.subCategory,
                             confidence: classification.confidence,
                             keywords: classification.keywords,
-                        },
+                            // Nouveau: persister le flag de revue et suggestion LLM
+                            needsReview: classification.needsReview || false,
+                            suggestedCategory: classification.suggestedCategory || null,
+                        } as Prisma.DocumentUpdateInput),
                     });
 
                     console.log(`[API Classify] ✓ Document updated in DB: ${doc.originalName}`);

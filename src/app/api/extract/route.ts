@@ -116,6 +116,7 @@ export async function POST(request: NextRequest) {
                             language: detectedLanguage,
                             pageCount: extraction.pageCount,
                             wordCount,
+                            // Keep existing review fields untouched (no-op) to avoid overwriting
                         },
                     });
 

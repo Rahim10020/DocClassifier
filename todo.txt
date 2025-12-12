@@ -1,5 +1,4 @@
-- la prochaine fois, dire a claude de ne pas mettre des emojis dans le code et de use &apos; a la place des apostrophes
-    il y a des soucis avec ca quand je fais le build.
+- executer les migrations prisma la prochaine fois. Regarder dans le chat de copilot
 
 -- ERREURS:
 E-marketing e-commerce doper ses ventes.pdf
