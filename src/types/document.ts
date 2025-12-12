@@ -70,6 +70,10 @@ export interface DocumentClassification {
     confidence: number;
     keywords: string[];
     alternativeCategories?: AlternativeCategory[];
+    /** Indique si le document nécessite une revue humaine */
+    needsReview?: boolean;
+    /** Suggestion de catégorie provenant d'un fallback (LLM) ou heuristique */
+    suggestedCategory?: string;
 }
 
 /**

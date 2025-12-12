@@ -9,11 +9,14 @@
  */
 
 import { extractKeywords } from './keyword-extractor';
-import { scoreAgainstTaxonomy, findBestMatch } from './scorer';
+import { scoreAgainstTaxonomy, findBestMatch, ScoreResult } from './scorer';
 import { getTaxonomyByProfile } from './taxonomy';
 import { DocumentClassification, AlternativeCategory } from '@/types/document';
-import { Profile } from '@/types/category';
+import { Profile, Category } from '@/types/category';
 import { SYSTEM_CATEGORIES } from './constants';
+import { suggestCategoryWithLLM } from './llm-fallback';
+
+const DEFAULT_CONFIDENCE_THRESHOLD = parseFloat(process.env.CLASSIFY_CONFIDENCE_THRESHOLD || '0.7');
 
 /**
  * Interface définissant les données d'entrée pour la classification d'un document.
@@ -130,7 +133,7 @@ export async function classifyDocument(
 
     // 3. Scoring contre la taxonomie
     const scoringStart = Date.now();
-    let scores;
+    let scores: ScoreResult[] = [];
 
     try {
         scores = scoreAgainstTaxonomy(keywords, taxonomy, profile, language, text);
@@ -154,6 +157,37 @@ export async function classifyDocument(
         matchedKeywords: alt.matchedKeywords,
     }));
 
+    // If confidence is low, try LLM fallback (if enabled) and mark for review
+    let needsReview = false;
+    let suggestedCategory: string | undefined = undefined;
+
+    try {
+        if (!bestMatch.confidence || bestMatch.confidence < DEFAULT_CONFIDENCE_THRESHOLD) {
+            needsReview = true;
+            const llmSuggestion = await suggestCategoryWithLLM(text, (taxonomy as Category[]).slice(0, 10).map((t: Category) => t.name));
+            if (llmSuggestion) {
+                suggestedCategory = llmSuggestion.suggestedCategory;
+                // If the LLM suggestion has a reasonable confidence, use it as mainCategory
+                if (llmSuggestion.confidence && llmSuggestion.confidence > 0.6) {
+                    // Accept LLM suggestion as mainCategory
+                    console.log(`[Classification] LLM suggestion accepted for ${documentId}: ${suggestedCategory} (conf ${llmSuggestion.confidence})`);
+                    return {
+                        documentId,
+                        mainCategory: suggestedCategory,
+                        subCategory: undefined,
+                        confidence: llmSuggestion.confidence,
+                        keywords: keywords.slice(0, 10),
+                        alternativeCategories,
+                        needsReview: false,
+                        suggestedCategory,
+                    };
+                }
+            }
+        }
+    } catch (llmError) {
+        console.error(`[Classification] LLM fallback error for ${documentId}:`, llmError);
+    }
+
     const totalTime = Date.now() - startTime;
     console.log(`[Classification] ✓ Terminé - ${documentId} (TOTAL: ${totalTime}ms)`);
 
@@ -164,6 +198,8 @@ export async function classifyDocument(
         confidence: bestMatch.confidence,
         keywords: keywords.slice(0, 10), // Top 10 keywords
         alternativeCategories,
+        needsReview,
+        suggestedCategory,
     };
 }
 

@@ -40,6 +40,38 @@ export interface KeywordExtractionOptions {
 const MAX_TEXT_LENGTH_FOR_EXTRACTION = 50000;
 
 /**
+ * Normalise le texte brut avant extraction :
+ * - Normalisation Unicode (NFKC)
+ * - Suppression des caractères de contrôle
+ * - Remplacement des caractères non alphanumériques (sauf accents et apostrophe) par des espaces
+ * - Collapse des espaces multiples
+ */
+function normalizeTextForExtraction(text: string): string {
+    if (!text) return text;
+    try {
+        // Unicode normalization
+        let t = text.normalize('NFKC');
+        // Remove control characters
+        t = t.replace(/[\p{C}]/gu, ' ');
+        // Replace unwanted punctuation (keep letters, numbers, accents, apostrophes and hyphens)
+        t = t.replace(/[^\p{L}\p{N}\s'’-]/gu, ' ');
+        // Collapse whitespace
+        t = t.replace(/\s+/g, ' ').trim();
+        return t;
+    } catch (err) {
+        // If any regex with unicode properties fails on older runtimes, fallback to a simpler cleaning
+        try {
+            let t = text.replace(/[\x00-\x1F\x7F]/g, ' ');
+            t = t.replace(/[^\w\s'’-]/g, ' ');
+            t = t.replace(/\s+/g, ' ').trim();
+            return t;
+        } catch (e) {
+            return text;
+        }
+    }
+}
+
+/**
  * Extrait les mots-clés significatifs d'un texte.
  *
  * Le processus d'extraction :
@@ -75,10 +107,13 @@ export function extractKeywords(
     }
 
     try {
+        // Apply normalization before extraction
+        const cleanedText = normalizeTextForExtraction(text);
+
         // Limiter la taille du texte pour éviter les traitements trop longs
-        const processedText = text.length > MAX_TEXT_LENGTH_FOR_EXTRACTION
-            ? text.substring(0, MAX_TEXT_LENGTH_FOR_EXTRACTION)
-            : text;
+        const processedText = cleanedText.length > MAX_TEXT_LENGTH_FOR_EXTRACTION
+            ? cleanedText.substring(0, MAX_TEXT_LENGTH_FOR_EXTRACTION)
+            : cleanedText;
 
         // Extraction via keyword-extractor
         let extractedKeywords: string[] = [];
@@ -93,13 +128,13 @@ export function extractKeywords(
 
             // Vérifier que le résultat est bien un tableau
             extractedKeywords = Array.isArray(result) ? result : [];
-        } catch (extractError) {
-            console.error('keyword-extractor.extract failed:', extractError);
+        } catch (_extractError) {
+            console.error('keyword-extractor.extract failed:', _extractError);
             // Fallback: extraire manuellement les mots simples
             extractedKeywords = processedText
                 .toLowerCase()
                 .split(/\s+/)
-                .filter(word => word.length >= minLength && /^[a-zàâäéèêëïîôùûüÿæœç]+$/i.test(word))
+                .filter(word => word.length >= minLength && /^[a-zàâäéèêëïîôùûüÿæœç'’-]+$/i.test(word))
                 .slice(0, 100);
         }
 
@@ -116,8 +151,8 @@ export function extractKeywords(
             .map(keyword => {
                 try {
                     return stemmer.stem(keyword.toLowerCase());
-                } catch (stemError) {
-                    console.error('Stemming error for keyword:', keyword, stemError);
+                } catch (_stemError) {
+                    console.error('Stemming error for keyword:', keyword, _stemError);
                     return keyword.toLowerCase();
                 }
             })
